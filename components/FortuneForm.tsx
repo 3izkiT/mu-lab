@@ -287,7 +287,7 @@ export default function FortuneForm() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[1.35rem] border border-[rgba(247,231,206,0.75)] bg-white/88 shadow-[0_0_0_1px_rgba(247,231,206,0.25)_inset,0_26px_60px_rgba(26,35,126,0.12)] backdrop-blur-xl sm:rounded-3xl">
+    <div className="relative overflow-hidden rounded-[1.35rem] border border-[rgba(247,231,206,0.5)] bg-[#08142f]/85 shadow-[0_0_0_1px_rgba(247,231,206,0.14)_inset,0_26px_60px_rgba(0,0,0,0.42)] backdrop-blur-xl sm:rounded-3xl">
       {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -323,20 +323,20 @@ export default function FortuneForm() {
       <div className={`p-6 sm:p-8 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}>
         <div className="mb-8">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#1a237e]/70">Session</p>
-            <h2 className="mt-2 font-serif text-2xl font-medium tracking-tight text-[#1a237e] sm:text-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--gold)]/78">Session</p>
+            <h2 className="mt-2 font-serif text-2xl font-medium tracking-tight text-[#edf3ff] sm:text-3xl">
               ข้อมูลดวง
             </h2>
-            <p className="mt-2 text-sm font-light text-[#1a237e]/72">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
+            <p className="mt-2 text-sm font-light text-[#d8e2ff]/78">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
           </div>
         </div>
 
         <div className="space-y-6">
-          <section className="rounded-2xl border border-[rgba(247,231,206,0.55)] bg-white p-4 sm:p-5">
-            <p className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-[#1a237e]/68">ข้อมูลพื้นฐาน</p>
+          <section className="rounded-2xl border border-[rgba(247,231,206,0.45)] bg-[#0a1636] p-4 sm:p-5">
+            <p className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-[var(--gold)]/75">ข้อมูลพื้นฐาน</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block sm:col-span-2">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#1a237e]/68">
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d8e2ff]/74">
                   ชื่อ-นามสกุล
                 </span>
                 <input
@@ -346,12 +346,12 @@ export default function FortuneForm() {
                     setFormData((prev) => ({ ...prev, fullName: event.target.value }))
                   }
                   placeholder="เช่น อรทัย ใจดี"
-                  className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#1a237e]/45"
+                  className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#d8e2ff]/45"
                 />
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#1a237e]/68">
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d8e2ff]/74">
                   เพศ
                 </span>
                 <select
@@ -377,7 +377,7 @@ export default function FortuneForm() {
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#1a237e]/68">
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d8e2ff]/74">
                   วันเกิด
                 </span>
                 <input
@@ -392,11 +392,11 @@ export default function FortuneForm() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-[rgba(247,231,206,0.55)] bg-white p-4 sm:p-5">
-            <p className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-[#1a237e]/68">ข้อมูลเวลาและสถานที่เกิด</p>
+          <section className="rounded-2xl border border-[rgba(247,231,206,0.45)] bg-[#0a1636] p-4 sm:p-5">
+            <p className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-[var(--gold)]/75">ข้อมูลเวลาและสถานที่เกิด</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#1a237e]/68">
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d8e2ff]/74">
                   เวลาเกิด (ชั่วโมง · นาที)
                 </span>
                 <div className="grid grid-cols-2 gap-3">
@@ -409,7 +409,7 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthHour: event.target.value }))
                     }
                     placeholder="0–23"
-                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#1a237e]/45"
+                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#d8e2ff]/45"
                   />
                   <input
                     type="number"
@@ -420,13 +420,13 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthMinute: event.target.value }))
                     }
                     placeholder="0–59"
-                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#1a237e]/45"
+                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#d8e2ff]/45"
                   />
                 </div>
               </div>
 
               <div className="sm:col-span-2">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#1a237e]/68">
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d8e2ff]/74">
                   จังหวัดที่เกิด
                 </span>
                 <ProvinceCommand
@@ -456,7 +456,7 @@ export default function FortuneForm() {
             type="button"
             onClick={handleSubmit}
             disabled={!isFormValid || isLoading}
-            className="mu-lab-btn-shimmer relative inline-flex min-h-[46px] min-w-[min(100%,250px)] items-center justify-center overflow-hidden rounded-full border border-[rgba(247,231,206,0.35)] bg-gradient-to-b from-[rgba(247,231,206,0.18)] to-[rgba(247,231,206,0.04)] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1a1428] shadow-[0_0_48px_rgba(247,231,206,0.15)] transition hover:border-[rgba(247,231,206,0.5)] disabled:cursor-not-allowed disabled:opacity-35 sm:min-w-0"
+            className="mu-lab-btn-shimmer relative inline-flex min-h-[46px] min-w-[min(100%,250px)] items-center justify-center overflow-hidden rounded-full border border-[rgba(247,231,206,0.45)] bg-gradient-to-b from-[rgba(247,231,206,0.2)] to-[rgba(247,231,206,0.08)] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1b1a25] shadow-[0_0_48px_rgba(247,231,206,0.15)] transition hover:border-[rgba(247,231,206,0.62)] disabled:cursor-not-allowed disabled:opacity-35 sm:min-w-0"
           >
             <span className="relative z-10">Reveal My Fate</span>
           </button>
