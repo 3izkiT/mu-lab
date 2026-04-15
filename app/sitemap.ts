@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
+import { getSiteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mu-lab.vercel.app";
+const SITE_URL = getSiteUrl();
 
 function segmentToPath(segment: string): string {
   if (segment === "page.tsx") return "";

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getSiteUrl } from "@/lib/site-url";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://mu-lab.vercel.app");
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Mu-Lab",

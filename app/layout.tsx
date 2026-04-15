@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { Pridi, Prompt } from "next/font/google";
+import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const prompt = Prompt({
@@ -17,9 +18,7 @@ const pridi = Pridi({
   display: "swap",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+const siteUrl = getSiteUrl();
 
 const siteTitle =
   "Mu-Lab: ไขรหัสชีวิตรายบุคคลด้วย AI ห้องทดลองโหราศาสตร์ยุคใหม่";
