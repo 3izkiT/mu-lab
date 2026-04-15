@@ -1,4 +1,11 @@
 import DailyCosmicDashboard from "@/components/DailyCosmicDashboard";
+import {
+  Floating,
+  GlintWrap,
+  HoverConstellation,
+  ParallaxNebula,
+  Reveal,
+} from "@/components/CinematicCelestial";
 import FortuneForm from "@/components/FortuneForm";
 import { getDailyForecast } from "@/lib/daily-forecast-data";
 import Link from "next/link";
@@ -17,30 +24,38 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
           <p className="font-serif text-xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
           <nav className="hidden items-center gap-2 sm:flex">
-            <Link
-              href="#fortune-form"
-              className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-            >
-              ดูดวงทันที
-            </Link>
-            <Link
-              href="#services"
-              className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-            >
-              บริการและแพ็กเกจ
-            </Link>
-            <Link
-              href="#about"
-              className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-            >
-              เกี่ยวกับ Mu-Lab
-            </Link>
-            <Link
-              href="#fortune-form"
-              className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_28px_rgba(247,231,206,0.26)] transition hover:brightness-105"
-            >
-              เริ่มวิเคราะห์
-            </Link>
+            <HoverConstellation>
+              <Link
+                href="#fortune-form"
+                className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
+              >
+                ดูดวงทันที
+              </Link>
+            </HoverConstellation>
+            <HoverConstellation>
+              <Link
+                href="#services"
+                className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
+              >
+                บริการและแพ็กเกจ
+              </Link>
+            </HoverConstellation>
+            <HoverConstellation>
+              <Link
+                href="#about"
+                className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
+              >
+                เกี่ยวกับ Mu-Lab
+              </Link>
+            </HoverConstellation>
+            <HoverConstellation>
+              <Link
+                href="#fortune-form"
+                className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_28px_rgba(247,231,206,0.26)] transition hover:brightness-105"
+              >
+                <GlintWrap>เริ่มวิเคราะห์</GlintWrap>
+              </Link>
+            </HoverConstellation>
           </nav>
         </div>
       </header>
@@ -58,8 +73,8 @@ export default async function Home() {
         className="pointer-events-none fixed inset-0 bg-[radial-gradient(70%_50%_at_96%_0%,rgba(247,231,206,0.15)_0%,transparent_58%)]"
         aria-hidden
       />
+      <ParallaxNebula />
       <div className="pointer-events-none fixed inset-0 mu-lab-starfield" aria-hidden />
-      <div className="pointer-events-none fixed inset-0 mu-lab-blueprint" aria-hidden />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 pb-28 pt-16 sm:px-8 sm:pt-20 lg:px-10 lg:pt-24">
         {/* HERO */}
@@ -73,50 +88,60 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
-          <header
-            className={`relative col-span-12 rounded-[1.6rem] ${glassPanel} p-10 sm:rounded-[2rem] sm:p-12 lg:col-span-6`}
-          >
+          <Reveal delay={0}>
+            <header
+              className={`relative col-span-12 rounded-[1.6rem] ${glassPanel} p-10 sm:rounded-[2rem] sm:p-12 lg:col-span-6`}
+            >
             <p className="text-xs font-medium uppercase tracking-[0.27em] text-[var(--gold)]/85">
               Possibilities At The Dawn Of Fate
             </p>
             <h1 className="mt-6 font-serif text-[clamp(2.5rem,5.4vw,4.2rem)] font-light leading-[1.02] tracking-[0.05em] text-[#eef1ff]">
-              Ancient Wisdom,
-              <br />
-              <span className="text-[var(--gold)]">Future Precision</span>
+              <GlintWrap>
+                Ancient Wisdom,
+                <br />
+                <span className="text-[var(--gold)]">Future Precision</span>
+              </GlintWrap>
             </h1>
             <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed tracking-[0.01em] text-[#dbe1ff]/84">
               ห้องทดลองพยากรณ์ที่ถอดสัญญาณจักรวาลให้กลายเป็นแผนตัดสินใจที่ใช้ได้จริงในทุกวัน
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
-              <Link
-                href="#fortune-form"
-                className="rounded-full bg-[linear-gradient(128deg,#f7e7ce_0%,#ecd4aa_45%,#d8b67a_100%)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_30px_rgba(247,231,206,0.22)] transition hover:brightness-105"
-              >
-                Reveal My Fate
-              </Link>
-              <Link
-                href="/the-science-behind-mu-lab"
-                className="rounded-full bg-white/[0.05] px-6 py-3 text-sm font-medium tracking-[0.05em] text-[#e2e8ff] transition hover:bg-white/[0.08]"
-              >
-                Explore Our Science
-              </Link>
+              <HoverConstellation>
+                <Link
+                  href="#fortune-form"
+                  className="rounded-full bg-[linear-gradient(128deg,#f7e7ce_0%,#ecd4aa_45%,#d8b67a_100%)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_30px_rgba(247,231,206,0.22)] transition hover:brightness-105"
+                >
+                  <GlintWrap>Reveal My Fate</GlintWrap>
+                </Link>
+              </HoverConstellation>
+              <HoverConstellation>
+                <Link
+                  href="/the-science-behind-mu-lab"
+                  className="rounded-full bg-white/[0.05] px-6 py-3 text-sm font-medium tracking-[0.05em] text-[#e2e8ff] transition hover:bg-white/[0.08]"
+                >
+                  Explore Our Science
+                </Link>
+              </HoverConstellation>
             </div>
-          </header>
+            </header>
+          </Reveal>
 
-          <div
-            id="fortune-form"
-            className={`relative col-span-12 rounded-[1.6rem] ${glassPanel} p-4 sm:rounded-[2rem] sm:p-5 lg:col-span-6`}
-          >
-            <FortuneForm />
-          </div>
+          <Reveal delay={0.2}>
+            <Floating
+              id="fortune-form"
+              className={`relative col-span-12 rounded-[1.6rem] ${glassPanel} p-4 sm:rounded-[2rem] sm:p-5 lg:col-span-6`}
+            >
+              <FortuneForm />
+            </Floating>
+          </Reveal>
         </section>
 
         {/* SECONDARY */}
-        <section className="mt-4">
+        <Reveal delay={0.35} className="mt-4">
           <DailyCosmicDashboard data={daily} />
-        </section>
+        </Reveal>
 
-        <section className={`mt-8 rounded-[1.6rem] p-10 sm:rounded-[2rem] sm:p-12 ${glassPanel}`}>
+        <Reveal delay={0.45} className={`mt-8 rounded-[1.6rem] p-10 sm:rounded-[2rem] sm:p-12 ${glassPanel}`}>
           <h2 className="font-serif text-3xl tracking-[0.05em] text-[#eef1ff] sm:text-4xl">Why Mu-Lab</h2>
           <p className="mt-6 max-w-3xl text-base font-light leading-relaxed text-[#dbe1ff]/82">
             เราแปลงโหราศาสตร์ให้เป็นระบบคิดที่ใช้ตัดสินใจได้จริง ไม่ใช่แค่อ่านแล้วผ่านไป
@@ -135,13 +160,14 @@ export default async function Home() {
               <p className="mt-3 text-base text-[#dbe1ff]/86">สรุปผลเป็นคำแนะนำที่ลงมือทำได้ทันที</p>
             </div>
           </div>
-        </section>
+        </Reveal>
 
         {/* MONEY SECTION: บริการที่แปลงเป็นรายได้ */}
         <section id="services" className="mt-8 grid grid-cols-12 gap-6 lg:gap-8">
-          <div
+          <Reveal delay={0.55} className="col-span-12">
+            <div
             className={`col-span-12 rounded-[1.6rem] p-10 sm:rounded-[2rem] sm:p-12 ${glassPanel}`}
-          >
+            >
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--gold)]/75">
               Services & Offers
             </p>
@@ -195,11 +221,13 @@ export default async function Home() {
                 </Link>
               </article>
             </div>
-          </div>
+            </div>
+          </Reveal>
         </section>
       </div>
 
-      <footer id="about" className="relative z-10 mt-12 bg-[rgba(3,7,17,0.5)]">
+      <Reveal delay={0.7}>
+        <footer id="about" className="relative z-10 mt-12 bg-[rgba(3,7,17,0.5)]">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-6 py-14 sm:flex-row sm:items-center sm:px-8 lg:px-10">
           <div>
             <p className="font-serif text-lg text-[var(--gold)]">Mu-Lab</p>
@@ -226,7 +254,8 @@ export default async function Home() {
             </Link>
           </div>
         </div>
-      </footer>
+        </footer>
+      </Reveal>
     </main>
   );
 }
