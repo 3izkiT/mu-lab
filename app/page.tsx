@@ -119,6 +119,92 @@ export default async function Home() {
             </Link>
           </div>
         </section>
+
+        {/* SYSTEM STORY: ถอดแนวคิดจาก benchmark แล้วปรับเป็น Mu-Lab */}
+        <section className="mt-4 grid grid-cols-12 gap-3 sm:gap-4 lg:gap-5">
+          <article
+            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.75] p-6 shadow-[0_18px_44px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-8`}
+          >
+            <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">
+              Mu-Lab Method
+            </p>
+            <h2 className="mt-3 font-serif text-2xl font-light tracking-tight text-[#162238] sm:text-3xl">
+              ดวงของคุณถูกคำนวณอย่างไร
+            </h2>
+            <p className="mt-4 max-w-3xl text-sm font-light leading-relaxed text-slate-600">
+              Mu-Lab ประมวลผลวันเวลาและจังหวัดเกิดร่วมกับบริบทพลังงานรายวัน แล้วแปลงเป็นคำแนะนำที่อ่านง่ายและตัดสินใจได้จริง
+              เพื่อให้การดูดวงเป็นระบบคิด ไม่ใช่คำทำนายลอย ๆ
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Step 01</p>
+                <p className="mt-2 text-sm font-light text-slate-700">อ่านพื้นข้อมูลกำเนิดเฉพาะบุคคล</p>
+              </div>
+              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Step 02</p>
+                <p className="mt-2 text-sm font-light text-slate-700">คำนวณพลังงานช่วงเวลาเพื่อจัดลำดับความสำคัญ</p>
+              </div>
+              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Step 03</p>
+                <p className="mt-2 text-sm font-light text-slate-700">สรุปเป็น Action Guidance แบบใช้งานได้ทันที</p>
+              </div>
+            </div>
+          </article>
+
+          <article
+            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.75] p-6 shadow-[0_18px_44px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-8 lg:col-span-7`}
+          >
+            <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">
+              Why Mu-Lab
+            </p>
+            <h3 className="mt-3 font-serif text-xl font-light tracking-tight text-[#162238] sm:text-2xl">
+              ไม่ใช่เว็บดูดวงทั่วไป แต่เป็น Spiritual Tech Framework
+            </h3>
+            <div className="mt-5 overflow-hidden rounded-2xl border border-[rgba(247,231,206,0.22)] bg-white/80">
+              <div className="grid grid-cols-3 border-b border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.16)] px-4 py-2.5 text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+                <span>Capability</span>
+                <span className="text-[#162238]">Mu-Lab</span>
+                <span>ทั่วไป</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 px-4 py-3 text-sm font-light text-slate-700">
+                <span>วิเคราะห์เฉพาะบุคคล</span>
+                <span className="text-emerald-700">ครบ</span>
+                <span className="text-zinc-500">บางส่วน</span>
+                <span>พลังงานรายวันพร้อมคำแนะนำ</span>
+                <span className="text-emerald-700">ครบ</span>
+                <span className="text-zinc-500">ไม่สม่ำเสมอ</span>
+                <span>ภาษาที่แปลเป็นแผนการกระทำ</span>
+                <span className="text-emerald-700">ชัดเจน</span>
+                <span className="text-zinc-500">เชิงทำนาย</span>
+              </div>
+            </div>
+          </article>
+
+          <article
+            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.75] p-6 shadow-[0_18px_44px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-8 lg:col-span-5`}
+          >
+            <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">
+              Expert Lenses
+            </p>
+            <h3 className="mt-3 font-serif text-xl font-light tracking-tight text-[#162238]">
+              เลือกมุมวิเคราะห์ที่เหมาะกับคุณ
+            </h3>
+            <div className="mt-5 space-y-3">
+              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
+                <p className="text-xs uppercase tracking-[0.14em] text-zinc-500">Mu-Lab Signature</p>
+                <p className="mt-1 text-sm font-light leading-relaxed text-slate-700">
+                  โหมดภาพรวมครบทุกมิติ: งาน เงิน ความรัก สุขภาพ
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
+                <p className="text-xs uppercase tracking-[0.14em] text-zinc-500">Precision Focus</p>
+                <p className="mt-1 text-sm font-light leading-relaxed text-slate-700">
+                  โหมดโฟกัสเรื่องเดียวแบบลึก (coming next phase)
+                </p>
+              </div>
+            </div>
+          </article>
+        </section>
       </div>
 
       <footer className="relative z-10 mx-auto mt-2 max-w-6xl px-4 pb-14 sm:px-6 lg:px-8">
