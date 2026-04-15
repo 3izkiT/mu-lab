@@ -107,7 +107,7 @@ export default function RootLayout({
 
   return (
     <html lang="th" className={`${prompt.variable} ${pridi.variable} h-full`}>
-      <body className="min-h-full bg-[#07060d] font-sans text-zinc-100 antialiased">
+      <body className="min-h-full bg-[#f9f9f9] font-sans text-[#1a237e] antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

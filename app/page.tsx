@@ -58,12 +58,13 @@ export default async function Home() {
         className="pointer-events-none fixed inset-0 bg-[radial-gradient(70%_55%_at_100%_0%,rgba(200,170,120,0.14)_0%,transparent_56%)]"
         aria-hidden
       />
+      <div className="pointer-events-none fixed inset-0 mu-lab-starfield" aria-hidden />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
         {/* HERO */}
         <section className="grid grid-cols-12 gap-3 sm:gap-4 lg:gap-5">
           <header
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.72] p-6 shadow-[0_0_0_1px_rgba(247,231,206,0.18)_inset,0_28px_70px_rgba(63,91,148,0.14)] backdrop-blur-xl sm:rounded-3xl sm:p-8`}
+            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.72] p-6 shadow-[0_0_0_1px_rgba(247,231,206,0.18)_inset,0_28px_70px_rgba(63,91,148,0.14)] backdrop-blur-xl sm:rounded-3xl sm:p-8 lg:col-span-6`}
           >
             <p className="text-[10px] font-light uppercase tracking-[0.38em] text-zinc-500/80 sm:text-[11px]">
               Mu-Lab Analysis
@@ -77,7 +78,7 @@ export default async function Home() {
             <div className="mt-6 flex flex-wrap gap-2">
               <Link
                 href="#fortune-form"
-                className="rounded-full border border-[rgba(247,231,206,0.3)] bg-[rgba(247,231,206,0.14)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.2)]"
+                className="rounded-full border border-[rgba(247,231,206,0.6)] bg-[rgba(247,231,206,0.42)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#1a237e] transition hover:bg-[rgba(247,231,206,0.62)]"
               >
                 Reveal My Fate
               </Link>
@@ -107,7 +108,7 @@ export default async function Home() {
 
           <div
             id="fortune-form"
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.74] p-2 shadow-[0_26px_70px_rgba(63,91,148,0.14)] sm:rounded-3xl sm:p-3`}
+            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.74] p-2 shadow-[0_26px_70px_rgba(63,91,148,0.14)] sm:rounded-3xl sm:p-3 lg:col-span-6`}
           >
             <FortuneForm />
           </div>
@@ -118,124 +119,25 @@ export default async function Home() {
           <DailyCosmicDashboard data={daily} />
         </section>
 
-        {/* SUPPORTING */}
-        <section className="mt-4 grid grid-cols-12 gap-3 sm:gap-4 lg:gap-5">
-          <div
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.66] p-5 shadow-[0_16px_42px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-6 lg:col-span-4`}
-          >
-            <p className="text-[10px] font-light uppercase tracking-[0.3em] text-zinc-500">Experience</p>
-            <p className="mt-3 text-sm font-light leading-relaxed text-slate-600">
-              ดีไซน์เงียบ ละเอียด — เน้นข้อมูลที่อ่านง่ายและลงมือทำได้จริง
-            </p>
-          </div>
-          <div
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.66] p-5 shadow-[0_16px_42px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-6 lg:col-span-4`}
-          >
-            <p className="text-[10px] font-light uppercase tracking-[0.3em] text-zinc-500">Privacy</p>
-            <p className="mt-3 text-sm font-light leading-relaxed text-slate-600">
-              ข้อมูลของคุณใช้เพื่อการวิเคราะห์เท่านั้น ไม่แสดงต่อสาธารณะ
-            </p>
-          </div>
-          <div
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.66] p-5 shadow-[0_16px_42px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-6 lg:col-span-4`}
-          >
-            <p className="text-[10px] font-light uppercase tracking-[0.35em] text-zinc-600">Next Read</p>
-            <p className="mt-3 text-sm font-light leading-relaxed text-slate-600">
-              เข้าใจหลักคิดของระบบก่อนอ่านคำพยากรณ์เชิงลึก
-            </p>
-            <Link
-              href="/the-science-behind-mu-lab"
-              className="mt-4 inline-flex rounded-full border border-[rgba(247,231,206,0.3)] bg-white/70 px-3 py-1.5 text-[11px] font-light tracking-wide text-slate-700 transition hover:bg-white"
-            >
-              Explore Science
-            </Link>
-          </div>
-        </section>
-
-        {/* SYSTEM STORY: ถอดแนวคิดจาก benchmark แล้วปรับเป็น Mu-Lab */}
-        <section className="mt-4 grid grid-cols-12 gap-3 sm:gap-4 lg:gap-5">
-          <article
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.75] p-6 shadow-[0_18px_44px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-8`}
-          >
-            <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">
-              Mu-Lab Method
-            </p>
-            <h2 className="mt-3 font-serif text-2xl font-light tracking-tight text-[#162238] sm:text-3xl">
-              ดวงของคุณถูกคำนวณอย่างไร
-            </h2>
-            <p className="mt-4 max-w-3xl text-sm font-light leading-relaxed text-slate-600">
-              Mu-Lab ประมวลผลวันเวลาและจังหวัดเกิดร่วมกับบริบทพลังงานรายวัน แล้วแปลงเป็นคำแนะนำที่อ่านง่ายและตัดสินใจได้จริง
-              เพื่อให้การดูดวงเป็นระบบคิด ไม่ใช่คำทำนายลอย ๆ
-            </p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Step 01</p>
-                <p className="mt-2 text-sm font-light text-slate-700">อ่านพื้นข้อมูลกำเนิดเฉพาะบุคคล</p>
-              </div>
-              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Step 02</p>
-                <p className="mt-2 text-sm font-light text-slate-700">คำนวณพลังงานช่วงเวลาเพื่อจัดลำดับความสำคัญ</p>
-              </div>
-              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Step 03</p>
-                <p className="mt-2 text-sm font-light text-slate-700">สรุปเป็น Action Guidance แบบใช้งานได้ทันที</p>
-              </div>
+        <section className="mt-4 rounded-[1.35rem] border border-[rgba(247,231,206,0.55)] bg-white/82 p-6 shadow-[0_18px_44px_rgba(26,35,126,0.08)] sm:rounded-3xl sm:p-8">
+          <h2 className="font-serif text-2xl text-[#1a237e] sm:text-3xl">Why Mu-Lab</h2>
+          <p className="mt-3 max-w-3xl text-sm font-light leading-relaxed text-[#1a237e]/80">
+            เราแปลงโหราศาสตร์ให้เป็นระบบคิดที่ใช้ตัดสินใจได้จริง ไม่ใช่แค่อ่านแล้วผ่านไป
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-[rgba(247,231,206,0.55)] bg-white p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#1a237e]/62">Precision</p>
+              <p className="mt-2 text-sm text-[#1a237e]/88">อ่านพื้นข้อมูลเกิดแบบเฉพาะบุคคล</p>
             </div>
-          </article>
-
-          <article
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.75] p-6 shadow-[0_18px_44px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-8 lg:col-span-7`}
-          >
-            <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">
-              Why Mu-Lab
-            </p>
-            <h3 className="mt-3 font-serif text-xl font-light tracking-tight text-[#162238] sm:text-2xl">
-              ไม่ใช่เว็บดูดวงทั่วไป แต่เป็น Spiritual Tech Framework
-            </h3>
-            <div className="mt-5 overflow-hidden rounded-2xl border border-[rgba(247,231,206,0.22)] bg-white/80">
-              <div className="grid grid-cols-3 border-b border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.16)] px-4 py-2.5 text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-                <span>Capability</span>
-                <span className="text-[#162238]">Mu-Lab</span>
-                <span>ทั่วไป</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 px-4 py-3 text-sm font-light text-slate-700">
-                <span>วิเคราะห์เฉพาะบุคคล</span>
-                <span className="text-emerald-700">ครบ</span>
-                <span className="text-zinc-500">บางส่วน</span>
-                <span>พลังงานรายวันพร้อมคำแนะนำ</span>
-                <span className="text-emerald-700">ครบ</span>
-                <span className="text-zinc-500">ไม่สม่ำเสมอ</span>
-                <span>ภาษาที่แปลเป็นแผนการกระทำ</span>
-                <span className="text-emerald-700">ชัดเจน</span>
-                <span className="text-zinc-500">เชิงทำนาย</span>
-              </div>
+            <div className="rounded-2xl border border-[rgba(247,231,206,0.55)] bg-white p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#1a237e]/62">Clarity</p>
+              <p className="mt-2 text-sm text-[#1a237e]/88">มี Daily Dashboard ให้เช็คทุกเช้าในหน้าเดียว</p>
             </div>
-          </article>
-
-          <article
-            className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.75] p-6 shadow-[0_18px_44px_rgba(63,91,148,0.12)] backdrop-blur-xl sm:rounded-3xl sm:p-8 lg:col-span-5`}
-          >
-            <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">
-              Expert Lenses
-            </p>
-            <h3 className="mt-3 font-serif text-xl font-light tracking-tight text-[#162238]">
-              เลือกมุมวิเคราะห์ที่เหมาะกับคุณ
-            </h3>
-            <div className="mt-5 space-y-3">
-              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
-                <p className="text-xs uppercase tracking-[0.14em] text-zinc-500">Mu-Lab Signature</p>
-                <p className="mt-1 text-sm font-light leading-relaxed text-slate-700">
-                  โหมดภาพรวมครบทุกมิติ: งาน เงิน ความรัก สุขภาพ
-                </p>
-              </div>
-              <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-white/75 p-4">
-                <p className="text-xs uppercase tracking-[0.14em] text-zinc-500">Precision Focus</p>
-                <p className="mt-1 text-sm font-light leading-relaxed text-slate-700">
-                  โหมดโฟกัสเรื่องเดียวแบบลึก (coming next phase)
-                </p>
-              </div>
+            <div className="rounded-2xl border border-[rgba(247,231,206,0.55)] bg-white p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#1a237e]/62">Action</p>
+              <p className="mt-2 text-sm text-[#1a237e]/88">สรุปผลเป็นคำแนะนำที่ลงมือทำได้ทันที</p>
             </div>
-          </article>
+          </div>
         </section>
 
         {/* MONEY SECTION: บริการที่แปลงเป็นรายได้ */}
@@ -302,10 +204,10 @@ export default async function Home() {
 
       <footer id="about" className="relative z-10 mx-auto mt-2 max-w-6xl px-4 pb-14 sm:px-6 lg:px-8">
         <div
-          className={`rounded-[1.35rem] ${goldBorder} bg-white/[0.03] p-6 shadow-[inset_0_1px_0_rgba(247,231,206,0.03)] backdrop-blur-2xl sm:rounded-3xl sm:p-8`}
+          className={`rounded-[1.35rem] ${goldBorder} bg-white/82 p-6 shadow-[0_16px_42px_rgba(26,35,126,0.08)] backdrop-blur-xl sm:rounded-3xl sm:p-8`}
         >
           <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">About Mu-Lab</p>
-          <div className="mt-4 space-y-4 text-sm font-light leading-relaxed text-zinc-400">
+          <div className="mt-4 space-y-4 text-sm font-light leading-relaxed text-[#1a237e]/80">
             <p className="font-serif">
               Mu-Lab เริ่มจากคำถามง่าย ๆ ว่า “ทำไมคำทำนายต้องคลุมเครือ?” เราจึงสร้างพื้นที่ที่แปลงภาษาดวงดาวให้เป็นภาษาชีวิตจริง
               ให้คุณมองเห็นจังหวะที่ควรเดินหน้า ชะลอ หรือเปลี่ยนเกมอย่างมั่นใจ
@@ -318,19 +220,19 @@ export default async function Home() {
           <div className="mt-6 flex flex-wrap gap-2">
             <Link
               href="/the-science-behind-mu-lab"
-              className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
+              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
             >
               The Science Behind Mu-Lab
             </Link>
             <Link
               href="/terms"
-              className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
+              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
             >
               Terms of Service
             </Link>
             <Link
               href="/privacy"
-              className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
+              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
             >
               Privacy Policy
             </Link>

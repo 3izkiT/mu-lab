@@ -98,18 +98,18 @@ export default function SciencePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <div
-        className="pointer-events-none fixed inset-0 bg-[linear-gradient(165deg,#0a1628_0%,#121528_28%,#1a1032_58%,#0d0818_88%,#050308_100%)]"
+        className="pointer-events-none fixed inset-0 bg-[linear-gradient(165deg,#fbfdff_0%,#f5f8ff_36%,#eef3ff_68%,#e9eefc_100%)]"
         aria-hidden
       />
       <div className="pointer-events-none fixed inset-0 mu-lab-starfield" aria-hidden />
 
       <section className="relative z-10 mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 lg:px-8 lg:pt-16">
-        <div className={`rounded-[1.35rem] ${goldBorder} bg-white/[0.04] p-7 backdrop-blur-2xl sm:rounded-3xl sm:p-10`}>
+        <div className={`rounded-[1.35rem] ${goldBorder} bg-white/82 p-7 shadow-[0_16px_42px_rgba(26,35,126,0.08)] backdrop-blur-xl sm:rounded-3xl sm:p-10`}>
           <p className="text-[10px] font-light uppercase tracking-[0.34em] text-zinc-500">Mu-Lab Knowledge</p>
-          <h1 className="mt-4 font-serif text-3xl font-light tracking-tight text-zinc-100 sm:text-4xl">
+          <h1 className="mt-4 font-serif text-3xl font-light tracking-tight text-[#1a237e] sm:text-4xl">
             The Science Behind Mu-Lab
           </h1>
-          <p className="mt-4 max-w-3xl text-sm font-light leading-relaxed text-zinc-400">
+          <p className="mt-4 max-w-3xl text-sm font-light leading-relaxed text-[#1a237e]/80">
             หน้านี้อธิบายแนวคิดการทำงานของ Mu-Lab ในมุมวิทยาศาสตร์ผสมโหราศาสตร์: การอ่านองศาดาวเชิงเวลา การแปลงสัญญาณเป็นพลังงานรายมิติ และการสังเคราะห์ผลด้วยตรรกะเชิงภาษาให้เข้าใจง่าย
           </p>
 
@@ -117,10 +117,10 @@ export default function SciencePage() {
             {faqs.map((item) => (
               <article
                 key={item.q}
-                className={`rounded-2xl ${goldBorder} bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(247,231,206,0.03)]`}
+                className={`rounded-2xl ${goldBorder} bg-white p-5 shadow-[0_8px_20px_rgba(26,35,126,0.06)]`}
               >
-                <h2 className="font-serif text-xl text-zinc-100">{item.q}</h2>
-                <p className="mt-2 text-sm font-light leading-relaxed text-zinc-300">{item.a}</p>
+                <h2 className="font-serif text-xl text-[#1a237e]">{item.q}</h2>
+                <p className="mt-2 text-sm font-light leading-relaxed text-[#1a237e]/80">{item.a}</p>
               </article>
             ))}
           </div>
@@ -128,19 +128,19 @@ export default function SciencePage() {
           <div className="mt-10 flex flex-wrap gap-2">
             <Link
               href="/terms"
-              className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
+              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
             >
               Terms of Service
             </Link>
             <Link
               href="/privacy"
-              className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
+              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
             >
               Privacy Policy
             </Link>
             <Link
               href="/"
-              className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
+              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
             >
               Back to Mu-Lab
             </Link>
