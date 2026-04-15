@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #03130f;
-  --foreground: #e8f8f2;
+  --background: #030711;
+  --foreground: #e9edff;
   --gold: #f7e7ce;
-  --gold-soft: rgba(247, 231, 206, 0.5);
-  --cosmic-blue: #052019;
-  --cosmic-blue-soft: rgba(42, 160, 124, 0.16);
+  --gold-soft: rgba(247, 231, 206, 0.22);
+  --cosmic-blue: #070f24;
+  --cosmic-blue-soft: rgba(102, 118, 212, 0.2);
 }
 
 @theme inline {
@@ -49,12 +49,16 @@
 }
 
 body {
-  background-color: var(--background);
+  background:
+    radial-gradient(70% 55% at 22% 20%, rgba(92, 116, 214, 0.2) 0%, transparent 65%),
+    radial-gradient(50% 42% at 80% 18%, rgba(121, 72, 186, 0.2) 0%, transparent 66%),
+    radial-gradient(58% 45% at 54% 70%, rgba(58, 104, 168, 0.16) 0%, transparent 68%),
+    linear-gradient(160deg, #060c1f 0%, #030711 55%, #02040a 100%);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Celestial line art blueprint for dark mode */
+/* Celestial line art blueprint for nebula depth */
 .mu-lab-starfield {
   background-image:
     radial-gradient(1px 1px at 12% 16%, rgba(247, 231, 206, 0.18), transparent),
@@ -62,8 +66,8 @@ body {
     radial-gradient(1px 1px at 36% 74%, rgba(247, 231, 206, 0.14), transparent),
     radial-gradient(1px 1px at 64% 46%, rgba(247, 231, 206, 0.12), transparent),
     radial-gradient(1px 1px at 92% 66%, rgba(247, 231, 206, 0.12), transparent),
-    repeating-radial-gradient(circle at 20% 28%, rgba(86, 200, 164, 0.08) 0 1px, transparent 1px 46px),
-    repeating-radial-gradient(circle at 78% 70%, rgba(86, 200, 164, 0.08) 0 1px, transparent 1px 52px);
+    repeating-radial-gradient(circle at 20% 28%, rgba(120, 138, 255, 0.08) 0 1px, transparent 1px 46px),
+    repeating-radial-gradient(circle at 78% 70%, rgba(146, 112, 214, 0.08) 0 1px, transparent 1px 52px);
   background-size:
     120px 140px,
     180px 160px,
@@ -72,17 +76,27 @@ body {
     160px 180px,
     380px 380px,
     460px 460px;
-  opacity: 0.22;
+  opacity: 0.16;
   will-change: opacity;
   contain: layout style paint;
 }
 
 .mu-lab-blueprint {
   background-image:
-    radial-gradient(circle at 22% 32%, transparent 0 62px, rgba(86, 200, 164, 0.12) 62px 63px, transparent 63px),
-    radial-gradient(circle at 75% 65%, transparent 0 88px, rgba(86, 200, 164, 0.1) 88px 89px, transparent 89px),
-    radial-gradient(circle at 52% 48%, transparent 0 130px, rgba(86, 200, 164, 0.08) 130px 131px, transparent 131px);
-  opacity: 0.05;
+    radial-gradient(circle at 22% 32%, transparent 0 62px, rgba(126, 140, 255, 0.14) 62px 63px, transparent 63px),
+    radial-gradient(circle at 75% 65%, transparent 0 88px, rgba(156, 98, 220, 0.12) 88px 89px, transparent 89px),
+    radial-gradient(circle at 52% 48%, transparent 0 130px, rgba(126, 140, 255, 0.08) 130px 131px, transparent 131px);
+  opacity: 0.06;
+}
+
+.mu-lab-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 26px 66px rgba(1, 4, 16, 0.45);
 }
 
 .mu-lab-shimmer-bar {
@@ -99,14 +113,16 @@ body {
 
 /* Glass + champagne focus */
 .mu-lab-input {
-  border: 1px solid rgba(247, 231, 206, 0.35);
-  background: rgba(6, 30, 25, 0.52);
+  border: none;
+  border-bottom: 1px solid rgba(247, 231, 206, 0.28);
+  background: rgba(255, 255, 255, 0.02);
   color: #f2fbf8;
   box-shadow:
-    inset 0 1px 0 rgba(247, 231, 206, 0.08),
-    0 14px 30px rgba(4, 20, 16, 0.45);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 22px rgba(3, 5, 12, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0.85rem;
   outline: none;
   transition:
     border-color 0.2s ease,
@@ -115,12 +131,12 @@ body {
 }
 
 .mu-lab-input:focus {
-  border-color: rgba(247, 231, 206, 0.9);
-  background: rgba(6, 30, 25, 0.72);
+  border-bottom-color: rgba(247, 231, 206, 0.7);
+  background: rgba(255, 255, 255, 0.04);
   box-shadow:
-    inset 0 1px 0 rgba(247, 231, 206, 0.16),
-    0 0 0 1px rgba(247, 231, 206, 0.4),
-    0 0 0 3px rgba(247, 231, 206, 0.15);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(247, 231, 206, 0.18),
+    0 0 0 4px rgba(247, 231, 206, 0.08);
 }
 
 .mu-lab-input:focus-visible {

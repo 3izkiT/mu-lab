@@ -80,31 +80,26 @@ const sectionIndexLabel = (key: SectionKey, index: number) => {
 
 const ILLUSION_DURATION_MS = 3000;
 const ILLUSION_STATUS_LINES = [
-  "Aligning Celestial Coordinates...",
-  "Parsing Quantum Variables...",
-  "Synthesizing Fate Pattern...",
+  "Aligning Natal Coordinates...",
+  "Synthesizing Quantum Fate...",
 ];
-const ILLUSION_ZIP_LINES = [
-  { angle: -22, offset: -130, duration: 1.2, delay: 0 },
-  { angle: 14, offset: -90, duration: 1.05, delay: 0.14 },
-  { angle: -8, offset: -46, duration: 1.15, delay: 0.24 },
-  { angle: 4, offset: 0, duration: 1, delay: 0.32 },
-  { angle: 16, offset: 42, duration: 1.18, delay: 0.4 },
-  { angle: -14, offset: 84, duration: 1.1, delay: 0.5 },
-  { angle: 24, offset: 122, duration: 1.24, delay: 0.62 },
+const ILLUSION_PATHS = [
+  "M -20 50 L 120 50",
+  "M 14 86 L 86 14",
+  "M 16 14 L 84 86",
 ];
 
 const markdownComponents = {
   p: ({ children }: { children?: React.ReactNode }) => (
-    <p className="mb-3 text-[13px] font-light leading-[1.75] tracking-wide text-zinc-400 last:mb-0 sm:text-sm sm:leading-7">
+    <p className="mb-3 text-[14px] font-light leading-[1.8] tracking-wide text-zinc-300 last:mb-0 sm:text-base sm:leading-8">
       {children}
     </p>
   ),
   ul: ({ children }: { children?: React.ReactNode }) => (
-    <ul className="mb-3 list-disc space-y-1.5 pl-4 text-[13px] font-light text-zinc-400 sm:text-sm">{children}</ul>
+    <ul className="mb-3 list-disc space-y-2 pl-4 text-[14px] font-light text-zinc-300 sm:text-base">{children}</ul>
   ),
   ol: ({ children }: { children?: React.ReactNode }) => (
-    <ol className="mb-3 list-decimal space-y-1.5 pl-4 text-[13px] font-light text-zinc-400 sm:text-sm">{children}</ol>
+    <ol className="mb-3 list-decimal space-y-2 pl-4 text-[14px] font-light text-zinc-300 sm:text-base">{children}</ol>
   ),
   li: ({ children }: { children?: React.ReactNode }) => (
     <li className="marker:text-[var(--gold)]/70">{children}</li>
@@ -236,51 +231,63 @@ export default function FortuneForm() {
           initial={{ opacity: 0 }}
           animate={{ opacity: illusionProgress > 0.92 ? 1 - (illusionProgress - 0.92) / 0.08 : 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.28 }}
-          className="fixed inset-0 z-[120] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(16,64,52,0.65)_0%,rgba(4,18,15,0.95)_62%,#030f0c_100%)]"
+          transition={{ duration: 0.45 }}
+          className="fixed inset-0 z-[120] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(76,92,192,0.3)_0%,rgba(8,14,35,0.94)_64%,#030711_100%)]"
           role="status"
           aria-live="polite"
         >
           <div className="pointer-events-none absolute inset-0 mu-lab-starfield" />
           <div className="pointer-events-none absolute inset-0 mu-lab-blueprint" />
 
-          {ILLUSION_ZIP_LINES.map((line) => (
-            <motion.span
-              key={`${line.angle}-${line.offset}`}
-              className="pointer-events-none absolute left-[-35vw] top-1/2 h-px w-[170vw] bg-[linear-gradient(90deg,transparent_0%,rgba(247,231,206,0.2)_12%,#f7e7ce_45%,#f7e7ce_55%,rgba(247,231,206,0.2)_88%,transparent_100%)]"
-              style={{ y: line.offset, rotate: line.angle, opacity: 0.8 }}
-              animate={{ x: ["-32vw", "18vw", "68vw"] }}
-              transition={{
-                duration: line.duration,
-                delay: line.delay,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          ))}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg
+              viewBox="0 0 100 100"
+              className="h-[62vmin] w-[62vmin] max-h-[540px] max-w-[540px]"
+              aria-hidden
+            >
+              {ILLUSION_PATHS.map((path, index) => (
+                <motion.path
+                  key={path}
+                  d={path}
+                  fill="none"
+                  stroke="#F7E7CE"
+                  strokeWidth="0.45"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0.3 }}
+                  animate={{ pathLength: [0, 1, 1], opacity: [0.22, 0.85, 0.25] }}
+                  transition={{
+                    duration: 1.45,
+                    delay: index * 0.12,
+                    repeat: Infinity,
+                    repeatDelay: 0.06,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </svg>
+          </div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
             <motion.div
-              className="relative flex h-36 w-36 items-center justify-center rounded-full border border-[rgba(247,231,206,0.48)]"
+              className="relative flex h-32 w-32 items-center justify-center rounded-full"
               animate={{
-                scale: [1, 1.06, 1],
+                scale: [1, 1.05, 1],
                 boxShadow: [
-                  "0 0 26px rgba(247,231,206,0.22)",
-                  "0 0 70px rgba(247,231,206,0.42)",
-                  "0 0 110px rgba(247,231,206,0.68)",
+                  "0 0 22px rgba(247,231,206,0.2)",
+                  "0 0 56px rgba(247,231,206,0.42)",
+                  "0 0 94px rgba(247,231,206,0.62)",
                 ],
               }}
               transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
             >
               <motion.span
-                className="absolute inset-3 rounded-full bg-[radial-gradient(circle,rgba(247,231,206,0.55)_0%,rgba(247,231,206,0.12)_55%,transparent_100%)]"
-                animate={{ opacity: [0.45, 0.95, 0.55] }}
+                className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(247,231,206,0.58)_0%,rgba(247,231,206,0.12)_52%,transparent_100%)]"
+                animate={{ opacity: [0.42, 0.95, 0.5] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span className="relative font-serif text-lg tracking-[0.16em] text-[var(--gold)]">Mu-Lab</span>
             </motion.div>
 
-            <p className="mt-8 text-[10px] font-medium uppercase tracking-[0.38em] text-[#d9f2e9]/70">
+            <p className="mt-10 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
               Quantum Calculation
             </p>
             <AnimatePresence mode="wait">
@@ -289,8 +296,8 @@ export default function FortuneForm() {
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.26 }}
-                className="mt-2 font-serif text-[11px] tracking-[0.08em] text-[#f7e7ce]/92"
+                transition={{ duration: 0.22 }}
+                className="mt-3 font-serif text-[11px] tracking-[0.08em] text-[#f7e7ce]/92"
               >
                 {currentIllusionStatus}
               </motion.p>
@@ -409,7 +416,7 @@ export default function FortuneForm() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[1.35rem] border border-[rgba(247,231,206,0.5)] bg-[#07211c]/85 shadow-[0_0_0_1px_rgba(247,231,206,0.14)_inset,0_26px_60px_rgba(0,0,0,0.42)] backdrop-blur-xl sm:rounded-3xl">
+    <div className="mu-lab-glass relative overflow-hidden rounded-[1.6rem] sm:rounded-[2rem]">
       {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -442,21 +449,21 @@ export default function FortuneForm() {
         </motion.div>
       )}
 
-      <div className={`p-6 sm:p-8 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}>
-        <div className="mb-8">
+      <div className={`p-10 sm:p-12 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}>
+        <div className="mb-12">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--gold)]/78">Session</p>
-            <h2 className="mt-2 font-serif text-2xl font-medium tracking-tight text-[#ecfbf5] sm:text-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--gold)]/78">Session</p>
+            <h2 className="mt-4 font-serif text-3xl font-medium tracking-[0.05em] text-[#eef1ff] sm:text-4xl">
               ข้อมูลดวง
             </h2>
-            <p className="mt-2 text-sm font-light text-[#d9f2e9]/78">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
+            <p className="mt-4 text-base font-light text-[#dbe1ff]/78">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
           </div>
         </div>
 
-        <div className="space-y-6">
-          <section className="rounded-2xl border border-[rgba(247,231,206,0.45)] bg-[#0a2a22] p-4 sm:p-5">
-            <p className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-[var(--gold)]/75">ข้อมูลพื้นฐาน</p>
-            <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-10">
+          <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
+            <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลพื้นฐาน</p>
+            <div className="grid gap-6 sm:grid-cols-2">
               <label className="block sm:col-span-2">
                 <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
                   ชื่อ-นามสกุล
@@ -468,7 +475,7 @@ export default function FortuneForm() {
                     setFormData((prev) => ({ ...prev, fullName: event.target.value }))
                   }
                   placeholder="เช่น อรทัย ใจดี"
-                  className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#d9f2e9]/45"
+                  className="mu-lab-input w-full px-4 py-4 text-base placeholder:text-[#dbe1ff]/45"
                 />
               </label>
 
@@ -481,7 +488,7 @@ export default function FortuneForm() {
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, gender: event.target.value }))
                   }
-                  className="mu-lab-input w-full cursor-pointer appearance-none rounded-2xl px-4 py-3.5 text-base"
+                  className="mu-lab-input w-full cursor-pointer appearance-none px-4 py-4 text-base"
                 >
                   <option value="" className="bg-[#0a101c] text-zinc-400">
                     เลือกเพศ
@@ -508,15 +515,15 @@ export default function FortuneForm() {
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, birthDate: event.target.value }))
                   }
-                  className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base scheme-dark"
+                  className="mu-lab-input w-full px-4 py-4 text-base scheme-dark"
                 />
               </label>
             </div>
           </section>
 
-          <section className="rounded-2xl border border-[rgba(247,231,206,0.45)] bg-[#0a2a22] p-4 sm:p-5">
-            <p className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-[var(--gold)]/75">ข้อมูลเวลาและสถานที่เกิด</p>
-            <div className="grid gap-4 sm:grid-cols-2">
+          <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
+            <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลเวลาและสถานที่เกิด</p>
+            <div className="grid gap-6 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
                   เวลาเกิด (ชั่วโมง · นาที)
@@ -531,7 +538,7 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthHour: event.target.value }))
                     }
                     placeholder="0–23"
-                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#d9f2e9]/45"
+                    className="mu-lab-input w-full px-4 py-4 text-base placeholder:text-[#dbe1ff]/45"
                   />
                   <input
                     type="number"
@@ -542,7 +549,7 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthMinute: event.target.value }))
                     }
                     placeholder="0–59"
-                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-base placeholder:text-[#d9f2e9]/45"
+                    className="mu-lab-input w-full px-4 py-4 text-base placeholder:text-[#dbe1ff]/45"
                   />
                 </div>
               </div>
@@ -573,12 +580,12 @@ export default function FortuneForm() {
           </motion.p>
         )}
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-12 flex justify-end">
           <button
             type="button"
             onClick={handleSubmit}
             disabled={!isFormValid || isLoading}
-            className="mu-lab-btn-shimmer relative inline-flex min-h-[46px] min-w-[min(100%,250px)] items-center justify-center overflow-hidden rounded-full border border-[rgba(247,231,206,0.45)] bg-gradient-to-b from-[rgba(247,231,206,0.2)] to-[rgba(247,231,206,0.08)] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1b1a25] shadow-[0_0_48px_rgba(247,231,206,0.15)] transition hover:border-[rgba(247,231,206,0.62)] disabled:cursor-not-allowed disabled:opacity-35 sm:min-w-0"
+            className="mu-lab-btn-shimmer relative inline-flex min-h-[52px] min-w-[min(100%,290px)] items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ebd3a8_48%,#d6b379_100%)] px-8 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#201911] shadow-[0_0_34px_rgba(247,231,206,0.26)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-35 sm:min-w-0"
           >
             <span className="relative z-10">Reveal My Fate</span>
           </button>

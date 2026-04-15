@@ -21,7 +21,7 @@ export default function DailyEnergyGauges({ scores, animateKey }: Props) {
         return (
           <div
             key={key}
-            className="rounded-2xl border border-[rgba(247,231,206,0.38)] bg-[#0a2a22] p-3 shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
+            className="rounded-2xl bg-white/[0.03] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_rgba(2,5,14,0.32)]"
           >
             <div className="mb-2 flex items-end justify-between gap-2">
               <p className="text-[11px] font-light text-[#d9f2e9]">
@@ -38,7 +38,7 @@ export default function DailyEnergyGauges({ scores, animateKey }: Props) {
                 {v}%
               </motion.span>
             </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#10352d] ring-1 ring-inset ring-[rgba(247,231,206,0.2)]">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#1b254a]">
               <motion.div
                 key={`${animateKey}-${key}-bar`}
                 className="h-full rounded-full bg-gradient-to-r from-[#f7e7ce] via-[#eed7ad] to-[#e7c786] shadow-[0_0_10px_rgba(247,231,206,0.45)]"
