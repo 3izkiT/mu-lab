@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Link2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Link2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import LuckMeters from "@/components/LuckMeters";
 import ProvinceCommand from "@/components/ProvinceCommand";
@@ -25,8 +25,6 @@ type ParsedSection = {
   title: string;
   content: string;
 };
-
-const TOTAL_STEPS = 3;
 
 const initialData: FormData = {
   fullName: "",
@@ -101,7 +99,6 @@ const markdownComponents = {
 };
 
 export default function FortuneForm() {
-  const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [fortuneResult, setFortuneResult] = useState<string | null>(null);
   const [luckMeters, setLuckMeters] = useState<LuckMetersData | null>(null);
@@ -110,11 +107,6 @@ export default function FortuneForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>(initialData);
 
-  useEffect(() => {
-    track("fortune_form_step", { step: String(step) });
-  }, [step]);
-
-  const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step]);
   const parsedSections = useMemo(
     () => (fortuneResult ? parseFortuneMarkdown(fortuneResult) : []),
     [fortuneResult],
@@ -127,20 +119,7 @@ export default function FortuneForm() {
     formData.birthMinute !== "" &&
     formData.birthProvince.trim() !== "";
 
-  const canContinue =
-    (step === 1 && isStepOneValid) ||
-    (step === 2 && isStepTwoValid) ||
-    (step === 3 && isStepThreeValid);
-
-  const handleNext = () => {
-    if (!canContinue || step >= TOTAL_STEPS) return;
-    setStep((prev) => prev + 1);
-  };
-
-  const handleBack = () => {
-    if (step <= 1) return;
-    setStep((prev) => prev - 1);
-  };
+  const isFormValid = isStepOneValid && isStepTwoValid && isStepThreeValid;
 
   const handleSubmit = async () => {
     if (!isStepThreeValid) return;
@@ -201,7 +180,6 @@ export default function FortuneForm() {
   };
 
   const handleReset = () => {
-    setStep(1);
     setFormData(initialData);
     setFortuneResult(null);
     setLuckMeters(null);
@@ -343,82 +321,61 @@ export default function FortuneForm() {
       )}
 
       <div className={`p-6 sm:p-8 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}>
-        <div className="mb-8 flex items-end justify-between gap-4">
+        <div className="mb-8">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-[0.32em] text-zinc-600">Session</p>
             <h2 className="mt-2 font-serif text-xl font-light tracking-tight text-white sm:text-2xl">
               ข้อมูลดวง
             </h2>
+            <p className="mt-2 text-xs font-light text-zinc-500">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
           </div>
-          <span className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            {step}/{TOTAL_STEPS}
-          </span>
         </div>
 
-        <div className="mb-8 h-[2px] w-full overflow-hidden rounded-full bg-white/[0.06]">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[var(--gold)]/90 via-[var(--gold)]/40 to-zinc-600/30"
-            initial={false}
-            animate={{ width: `${progressValue}%` }}
-            transition={{ type: "spring", stiffness: 140, damping: 24 }}
-          />
-        </div>
+        <div className="space-y-6">
+          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+            <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">ข้อมูลพื้นฐาน</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block sm:col-span-2">
+                <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
+                  ชื่อ-นามสกุล
+                </span>
+                <input
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(event) =>
+                    setFormData((prev) => ({ ...prev, fullName: event.target.value }))
+                  }
+                  placeholder="เช่น อรทัย ใจดี"
+                  className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-sm text-zinc-100 placeholder:text-zinc-600"
+                />
+              </label>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 18 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -14 }}
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-5"
-          >
-            {step === 1 && (
-              <>
-                <label className="block">
-                  <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
-                    ชื่อ-นามสกุล
-                  </span>
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(event) =>
-                      setFormData((prev) => ({ ...prev, fullName: event.target.value }))
-                    }
-                    placeholder="เช่น อรทัย ใจดี"
-                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-sm text-zinc-100 placeholder:text-zinc-600"
-                  />
-                </label>
+              <label className="block">
+                <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
+                  เพศ
+                </span>
+                <select
+                  value={formData.gender}
+                  onChange={(event) =>
+                    setFormData((prev) => ({ ...prev, gender: event.target.value }))
+                  }
+                  className="mu-lab-input w-full cursor-pointer appearance-none rounded-2xl bg-[rgba(255,255,255,0.035)] px-4 py-3.5 text-sm text-zinc-100"
+                >
+                  <option value="" className="bg-[#0a101c] text-zinc-400">
+                    เลือกเพศ
+                  </option>
+                  <option value="female" className="bg-[#0a101c]">
+                    หญิง
+                  </option>
+                  <option value="male" className="bg-[#0a101c]">
+                    ชาย
+                  </option>
+                  <option value="non-binary" className="bg-[#0a101c]">
+                    ไม่ระบุ / อื่น ๆ
+                  </option>
+                </select>
+              </label>
 
-                <label className="block">
-                  <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
-                    เพศ
-                  </span>
-                  <select
-                    value={formData.gender}
-                    onChange={(event) =>
-                      setFormData((prev) => ({ ...prev, gender: event.target.value }))
-                    }
-                    className="mu-lab-input w-full cursor-pointer appearance-none rounded-2xl bg-[rgba(255,255,255,0.035)] px-4 py-3.5 text-sm text-zinc-100"
-                  >
-                    <option value="" className="bg-[#0a101c] text-zinc-400">
-                      เลือกเพศ
-                    </option>
-                    <option value="female" className="bg-[#0a101c]">
-                      หญิง
-                    </option>
-                    <option value="male" className="bg-[#0a101c]">
-                      ชาย
-                    </option>
-                    <option value="non-binary" className="bg-[#0a101c]">
-                      ไม่ระบุ / อื่น ๆ
-                    </option>
-                  </select>
-                </label>
-              </>
-            )}
-
-            {step === 2 && (
               <label className="block">
                 <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
                   วันเกิด
@@ -431,60 +388,58 @@ export default function FortuneForm() {
                   }
                   className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-sm text-zinc-100 scheme-dark"
                 />
-                <p className="mt-2 text-[11px] font-light leading-relaxed text-zinc-600">
-                  วันเกิดช่วยให้ Mu-Lab วิเคราะห์ภาพรวมและจังหวะชีวิตได้ละเอียดขึ้น
-                </p>
               </label>
-            )}
+            </div>
+          </section>
 
-            {step === 3 && (
-              <>
-                <div>
-                  <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
-                    เวลาเกิด (ชั่วโมง · นาที)
-                  </span>
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type="number"
-                      min={0}
-                      max={23}
-                      value={formData.birthHour}
-                      onChange={(event) =>
-                        setFormData((prev) => ({ ...prev, birthHour: event.target.value }))
-                      }
-                      placeholder="0–23"
-                      className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-sm text-zinc-100 placeholder:text-zinc-600"
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      max={59}
-                      value={formData.birthMinute}
-                      onChange={(event) =>
-                        setFormData((prev) => ({ ...prev, birthMinute: event.target.value }))
-                      }
-                      placeholder="0–59"
-                      className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-sm text-zinc-100 placeholder:text-zinc-600"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
-                    จังหวัดที่เกิด
-                  </span>
-                  <ProvinceCommand
-                    value={formData.birthProvince}
-                    onChange={(province) =>
-                      setFormData((prev) => ({ ...prev, birthProvince: province }))
+          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+            <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">ข้อมูลเวลาและสถานที่เกิด</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
+                  เวลาเกิด (ชั่วโมง · นาที)
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="number"
+                    min={0}
+                    max={23}
+                    value={formData.birthHour}
+                    onChange={(event) =>
+                      setFormData((prev) => ({ ...prev, birthHour: event.target.value }))
                     }
-                    disabled={isLoading}
+                    placeholder="0–23"
+                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-sm text-zinc-100 placeholder:text-zinc-600"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    max={59}
+                    value={formData.birthMinute}
+                    onChange={(event) =>
+                      setFormData((prev) => ({ ...prev, birthMinute: event.target.value }))
+                    }
+                    placeholder="0–59"
+                    className="mu-lab-input w-full rounded-2xl px-4 py-3.5 text-sm text-zinc-100 placeholder:text-zinc-600"
                   />
                 </div>
-              </>
-            )}
-          </motion.div>
-        </AnimatePresence>
+              </div>
+
+              <div className="sm:col-span-2">
+                <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-600">
+                  จังหวัดที่เกิด
+                </span>
+                <ProvinceCommand
+                  value={formData.birthProvince}
+                  onChange={(province) =>
+                    setFormData((prev) => ({ ...prev, birthProvince: province }))
+                  }
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+          </section>
+        </div>
 
         {errorMessage && (
           <motion.p
@@ -496,37 +451,15 @@ export default function FortuneForm() {
           </motion.p>
         )}
 
-        <div className="mt-8 flex items-center justify-between gap-3">
+        <div className="mt-8 flex justify-end">
           <button
             type="button"
-            onClick={handleBack}
-            disabled={step === 1 || isLoading}
-            className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-transparent px-4 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 transition hover:border-white/[0.14] hover:text-zinc-300 disabled:cursor-not-allowed disabled:opacity-30"
+            onClick={handleSubmit}
+            disabled={!isFormValid || isLoading}
+            className="mu-lab-btn-shimmer relative inline-flex min-h-[46px] min-w-[min(100%,250px)] items-center justify-center overflow-hidden rounded-full border border-[rgba(247,231,206,0.35)] bg-gradient-to-b from-[rgba(247,231,206,0.18)] to-[rgba(247,231,206,0.04)] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1a1428] shadow-[0_0_48px_rgba(247,231,206,0.15)] transition hover:border-[rgba(247,231,206,0.5)] disabled:cursor-not-allowed disabled:opacity-35 sm:min-w-0"
           >
-            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-            ย้อนกลับ
+            <span className="relative z-10">Reveal My Fate</span>
           </button>
-
-          {step < TOTAL_STEPS ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              disabled={!canContinue || isLoading}
-              className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.06] px-5 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-200 transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              ถัดไป
-              <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canContinue || isLoading}
-              className="mu-lab-btn-shimmer relative inline-flex min-h-[44px] min-w-[min(100%,200px)] items-center justify-center overflow-hidden rounded-full border border-[rgba(247,231,206,0.35)] bg-gradient-to-b from-[rgba(247,231,206,0.18)] to-[rgba(247,231,206,0.04)] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1a1428] shadow-[0_0_48px_rgba(247,231,206,0.15)] transition hover:border-[rgba(247,231,206,0.5)] disabled:cursor-not-allowed disabled:opacity-35 sm:min-w-0"
-            >
-              <span className="relative z-10">Reveal My Fate</span>
-            </button>
-          )}
         </div>
       </div>
     </div>
