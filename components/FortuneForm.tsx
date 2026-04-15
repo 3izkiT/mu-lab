@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link2 } from "lucide-react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import LuckMeters from "@/components/LuckMeters";
 import ProvinceCommand from "@/components/ProvinceCommand";
@@ -284,6 +285,14 @@ export default function FortuneForm() {
                 className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(247,231,206,0.58)_0%,rgba(247,231,206,0.12)_52%,transparent_100%)]"
                 animate={{ opacity: [0.42, 0.95, 0.5] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <Image
+                src="/logo-loader.png"
+                alt="Mu Lab loader"
+                width={96}
+                height={96}
+                className="relative z-10 h-24 w-24 rounded-full object-cover"
+                priority
               />
             </motion.div>
 

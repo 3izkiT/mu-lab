@@ -8,6 +8,7 @@ import {
 } from "@/components/CinematicCelestial";
 import FortuneForm from "@/components/FortuneForm";
 import { getDailyForecast } from "@/lib/daily-forecast-data";
+import Image from "next/image";
 import Link from "next/link";
 
 const glassPanel = "mu-lab-glass";
@@ -22,7 +23,10 @@ export default async function Home() {
     <main className="relative min-h-screen overflow-hidden">
       <header className="sticky top-0 z-30 bg-[rgba(6,10,22,0.68)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
-          <p className="font-serif text-xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
+          <div className="flex items-center gap-2">
+            <Image src="/logo.png" alt="Mu Lab" width={34} height={34} className="h-[34px] w-[34px] rounded-full" />
+            <p className="font-serif text-xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
+          </div>
           <nav className="hidden items-center gap-2 sm:flex">
             <HoverConstellation>
               <Link
