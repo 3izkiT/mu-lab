@@ -2,8 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "นโยบายความเป็นส่วนตัวของ Mu-Lab สำหรับการประมวลผลข้อมูลวันเวลาเกิด",
+  title: "Privacy Policy | Mu-Lab",
+  description:
+    "นโยบายความเป็นส่วนตัวของ Mu-Lab อธิบายการประมวลผลข้อมูลวันเวลาเกิดเพื่อการพยากรณ์โดยไม่ใช้เพื่อโปรไฟล์ถาวร",
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy | Mu-Lab",
+    description:
+      "นโยบายความเป็นส่วนตัวของ Mu-Lab อธิบายการประมวลผลข้อมูลวันเวลาเกิดเพื่อการพยากรณ์โดยไม่ใช้เพื่อโปรไฟล์ถาวร",
+    url: "/privacy",
+    type: "article",
+  },
 };
 
 const goldBorder = "border border-[rgba(247,231,206,0.14)]";

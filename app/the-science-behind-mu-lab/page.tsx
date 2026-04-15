@@ -2,8 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "The Science Behind Mu-Lab",
-  description: "คำอธิบายเชิงวิทยาศาสตร์-โหราศาสตร์ของกระบวนการวิเคราะห์ Mu-Lab",
+  title: "The Science Behind Mu-Lab | Algorithm & Astrology",
+  description:
+    "เจาะลึกหลักการทำงานของ Mu-Lab ที่ผสานการวิเคราะห์เชิงอัลกอริทึมกับกรอบโหราศาสตร์ร่วมสมัยเพื่อสร้างคำพยากรณ์ที่ใช้งานได้จริง",
+  alternates: {
+    canonical: "/the-science-behind-mu-lab",
+  },
+  openGraph: {
+    title: "The Science Behind Mu-Lab | Algorithm & Astrology",
+    description:
+      "เจาะลึกหลักการทำงานของ Mu-Lab ที่ผสานการวิเคราะห์เชิงอัลกอริทึมกับกรอบโหราศาสตร์ร่วมสมัยเพื่อสร้างคำพยากรณ์ที่ใช้งานได้จริง",
+    url: "/the-science-behind-mu-lab",
+    type: "article",
+  },
 };
 
 const goldBorder = "border border-[rgba(247,231,206,0.14)]";

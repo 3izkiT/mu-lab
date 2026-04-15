@@ -46,6 +46,20 @@ export default async function Home() {
               <p className="mt-5 max-w-md text-[13px] font-light leading-relaxed tracking-wide text-zinc-400 sm:text-sm">
                 ไขรหัสชีวิตรายบุคคล — ห้องทดลองโหราศาสตร์ยุคใหม่
               </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Link
+                  href="#fortune-form"
+                  className="rounded-full border border-[rgba(247,231,206,0.3)] bg-[rgba(247,231,206,0.14)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.2)]"
+                >
+                  Reveal My Fate
+                </Link>
+                <Link
+                  href="/the-science-behind-mu-lab"
+                  className={`rounded-full ${goldBorder} bg-transparent px-4 py-2 text-xs font-light tracking-[0.08em] text-zinc-300 transition hover:bg-white/[0.05]`}
+                >
+                  「 เจาะลึกกลไกของห้องทดลอง 」 (Explore our Science)
+                </Link>
+              </div>
             </div>
             <div className="mt-8 flex flex-wrap gap-2">
               <span
@@ -83,7 +97,7 @@ export default async function Home() {
             </div>
           </aside>
 
-          <div className="col-span-12 lg:col-span-8">
+          <div id="fortune-form" className="col-span-12 lg:col-span-8">
             <FortuneForm />
           </div>
           <div className="col-span-12 hidden lg:col-span-4 lg:block">

@@ -2,8 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "ข้อกำหนดการใช้งาน Mu-Lab สำหรับการวิเคราะห์พลังงานและดวงชะตา",
+  title: "Terms of Service | Mu-Lab",
+  description:
+    "ข้อกำหนดการใช้งาน Mu-Lab ครอบคลุมขอบเขตบริการและการใช้ข้อมูลเกิดเพื่อการพยากรณ์อย่างโปร่งใสและรับผิดชอบ",
+  alternates: {
+    canonical: "/terms",
+  },
+  openGraph: {
+    title: "Terms of Service | Mu-Lab",
+    description:
+      "ข้อกำหนดการใช้งาน Mu-Lab ครอบคลุมขอบเขตบริการและการใช้ข้อมูลเกิดเพื่อการพยากรณ์อย่างโปร่งใสและรับผิดชอบ",
+    url: "/terms",
+    type: "article",
+  },
 };
 
 const goldBorder = "border border-[rgba(247,231,206,0.14)]";
