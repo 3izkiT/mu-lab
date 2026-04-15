@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Link2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import LuckMeters from "@/components/LuckMeters";
@@ -78,6 +78,22 @@ const sectionIndexLabel = (key: SectionKey, index: number) => {
   return `${n}`;
 };
 
+const ILLUSION_DURATION_MS = 3000;
+const ILLUSION_STATUS_LINES = [
+  "Aligning Celestial Coordinates...",
+  "Parsing Quantum Variables...",
+  "Synthesizing Fate Pattern...",
+];
+const ILLUSION_ZIP_LINES = [
+  { angle: -22, offset: -130, duration: 1.2, delay: 0 },
+  { angle: 14, offset: -90, duration: 1.05, delay: 0.14 },
+  { angle: -8, offset: -46, duration: 1.15, delay: 0.24 },
+  { angle: 4, offset: 0, duration: 1, delay: 0.32 },
+  { angle: 16, offset: 42, duration: 1.18, delay: 0.4 },
+  { angle: -14, offset: 84, duration: 1.1, delay: 0.5 },
+  { angle: 24, offset: 122, duration: 1.24, delay: 0.62 },
+];
+
 const markdownComponents = {
   p: ({ children }: { children?: React.ReactNode }) => (
     <p className="mb-3 text-[13px] font-light leading-[1.75] tracking-wide text-zinc-400 last:mb-0 sm:text-sm sm:leading-7">
@@ -100,6 +116,8 @@ const markdownComponents = {
 
 export default function FortuneForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
+  const [illusionProgress, setIllusionProgress] = useState(0);
   const [fortuneResult, setFortuneResult] = useState<string | null>(null);
   const [luckMeters, setLuckMeters] = useState<LuckMetersData | null>(null);
   const [resultSessionId, setResultSessionId] = useState("");
@@ -120,11 +138,23 @@ export default function FortuneForm() {
     formData.birthProvince.trim() !== "";
 
   const isFormValid = isStepOneValid && isStepTwoValid && isStepThreeValid;
+  const currentIllusionStatus =
+    ILLUSION_STATUS_LINES[
+      Math.min(
+        ILLUSION_STATUS_LINES.length - 1,
+        Math.floor(illusionProgress * ILLUSION_STATUS_LINES.length),
+      )
+    ];
+
+  const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
   const handleSubmit = async () => {
-    if (!isStepThreeValid) return;
+    if (!isFormValid) return;
 
+    const startedAt = Date.now();
     setIsLoading(true);
+    setShowTransition(true);
+    setIllusionProgress(0);
     setErrorMessage(null);
     setFortuneResult(null);
     setLuckMeters(null);
@@ -140,6 +170,9 @@ export default function FortuneForm() {
         message?: string;
         meters?: LuckMetersData;
       };
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, ILLUSION_DURATION_MS - elapsed);
+      if (remaining > 0) await sleep(remaining);
 
       if (!response.ok) {
         setErrorMessage(
@@ -172,12 +205,101 @@ export default function FortuneForm() {
         track("fortune_result_empty");
       }
     } catch {
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, ILLUSION_DURATION_MS - elapsed);
+      if (remaining > 0) await sleep(remaining);
       setErrorMessage("สภาวะดวงดาวไม่เอื้ออำนวย กรุณาลองใหม่อีกครั้ง");
       track("fortune_result_error");
     } finally {
+      setShowTransition(false);
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!showTransition) return;
+
+    const start = Date.now();
+    const timer = window.setInterval(() => {
+      const ratio = Math.min(1, (Date.now() - start) / ILLUSION_DURATION_MS);
+      setIllusionProgress(ratio);
+      if (ratio >= 1) window.clearInterval(timer);
+    }, 45);
+
+    return () => window.clearInterval(timer);
+  }, [showTransition]);
+
+  if (showTransition) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: illusionProgress > 0.92 ? 1 - (illusionProgress - 0.92) / 0.08 : 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.28 }}
+          className="fixed inset-0 z-[120] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(20,33,72,0.65)_0%,rgba(7,11,25,0.95)_62%,#040915_100%)]"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="pointer-events-none absolute inset-0 mu-lab-starfield" />
+          <div className="pointer-events-none absolute inset-0 mu-lab-blueprint" />
+
+          {ILLUSION_ZIP_LINES.map((line) => (
+            <motion.span
+              key={`${line.angle}-${line.offset}`}
+              className="pointer-events-none absolute left-[-35vw] top-1/2 h-px w-[170vw] bg-[linear-gradient(90deg,transparent_0%,rgba(247,231,206,0.2)_12%,#f7e7ce_45%,#f7e7ce_55%,rgba(247,231,206,0.2)_88%,transparent_100%)]"
+              style={{ y: line.offset, rotate: line.angle, opacity: 0.8 }}
+              animate={{ x: ["-32vw", "18vw", "68vw"] }}
+              transition={{
+                duration: line.duration,
+                delay: line.delay,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+            <motion.div
+              className="relative flex h-36 w-36 items-center justify-center rounded-full border border-[rgba(247,231,206,0.48)]"
+              animate={{
+                scale: [1, 1.06, 1],
+                boxShadow: [
+                  "0 0 26px rgba(247,231,206,0.22)",
+                  "0 0 70px rgba(247,231,206,0.42)",
+                  "0 0 110px rgba(247,231,206,0.68)",
+                ],
+              }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <motion.span
+                className="absolute inset-3 rounded-full bg-[radial-gradient(circle,rgba(247,231,206,0.55)_0%,rgba(247,231,206,0.12)_55%,transparent_100%)]"
+                animate={{ opacity: [0.45, 0.95, 0.55] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <span className="relative font-serif text-lg tracking-[0.16em] text-[var(--gold)]">Mu-Lab</span>
+            </motion.div>
+
+            <p className="mt-8 text-[10px] font-medium uppercase tracking-[0.38em] text-[#d8e2ff]/70">
+              Quantum Calculation
+            </p>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={currentIllusionStatus}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.26 }}
+                className="mt-2 font-serif text-[11px] tracking-[0.08em] text-[#f7e7ce]/92"
+              >
+                {currentIllusionStatus}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
 
   const handleReset = () => {
     setFormData(initialData);
