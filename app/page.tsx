@@ -23,9 +23,9 @@ export default async function Home() {
     <main className="relative min-h-screen overflow-hidden">
       <header className="sticky top-0 z-30 bg-[rgba(6,10,22,0.68)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Mu Lab" width={34} height={34} className="h-[34px] w-[34px] rounded-full" />
-            <p className="font-serif text-xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
+          <div className="flex items-center gap-3">
+            <Image src="/logo.png" alt="Mu Lab" width={46} height={46} className="h-[46px] w-[46px] rounded-full" />
+            <p className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
           </div>
           <nav className="hidden items-center gap-2 sm:flex">
             <HoverConstellation>
@@ -82,7 +82,7 @@ export default async function Home() {
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 pb-28 pt-16 sm:px-8 sm:pt-20 lg:px-10 lg:pt-24">
         {/* HERO: form-first */}
-        <section className="relative overflow-hidden rounded-[2rem] p-6 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:p-8 lg:p-10">
+        <section className="relative overflow-visible rounded-[2rem] p-6 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:p-8 lg:p-10">
           <div
             className="pointer-events-none absolute inset-0 opacity-90"
             style={{
@@ -92,6 +92,9 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
+          <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-[0.18]" aria-hidden>
+            <Image src="/logo.png" alt="" width={220} height={220} className="h-[220px] w-[220px] rounded-full blur-[0.2px]" />
+          </div>
           <Reveal delay={0.1} className="relative">
             <Floating
               id="fortune-form"

@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #030711;
-  --foreground: #e9edff;
+  --background: #100a2a;
+  --foreground: #f0eafe;
   --gold: #f7e7ce;
   --gold-soft: rgba(247, 231, 206, 0.22);
-  --cosmic-blue: #070f24;
-  --cosmic-blue-soft: rgba(102, 118, 212, 0.2);
+  --cosmic-blue: #120d35;
+  --cosmic-blue-soft: rgba(82, 66, 160, 0.22);
 }
 
 @theme inline {
@@ -50,10 +50,10 @@
 
 body {
   background:
-    radial-gradient(70% 55% at 22% 20%, rgba(92, 116, 214, 0.2) 0%, transparent 65%),
-    radial-gradient(50% 42% at 80% 18%, rgba(121, 72, 186, 0.2) 0%, transparent 66%),
-    radial-gradient(58% 45% at 54% 70%, rgba(58, 104, 168, 0.16) 0%, transparent 68%),
-    linear-gradient(160deg, #060c1f 0%, #030711 55%, #02040a 100%);
+    radial-gradient(70% 55% at 22% 20%, rgba(82, 66, 160, 0.28) 0%, transparent 65%),
+    radial-gradient(50% 42% at 80% 18%, rgba(101, 56, 152, 0.24) 0%, transparent 66%),
+    radial-gradient(58% 45% at 54% 70%, rgba(43, 52, 130, 0.22) 0%, transparent 68%),
+    linear-gradient(160deg, #150d38 0%, #100a2a 55%, #0a0718 100%);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
@@ -66,8 +66,8 @@ body {
     radial-gradient(1px 1px at 36% 74%, rgba(247, 231, 206, 0.14), transparent),
     radial-gradient(1px 1px at 64% 46%, rgba(247, 231, 206, 0.12), transparent),
     radial-gradient(1px 1px at 92% 66%, rgba(247, 231, 206, 0.12), transparent),
-    repeating-radial-gradient(circle at 20% 28%, rgba(120, 138, 255, 0.08) 0 1px, transparent 1px 46px),
-    repeating-radial-gradient(circle at 78% 70%, rgba(146, 112, 214, 0.08) 0 1px, transparent 1px 52px);
+    repeating-radial-gradient(circle at 20% 28%, rgba(106, 118, 212, 0.1) 0 1px, transparent 1px 46px),
+    repeating-radial-gradient(circle at 78% 70%, rgba(140, 98, 202, 0.1) 0 1px, transparent 1px 52px);
   background-size:
     120px 140px,
     180px 160px,
@@ -83,9 +83,9 @@ body {
 
 .mu-lab-blueprint {
   background-image:
-    radial-gradient(circle at 22% 32%, transparent 0 62px, rgba(126, 140, 255, 0.14) 62px 63px, transparent 63px),
-    radial-gradient(circle at 75% 65%, transparent 0 88px, rgba(156, 98, 220, 0.12) 88px 89px, transparent 89px),
-    radial-gradient(circle at 52% 48%, transparent 0 130px, rgba(126, 140, 255, 0.08) 130px 131px, transparent 131px);
+    radial-gradient(circle at 22% 32%, transparent 0 62px, rgba(106, 118, 212, 0.16) 62px 63px, transparent 63px),
+    radial-gradient(circle at 75% 65%, transparent 0 88px, rgba(140, 98, 202, 0.14) 88px 89px, transparent 89px),
+    radial-gradient(circle at 52% 48%, transparent 0 130px, rgba(106, 118, 212, 0.1) 130px 131px, transparent 131px);
   opacity: 0.06;
 }
 
