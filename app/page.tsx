@@ -1,6 +1,7 @@
 import DailyCosmicDashboard from "@/components/DailyCosmicDashboard";
 import FortuneForm from "@/components/FortuneForm";
 import { getDailyForecast } from "@/lib/daily-forecast-data";
+import Link from "next/link";
 
 const goldBorder = "border border-[rgba(247,231,206,0.14)]";
 
@@ -116,18 +117,24 @@ export default async function Home() {
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
-            <a
-              href="#"
+            <Link
+              href="/the-science-behind-mu-lab"
+              className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
+            >
+              The Science Behind Mu-Lab
+            </Link>
+            <Link
+              href="/terms"
               className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
             >
               Terms of Service
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/privacy"
               className={`rounded-full ${goldBorder} bg-white/[0.04] px-4 py-1.5 text-xs font-light tracking-wide text-zinc-400 transition hover:bg-white/[0.06]`}
             >
               Privacy Policy
-            </a>
+            </Link>
           </div>
         </div>
       </footer>
