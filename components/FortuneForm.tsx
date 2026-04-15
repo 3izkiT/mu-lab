@@ -416,7 +416,7 @@ export default function FortuneForm() {
   }
 
   return (
-    <div className="mu-lab-glass relative overflow-hidden rounded-[1.6rem] sm:rounded-[2rem]">
+    <div className="mu-lab-glass relative overflow-visible rounded-[1.6rem] sm:rounded-[2rem]">
       {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
