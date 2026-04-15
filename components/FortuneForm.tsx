@@ -315,26 +315,29 @@ export default function FortuneForm() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-8 rounded-[inherit] bg-[#05080f]/80 px-6 py-14 text-center backdrop-blur-xl"
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-8 rounded-[inherit] bg-[#05080f]/84 px-6 py-14 text-center backdrop-blur-xl"
           role="status"
           aria-live="polite"
         >
-          <div className="relative flex h-28 w-28 items-center justify-center">
-            <span className="absolute inset-0 rounded-full border border-[var(--gold)]/20 mu-lab-scan-pulse" />
+          <div className="relative flex h-32 w-32 items-center justify-center">
+            <span className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(247,231,206,0.12),transparent_72%)]" />
+            <span className="absolute inset-0 rounded-full border border-[var(--gold)]/18 mu-lab-scan-pulse" />
             <span
-              className="absolute inset-0 rounded-full border border-[var(--gold)]/12 mu-lab-scan-ring"
+              className="absolute inset-0 rounded-full border border-[var(--gold)]/14 mu-lab-scan-ring"
               style={{ animationDelay: "0.45s" }}
             />
-            <span className="absolute inset-4 rounded-full border border-white/[0.08]" />
-            <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(247,231,206,0.14),transparent_68%)]" />
-            <span className="relative text-[10px] font-light uppercase tracking-[0.55em] text-zinc-500">Lab</span>
+            <span className="absolute inset-4 rounded-full border border-white/[0.08] shadow-[0_0_30px_rgba(83,133,220,0.24)]" />
+            <span className="absolute inset-[26px] rounded-full border border-[rgba(247,231,206,0.15)]" />
+            <span className="relative text-[10px] font-light uppercase tracking-[0.48em] text-zinc-500">Mu-Lab</span>
           </div>
           <div className="space-y-2">
-            <p className="text-[10px] font-medium uppercase tracking-[0.42em] text-zinc-600">Scanning</p>
-            <p className="max-w-xs text-sm font-light leading-relaxed text-zinc-300 sm:text-base">
-              Mu-Lab กำลังถอดรหัสชีวิตของคุณจากดวงดาว...
+            <p className="text-[10px] font-medium uppercase tracking-[0.42em] text-zinc-600">
+              Aligning Frequencies
             </p>
-            <p className="text-[11px] font-light text-zinc-600">กรุณารอสักครู่</p>
+            <p className="max-w-xs text-sm font-light leading-relaxed text-zinc-200 sm:text-base">
+              Mu-Lab กำลังถอดรหัสชีวิตของคุณด้วยลำแสงเชิงดาราศาสตร์...
+            </p>
+            <p className="text-[11px] font-light text-zinc-500">Please hold this cosmic moment.</p>
           </div>
         </motion.div>
       )}

@@ -7,6 +7,11 @@ type Props = {
 
 export default function DailyCosmicDashboard({ data }: Props) {
   const animateKey = `${data.dateKey}-${data.source}`;
+  const hasLabNote = Boolean(data.labNote?.trim());
+  const hasRitual = Boolean(data.ritualOfTheDay?.trim());
+  const hasLuckyColor = Boolean(data.luckyColor?.trim());
+  const hasLuckyItem = Boolean(data.luckyItem?.trim());
+  const emptyStateText = "The stars are aligning, please check back in a moment.";
 
   return (
     <section
@@ -59,7 +64,7 @@ export default function DailyCosmicDashboard({ data }: Props) {
             Daily Lab Note
           </h3>
           <p className="mt-3 text-[13px] font-light leading-relaxed text-zinc-300 sm:text-sm">
-            {data.labNote}
+            {hasLabNote ? data.labNote : emptyStateText}
           </p>
         </article>
 
@@ -69,7 +74,7 @@ export default function DailyCosmicDashboard({ data }: Props) {
               Ritual of the Day
             </h3>
             <p className="mt-3 text-[13px] font-light leading-relaxed text-zinc-300 sm:text-sm">
-              {data.ritualOfTheDay}
+              {hasRitual ? data.ritualOfTheDay : emptyStateText}
             </p>
           </article>
           <div className="grid grid-cols-2 gap-3">
@@ -77,13 +82,17 @@ export default function DailyCosmicDashboard({ data }: Props) {
               <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-zinc-600">
                 Lucky color
               </p>
-              <p className="mt-2 text-sm font-light text-[var(--gold)]">{data.luckyColor}</p>
+              <p className="mt-2 text-sm font-light text-[var(--gold)]">
+                {hasLuckyColor ? data.luckyColor : "Silver Mist"}
+              </p>
             </div>
             <div className="rounded-2xl border border-[rgba(247,231,206,0.1)] bg-black/20 p-4">
               <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-zinc-600">
                 Lucky item
               </p>
-              <p className="mt-2 text-sm font-light text-zinc-200">{data.luckyItem}</p>
+              <p className="mt-2 text-sm font-light text-zinc-200">
+                {hasLuckyItem ? data.luckyItem : "Minimal silver accessory"}
+              </p>
             </div>
           </div>
         </div>
