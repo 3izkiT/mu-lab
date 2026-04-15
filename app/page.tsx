@@ -92,8 +92,14 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
-          <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-100" aria-hidden>
-            <Image src="/logo.png" alt="" width={220} height={220} className="h-[220px] w-[220px] rounded-full shadow-[0_0_38px_rgba(247,231,206,0.2)]" />
+          <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2" aria-hidden>
+            <Image
+              src="/logo.png"
+              alt=""
+              width={260}
+              height={260}
+              className="h-[260px] w-[260px] rounded-full shadow-[0_0_46px_rgba(247,231,206,0.24)]"
+            />
           </div>
           <Reveal delay={0.1} className="relative">
             <Floating
