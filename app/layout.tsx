@@ -77,7 +77,7 @@ export default function RootLayout({
     "@type": "Organization",
     name: "Mu-Lab",
     url: siteUrl,
-    logo: `${siteUrl}/logo.png`,
+    logo: `${siteUrl}/logo-brand-v2.png`,
     description: siteDescription,
     contactPoint: [
       {

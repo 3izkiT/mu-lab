@@ -287,7 +287,7 @@ export default function FortuneForm() {
                 transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
               />
               <Image
-                src="/logo-loader.png"
+                src="/logo-loader-v2.png"
                 alt="Mu Lab loader"
                 width={96}
                 height={96}

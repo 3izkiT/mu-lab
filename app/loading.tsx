@@ -10,7 +10,7 @@ export default function Loading() {
         <div className="relative">
           <div className="absolute inset-0 animate-ping rounded-full bg-[var(--gold)]/20" />
           <Image
-            src="/logo-loader.png"
+            src="/logo-loader-v2.png"
             alt="Mu Lab loading"
             width={104}
             height={104}
