@@ -1,26 +1,153 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #07060d;
+  --foreground: #f4f4f5;
+  /* Champagne Gold */
+  --gold: #f7e7ce;
+  --gold-soft: rgba(247, 231, 206, 0.45);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-prompt), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-pridi), ui-serif, Georgia, "Times New Roman", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes mu-lab-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes mu-lab-scan {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@keyframes mu-lab-scan-pulse {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Subtle star field — tiny dots */
+.mu-lab-starfield {
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(247, 231, 206, 0.12), transparent),
+    radial-gradient(1px 1px at 82% 14%, rgba(255, 255, 255, 0.08), transparent),
+    radial-gradient(1px 1px at 30% 78%, rgba(247, 231, 206, 0.1), transparent),
+    radial-gradient(1px 1px at 64% 42%, rgba(255, 255, 255, 0.06), transparent),
+    radial-gradient(1px 1px at 48% 8%, rgba(247, 231, 206, 0.08), transparent),
+    radial-gradient(1px 1px at 92% 68%, rgba(255, 255, 255, 0.07), transparent),
+    radial-gradient(1px 1px at 18% 55%, rgba(247, 231, 206, 0.06), transparent),
+    radial-gradient(1px 1px at 55% 88%, rgba(255, 255, 255, 0.05), transparent);
+  background-size:
+    120px 140px,
+    180px 160px,
+    100px 120px,
+    200px 200px,
+    140px 130px,
+    160px 180px,
+    110px 150px,
+    190px 170px;
+  opacity: 0.5;
+  will-change: opacity;
+  contain: layout style paint;
+}
+
+.mu-lab-shimmer-bar {
+  animation: mu-lab-shimmer 2.8s ease-in-out infinite;
+}
+
+.mu-lab-scan-ring {
+  animation: mu-lab-scan 2.4s ease-in-out infinite;
+}
+
+.mu-lab-scan-pulse {
+  animation: mu-lab-scan-pulse 1.8s ease-out infinite;
+}
+
+/* Glass + champagne focus */
+.mu-lab-input {
+  border: 1px solid rgba(247, 231, 206, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(247, 231, 206, 0.06),
+    inset 0 0 24px rgba(120, 90, 180, 0.04);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.mu-lab-input:focus {
+  border-color: rgba(247, 231, 206, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(247, 231, 206, 0.1),
+    0 0 0 1px rgba(247, 231, 206, 0.2),
+    0 0 36px rgba(247, 231, 206, 0.12);
+}
+
+.mu-lab-input:focus-visible {
+  outline: none;
+}
+
+.mu-lab-btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.mu-lab-btn-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(247, 231, 206, 0.35) 48%,
+    rgba(255, 255, 255, 0.22) 54%,
+    rgba(247, 231, 206, 0.2) 58%,
+    transparent 100%
+  );
+  animation: mu-lab-shimmer 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* cmdk group heading */
+.province-cmdk [cmdk-group-heading] {
+  padding: 0.375rem 0.5rem 0.25rem;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 231, 206, 0.55);
 }
