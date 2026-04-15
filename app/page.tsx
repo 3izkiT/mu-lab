@@ -81,8 +81,8 @@ export default async function Home() {
       <div className="pointer-events-none fixed inset-0 mu-lab-starfield" aria-hidden />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 pb-28 pt-16 sm:px-8 sm:pt-20 lg:px-10 lg:pt-24">
-        {/* HERO */}
-        <section className="relative grid grid-cols-12 gap-6 overflow-hidden rounded-[2rem] p-8 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:p-10 lg:gap-8 lg:p-12">
+        {/* HERO: form-first */}
+        <section className="relative overflow-hidden rounded-[2rem] p-6 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:p-8 lg:p-10">
           <div
             className="pointer-events-none absolute inset-0 opacity-90"
             style={{
@@ -92,48 +92,10 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
-          <Reveal delay={0} className="col-span-12 lg:col-span-6">
-            <header
-              className={`relative rounded-[1.6rem] ${glassPanel} p-10 sm:rounded-[2rem] sm:p-12`}
-            >
-            <p className="text-xs font-medium uppercase tracking-[0.27em] text-[var(--gold)]/85">
-              Possibilities At The Dawn Of Fate
-            </p>
-            <h1 className="mt-6 font-serif text-[clamp(2.5rem,5.4vw,4.2rem)] font-light leading-[1.02] tracking-[0.05em] text-[#eef1ff]">
-              <GlintWrap>
-                Ancient Wisdom,
-                <br />
-                <span className="text-[var(--gold)]">Future Precision</span>
-              </GlintWrap>
-            </h1>
-            <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed tracking-[0.01em] text-[#dbe1ff]/84">
-              ห้องทดลองพยากรณ์ที่ถอดสัญญาณจักรวาลให้กลายเป็นแผนตัดสินใจที่ใช้ได้จริงในทุกวัน
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <HoverConstellation>
-                <Link
-                  href="#fortune-form"
-                  className="rounded-full bg-[linear-gradient(128deg,#f7e7ce_0%,#ecd4aa_45%,#d8b67a_100%)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_30px_rgba(247,231,206,0.22)] transition hover:brightness-105"
-                >
-                  <GlintWrap>Reveal My Fate</GlintWrap>
-                </Link>
-              </HoverConstellation>
-              <HoverConstellation>
-                <Link
-                  href="/the-science-behind-mu-lab"
-                  className="rounded-full bg-white/[0.05] px-6 py-3 text-sm font-medium tracking-[0.05em] text-[#e2e8ff] transition hover:bg-white/[0.08]"
-                >
-                  Explore Our Science
-                </Link>
-              </HoverConstellation>
-            </div>
-            </header>
-          </Reveal>
-
-          <Reveal delay={0.2} className="col-span-12 lg:col-span-6">
+          <Reveal delay={0.1} className="relative">
             <Floating
               id="fortune-form"
-              className={`relative rounded-[1.6rem] ${glassPanel} p-4 sm:rounded-[2rem] sm:p-5`}
+              className={`relative rounded-[1.6rem] ${glassPanel} p-2 sm:rounded-[2rem] sm:p-3`}
             >
               <FortuneForm />
             </Floating>
