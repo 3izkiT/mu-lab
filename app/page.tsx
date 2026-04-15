@@ -82,7 +82,7 @@ export default async function Home() {
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 pb-28 pt-16 sm:px-8 sm:pt-20 lg:px-10 lg:pt-24">
         {/* HERO: form-first */}
-        <section className="relative overflow-visible rounded-[2rem] p-6 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:p-8 lg:p-10">
+        <section className="relative z-40 overflow-visible rounded-[2rem] p-6 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:p-8 lg:p-10">
           <div
             className="pointer-events-none absolute inset-0 opacity-90"
             style={{
@@ -92,13 +92,13 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
-          <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-[0.92]" aria-hidden>
-            <Image src="/logo.png" alt="" width={220} height={220} className="h-[220px] w-[220px] rounded-full shadow-[0_0_38px_rgba(247,231,206,0.16)]" />
+          <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-100" aria-hidden>
+            <Image src="/logo.png" alt="" width={220} height={220} className="h-[220px] w-[220px] rounded-full shadow-[0_0_38px_rgba(247,231,206,0.2)]" />
           </div>
           <Reveal delay={0.1} className="relative">
             <Floating
               id="fortune-form"
-              className={`relative rounded-[1.6rem] ${glassPanel} p-2 sm:rounded-[2rem] sm:p-3`}
+              className="relative z-50 rounded-[1.6rem] p-2 sm:rounded-[2rem] sm:p-3"
             >
               <FortuneForm />
             </Floating>
@@ -106,7 +106,7 @@ export default async function Home() {
         </section>
 
         {/* SECONDARY */}
-        <Reveal delay={0.35} className="mt-4">
+        <Reveal delay={0.35} className="relative z-10 mt-4">
           <DailyCosmicDashboard data={daily} />
         </Reveal>
 

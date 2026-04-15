@@ -470,7 +470,7 @@ export default function FortuneForm() {
         </div>
 
         <div className="space-y-10">
-          <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
+          <section className="rounded-2xl bg-white/[0.03] p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-8">
             <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลพื้นฐาน</p>
             <div className="grid gap-6 sm:grid-cols-2">
               <label className="block sm:col-span-2">
@@ -530,7 +530,7 @@ export default function FortuneForm() {
             </div>
           </section>
 
-          <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
+          <section className="rounded-2xl bg-white/[0.03] p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-8">
             <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลเวลาและสถานที่เกิด</p>
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="sm:col-span-2">
