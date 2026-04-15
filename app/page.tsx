@@ -214,14 +214,12 @@ export default async function Home() {
           <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">About Mu-Lab</p>
           <div className="mt-4 space-y-4 text-sm font-light leading-relaxed text-zinc-400">
             <p className="font-serif">
-              Mu-Lab is a Quantum-Astrology Laboratory based in Nakhon Si Thammarat, Thailand,
-              combining ancient wisdom with generative AI logic to translate cosmic motion into clear
-              daily guidance.
+              Mu-Lab เริ่มจากคำถามง่าย ๆ ว่า “ทำไมคำทำนายต้องคลุมเครือ?” เราจึงสร้างพื้นที่ที่แปลงภาษาดวงดาวให้เป็นภาษาชีวิตจริง
+              ให้คุณมองเห็นจังหวะที่ควรเดินหน้า ชะลอ หรือเปลี่ยนเกมอย่างมั่นใจ
             </p>
             <p className="font-serif">
-              We design every reading around three values: Precision, Modernity, and Individual
-              Insight, so each recommendation feels refined, relevant, and grounded in both tradition
-              and contemporary analysis.
+              ทุกคำแนะนำถูกออกแบบเหมือนแผนที่ส่วนตัว: ละเอียดพอจะใช้ตัดสินใจ และนุ่มพอจะไม่ทำให้คุณหลงทาง
+              เพราะสำหรับเรา ดวงที่ดีไม่ใช่ดวงที่ฟังแล้วว้าว แต่คือดวงที่อ่านแล้ว “ใช้ได้จริง” ในวันพรุ่งนี้
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
