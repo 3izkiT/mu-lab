@@ -4,15 +4,17 @@ function normalizeSiteUrl(url: string): string {
 
 /**
  * Canonical site URL for SEO/schema.
- * In production, NEXT_PUBLIC_SITE_URL must be set explicitly.
+ * Prefer NEXT_PUBLIC_SITE_URL in all environments.
  */
 export function getSiteUrl(): string {
   const configured = process.env.NEXT_PUBLIC_SITE_URL;
   if (configured) return normalizeSiteUrl(configured);
 
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("NEXT_PUBLIC_SITE_URL is required in production for canonical SEO URLs.");
+  const vercelUrl = process.env.VERCEL_URL;
+  if (vercelUrl) {
+    return normalizeSiteUrl(`https://${vercelUrl}`);
   }
 
+  // Final local fallback to keep builds/dev from crashing.
   return "http://localhost:3000";
 }
