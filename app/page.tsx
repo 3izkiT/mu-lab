@@ -88,9 +88,9 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
-          <Reveal delay={0}>
+          <Reveal delay={0} className="col-span-12 lg:col-span-6">
             <header
-              className={`relative col-span-12 rounded-[1.6rem] ${glassPanel} p-10 sm:rounded-[2rem] sm:p-12 lg:col-span-6`}
+              className={`relative rounded-[1.6rem] ${glassPanel} p-10 sm:rounded-[2rem] sm:p-12`}
             >
             <p className="text-xs font-medium uppercase tracking-[0.27em] text-[var(--gold)]/85">
               Possibilities At The Dawn Of Fate
@@ -126,10 +126,10 @@ export default async function Home() {
             </header>
           </Reveal>
 
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} className="col-span-12 lg:col-span-6">
             <Floating
               id="fortune-form"
-              className={`relative col-span-12 rounded-[1.6rem] ${glassPanel} p-4 sm:rounded-[2rem] sm:p-5 lg:col-span-6`}
+              className={`relative rounded-[1.6rem] ${glassPanel} p-4 sm:rounded-[2rem] sm:p-5`}
             >
               <FortuneForm />
             </Floating>
