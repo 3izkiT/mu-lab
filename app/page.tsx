@@ -15,29 +15,29 @@ export default async function Home() {
     <main className="relative min-h-screen overflow-hidden">
       <header className="sticky top-0 z-30 border-b border-[rgba(247,231,206,0.2)] bg-white/[0.75] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <p className="font-serif text-lg tracking-tight text-[#162238]">Mu-Lab</p>
+          <p className="font-serif text-xl tracking-tight text-[#162238]">Mu-Lab</p>
           <nav className="hidden items-center gap-2 sm:flex">
             <Link
               href="#fortune-form"
-              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs text-slate-700 transition hover:bg-white"
+              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-sm text-slate-800 transition hover:bg-white"
             >
               ดูดวงทันที
             </Link>
             <Link
               href="#services"
-              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs text-slate-700 transition hover:bg-white"
+              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-sm text-slate-800 transition hover:bg-white"
             >
               บริการและแพ็กเกจ
             </Link>
             <Link
               href="#about"
-              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs text-slate-700 transition hover:bg-white"
+              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-sm text-slate-800 transition hover:bg-white"
             >
               เกี่ยวกับ Mu-Lab
             </Link>
             <Link
               href="#fortune-form"
-              className="rounded-full border border-[rgba(247,231,206,0.35)] bg-[rgba(247,231,206,0.2)] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.1em] text-[#6b4e12] transition hover:bg-[rgba(247,231,206,0.3)]"
+              className="rounded-full border border-[rgba(247,231,206,0.35)] bg-[rgba(247,231,206,0.2)] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.06em] text-[#6b4e12] transition hover:bg-[rgba(247,231,206,0.3)]"
             >
               เริ่มวิเคราะห์
             </Link>
@@ -66,41 +66,41 @@ export default async function Home() {
           <header
             className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.72] p-6 shadow-[0_0_0_1px_rgba(247,231,206,0.18)_inset,0_28px_70px_rgba(63,91,148,0.14)] backdrop-blur-xl sm:rounded-3xl sm:p-8 lg:col-span-6`}
           >
-            <p className="text-[10px] font-light uppercase tracking-[0.38em] text-zinc-500/80 sm:text-[11px]">
+            <p className="text-xs font-medium uppercase tracking-[0.22em] text-slate-700">
               Mu-Lab Analysis
             </p>
             <h1 className="mt-4 font-serif text-[clamp(2.3rem,5.2vw,3.6rem)] font-light leading-[1.06] tracking-[-0.03em] text-[#162238]">
               Mu-Lab
             </h1>
-            <p className="mt-5 max-w-2xl text-[13px] font-light leading-relaxed tracking-wide text-slate-600 sm:text-sm">
+            <p className="mt-5 max-w-2xl text-base font-light leading-relaxed tracking-normal text-slate-700">
               ไขรหัสชีวิตรายบุคคลในไม่กี่นาที จากวันเวลาเกิดและพลังงานรายวันแบบพรีเมียม
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Link
                 href="#fortune-form"
-                className="rounded-full border border-[rgba(247,231,206,0.6)] bg-[rgba(247,231,206,0.42)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#1a237e] transition hover:bg-[rgba(247,231,206,0.62)]"
+                className="rounded-full border border-[rgba(247,231,206,0.6)] bg-[rgba(247,231,206,0.42)] px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-[#1a237e] transition hover:bg-[rgba(247,231,206,0.62)]"
               >
                 Reveal My Fate
               </Link>
               <Link
                 href="/the-science-behind-mu-lab"
-                className={`rounded-full ${goldBorder} bg-transparent px-4 py-2 text-xs font-light tracking-[0.08em] text-slate-700 transition hover:bg-white/60`}
+                className={`rounded-full ${goldBorder} bg-transparent px-4 py-2 text-sm font-medium tracking-[0.02em] text-slate-800 transition hover:bg-white/60`}
               >
                 「 เจาะลึกกลไกของห้องทดลอง 」 (Explore our Science)
               </Link>
             </div>
             <div className="mt-7 flex flex-wrap gap-2">
               <span
-                className={`rounded-full ${goldBorder} bg-white/70 px-3 py-1 text-[10px] font-light uppercase tracking-wider text-slate-600`}
+                className={`rounded-full ${goldBorder} bg-white/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-slate-700`}
               >
                 ลักขณา
               </span>
               <span
-                className={`rounded-full ${goldBorder} bg-white/70 px-3 py-1 text-[10px] font-light uppercase tracking-wider text-slate-600`}
+                className={`rounded-full ${goldBorder} bg-white/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-slate-700`}
               >
                 Personal chart
               </span>
-              <span className="rounded-full border border-[rgba(247,231,206,0.24)] bg-[rgba(247,231,206,0.06)] px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-[var(--gold)]">
+              <span className="rounded-full border border-[rgba(247,231,206,0.24)] bg-[rgba(247,231,206,0.2)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#1a237e]">
                 Signature
               </span>
             </div>
@@ -145,54 +145,54 @@ export default async function Home() {
           <div
             className={`col-span-12 rounded-[1.35rem] ${goldBorder} bg-white/[0.78] p-6 shadow-[0_18px_44px_rgba(63,91,148,0.12)] sm:rounded-3xl sm:p-8`}
           >
-            <p className="text-[10px] font-light uppercase tracking-[0.32em] text-zinc-600">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#1a237e]/70">
               Services & Offers
             </p>
             <h2 className="mt-3 font-serif text-2xl font-light tracking-tight text-[#162238] sm:text-3xl">
               เลือกบริการดูดวงที่เหมาะกับจังหวะชีวิตคุณ
             </h2>
-            <p className="mt-3 max-w-2xl text-sm font-light leading-relaxed text-slate-600">
+            <p className="mt-3 max-w-2xl text-base font-light leading-relaxed text-slate-700">
               ออกแบบเป็นขั้น: เริ่มจาก Quick Reading เพื่อเห็นภาพรวม แล้วค่อยขยับเป็นโหมดลึกเพื่อการตัดสินใจเรื่องสำคัญ
             </p>
 
             <div className="mt-6 grid gap-3 lg:grid-cols-3">
               <article className="rounded-2xl border border-[rgba(247,231,206,0.24)] bg-white/80 p-5">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Starter</p>
+                <p className="text-xs uppercase tracking-[0.1em] text-[#1a237e]/70">Starter</p>
                 <h3 className="mt-2 font-serif text-xl text-[#162238]">Quick Reading</h3>
-                <p className="mt-2 text-sm font-light leading-relaxed text-slate-600">
+                <p className="mt-2 text-base font-light leading-relaxed text-slate-700">
                   วิเคราะห์พื้นดวงและคำแนะนำรายวันสำหรับการตัดสินใจทันที
                 </p>
                 <Link
                   href="#fortune-form"
-                  className="mt-4 inline-flex rounded-full border border-[rgba(247,231,206,0.34)] bg-white px-4 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-[rgba(247,231,206,0.18)]"
+                  className="mt-4 inline-flex rounded-full border border-[rgba(247,231,206,0.34)] bg-white px-4 py-1.5 text-sm font-semibold text-slate-800 transition hover:bg-[rgba(247,231,206,0.18)]"
                 >
                   เริ่มใช้ฟรี
                 </Link>
               </article>
 
               <article className="rounded-2xl border border-[rgba(247,231,206,0.3)] bg-[rgba(247,231,206,0.2)] p-5 shadow-[0_10px_25px_rgba(247,231,206,0.2)]">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#7a5a1f]">Most Popular</p>
+                <p className="text-xs uppercase tracking-[0.1em] text-[#7a5a1f]">Most Popular</p>
                 <h3 className="mt-2 font-serif text-xl text-[#162238]">Deep Insight Session</h3>
-                <p className="mt-2 text-sm font-light leading-relaxed text-slate-700">
+                <p className="mt-2 text-base font-light leading-relaxed text-slate-800">
                   เจาะลึกงาน เงิน ความรัก พร้อมแผน 30 วันแบบลงมือทำได้จริง
                 </p>
                 <Link
                   href="#fortune-form"
-                  className="mt-4 inline-flex rounded-full border border-[rgba(247,231,206,0.4)] bg-white px-4 py-1.5 text-xs font-semibold text-[#6b4e12] transition hover:bg-[rgba(247,231,206,0.25)]"
+                  className="mt-4 inline-flex rounded-full border border-[rgba(247,231,206,0.4)] bg-white px-4 py-1.5 text-sm font-semibold text-[#6b4e12] transition hover:bg-[rgba(247,231,206,0.25)]"
                 >
                   ปลดล็อกโหมดลึก
                 </Link>
               </article>
 
               <article className="rounded-2xl border border-[rgba(247,231,206,0.24)] bg-white/80 p-5">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Premium</p>
+                <p className="text-xs uppercase tracking-[0.1em] text-[#1a237e]/70">Premium</p>
                 <h3 className="mt-2 font-serif text-xl text-[#162238]">VIP Guidance</h3>
-                <p className="mt-2 text-sm font-light leading-relaxed text-slate-600">
+                <p className="mt-2 text-base font-light leading-relaxed text-slate-700">
                   วิเคราะห์เชิงกลยุทธ์รายเดือนสำหรับช่วงเปลี่ยนงาน ลงทุน หรือความสัมพันธ์
                 </p>
                 <Link
                   href="#fortune-form"
-                  className="mt-4 inline-flex rounded-full border border-[rgba(247,231,206,0.34)] bg-white px-4 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-[rgba(247,231,206,0.18)]"
+                  className="mt-4 inline-flex rounded-full border border-[rgba(247,231,206,0.34)] bg-white px-4 py-1.5 text-sm font-semibold text-slate-800 transition hover:bg-[rgba(247,231,206,0.18)]"
                 >
                   รับคำแนะนำพรีเมียม
                 </Link>
