@@ -69,9 +69,54 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Mu-Lab",
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
+    description: siteDescription,
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "hello@mu-lab.app",
+        availableLanguage: ["th", "en"],
+      },
+    ],
+    sameAs: ["https://www.facebook.com/mulab", "https://www.tiktok.com/@mulab"],
+  };
+
+  const webPageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: siteTitle,
+    url: siteUrl,
+    description: siteDescription,
+    inLanguage: "th-TH",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Mu-Lab",
+      url: siteUrl,
+    },
+    about: {
+      "@type": "Organization",
+      name: "Mu-Lab",
+      url: siteUrl,
+    },
+  };
+
   return (
     <html lang="th" className={`${prompt.variable} ${pridi.variable} h-full`}>
       <body className="min-h-full bg-[#07060d] font-sans text-zinc-100 antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+        />
         {children}
         <Analytics />
       </body>
