@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #100a2a;
+  --background: #130a35;
   --foreground: #f0eafe;
   --gold: #f7e7ce;
   --gold-soft: rgba(247, 231, 206, 0.22);
-  --cosmic-blue: #120d35;
-  --cosmic-blue-soft: rgba(82, 66, 160, 0.22);
+  --cosmic-blue: #130a35;
+  --cosmic-blue-soft: rgba(86, 66, 166, 0.2);
 }
 
 @theme inline {
@@ -50,10 +50,10 @@
 
 body {
   background:
-    radial-gradient(70% 55% at 22% 20%, rgba(82, 66, 160, 0.28) 0%, transparent 65%),
-    radial-gradient(50% 42% at 80% 18%, rgba(101, 56, 152, 0.24) 0%, transparent 66%),
-    radial-gradient(58% 45% at 54% 70%, rgba(43, 52, 130, 0.22) 0%, transparent 68%),
-    linear-gradient(160deg, #150d38 0%, #100a2a 55%, #0a0718 100%);
+    radial-gradient(70% 55% at 22% 20%, rgba(90, 70, 170, 0.24) 0%, transparent 65%),
+    radial-gradient(50% 42% at 80% 18%, rgba(110, 60, 160, 0.2) 0%, transparent 66%),
+    radial-gradient(58% 45% at 54% 70%, rgba(56, 60, 138, 0.18) 0%, transparent 68%),
+    linear-gradient(160deg, #1a1042 0%, #130a35 55%, #0d0824 100%);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }

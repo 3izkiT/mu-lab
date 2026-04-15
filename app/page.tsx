@@ -66,11 +66,11 @@ export default async function Home() {
 
       {/* Deep cosmic cinematic background */}
       <div
-        className="pointer-events-none fixed inset-0 bg-[linear-gradient(165deg,#060c1f_0%,#030711_52%,#02040a_100%)]"
+        className="pointer-events-none fixed inset-0 bg-[linear-gradient(165deg,#1a1042_0%,#130a35_52%,#0d0824_100%)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(85%_70%_at_50%_12%,rgba(104,118,218,0.24)_0%,transparent_62%)]"
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(85%_70%_at_50%_12%,rgba(98,86,188,0.2)_0%,transparent_62%)]"
         aria-hidden
       />
       <div
@@ -92,8 +92,8 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
-          <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-[0.18]" aria-hidden>
-            <Image src="/logo.png" alt="" width={220} height={220} className="h-[220px] w-[220px] rounded-full blur-[0.2px]" />
+          <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-[0.92]" aria-hidden>
+            <Image src="/logo.png" alt="" width={220} height={220} className="h-[220px] w-[220px] rounded-full shadow-[0_0_38px_rgba(247,231,206,0.16)]" />
           </div>
           <Reveal delay={0.1} className="relative">
             <Floating
