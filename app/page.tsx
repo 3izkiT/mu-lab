@@ -23,7 +23,7 @@ export default async function Home() {
               alt="Mu Lab"
               width={46}
               height={46}
-              className="mu-lab-logo-living h-[46px] w-[46px] shrink-0 rounded-full object-cover"
+              className="mu-lab-logo-solid mu-lab-logo-living h-[46px] w-[46px] shrink-0 rounded-full object-cover"
             />
             <p className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
           </Link>
@@ -88,7 +88,7 @@ export default async function Home() {
               alt=""
               width={260}
               height={260}
-              className="mu-lab-logo-living mu-lab-logo-floating h-full w-full rounded-full object-cover drop-shadow-[0_16px_44px_rgba(0,0,0,0.52)]"
+              className="mu-lab-logo-solid mu-lab-logo-living mu-lab-logo-floating h-full w-full rounded-full object-cover drop-shadow-[0_16px_44px_rgba(0,0,0,0.52)]"
             />
           </div>
           <div

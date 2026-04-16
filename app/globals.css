@@ -205,6 +205,12 @@ body {
   filter: contrast(1.08) saturate(1.08);
 }
 
+/* Force opaque logo plate (no transparent look) */
+.mu-lab-logo-solid {
+  background-color: #0a1024;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
 @keyframes mu-lab-logo-float {
   0%,
   100% {

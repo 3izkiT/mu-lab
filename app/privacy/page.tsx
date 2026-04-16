@@ -69,7 +69,7 @@ export default function PrivacyPage() {
             alt="Mu Lab"
             width={40}
             height={40}
-            className="mu-lab-logo-living h-10 w-10 rounded-full object-cover"
+            className="mu-lab-logo-solid mu-lab-logo-living h-10 w-10 rounded-full object-cover"
           />
           <span className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</span>
         </Link>

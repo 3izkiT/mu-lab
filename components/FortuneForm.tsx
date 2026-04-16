@@ -312,7 +312,7 @@ export default function FortuneForm() {
                 alt="Mu Lab loader"
                 width={96}
                 height={96}
-                className="mu-lab-logo-living relative z-10 h-24 w-24 rounded-full object-cover drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+                className="mu-lab-logo-solid mu-lab-logo-living relative z-10 h-24 w-24 rounded-full object-cover drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
                 priority
               />
             </motion.div>
