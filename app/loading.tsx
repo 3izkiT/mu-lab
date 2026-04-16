@@ -16,17 +16,14 @@ export default function Loading() {
           <span className="text-[10px] font-light uppercase tracking-[0.28em] text-[var(--gold)]/80">Quantum</span>
         </div>
         <div className="relative grid h-[104px] w-[104px] place-items-center">
-          <div className="absolute inset-0 animate-ping rounded-full bg-[var(--gold)]/20" />
-          <span className="relative grid h-[104px] w-[104px] place-items-center overflow-hidden rounded-full bg-[var(--background)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
-            <Image
-              src="/logo-loader-v2.png"
-              alt="Mu Lab loading"
-              width={104}
-              height={104}
-              className="h-[104px] w-[104px] rounded-full object-cover"
-              priority
-            />
-          </span>
+          <Image
+            src="/logo-loader-v2.png"
+            alt="Mu Lab loading"
+            width={104}
+            height={104}
+            className="mu-lab-logo-living h-[104px] w-[104px] rounded-full object-cover drop-shadow-[0_10px_28px_rgba(0,0,0,0.5)]"
+            priority
+          />
         </div>
         <p className="font-serif text-sm tracking-[0.12em] text-[var(--gold)]/90">Initializing Mu-Lab Orbit...</p>
       </div>

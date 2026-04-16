@@ -302,16 +302,14 @@ export default function FortuneForm() {
                 animate={{ opacity: [0.42, 0.95, 0.5] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span className="relative z-10 grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-[var(--background)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
-                <Image
-                  src="/logo-loader-v2.png"
-                  alt="Mu Lab loader"
-                  width={96}
-                  height={96}
-                  className="h-24 w-24 rounded-full object-cover"
-                  priority
-                />
-              </span>
+              <Image
+                src="/logo-loader-v2.png"
+                alt="Mu Lab loader"
+                width={96}
+                height={96}
+                className="mu-lab-logo-living relative z-10 h-24 w-24 rounded-full object-cover drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+                priority
+              />
             </motion.div>
 
             <p className="mt-10 flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
@@ -667,7 +665,7 @@ export default function FortuneForm() {
             type="button"
             onClick={handleSubmit}
             disabled={!isFormValid || isLoading}
-            className="mu-lab-btn-shimmer relative inline-flex min-h-[52px] w-full max-w-full items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ebd3a8_48%,#d6b379_100%)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#201911] shadow-[0_0_34px_rgba(247,231,206,0.26)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-35 sm:w-auto sm:min-w-[220px] sm:px-8 sm:tracking-[0.16em]"
+            className="mu-lab-btn-shimmer mu-lab-btn-fate relative inline-flex min-h-[52px] w-full max-w-full items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ebd3a8_48%,#d6b379_100%)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#201911] shadow-[0_0_34px_rgba(247,231,206,0.26)] disabled:cursor-not-allowed disabled:opacity-35 sm:w-auto sm:min-w-[220px] sm:px-8 sm:tracking-[0.16em]"
           >
             <span className="relative z-10">Reveal My Fate</span>
           </button>

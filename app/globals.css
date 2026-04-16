@@ -189,6 +189,51 @@ body {
   overflow: hidden;
 }
 
+/* Logo: natural asset colors + subtle “living” pulse (motion lives here, not the form) */
+@keyframes mu-lab-logo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px rgba(247, 231, 206, 0.12));
+  }
+  50% {
+    transform: scale(1.028);
+    filter: drop-shadow(0 0 20px rgba(247, 231, 206, 0.28));
+  }
+}
+
+.mu-lab-logo-living {
+  animation: mu-lab-logo-breathe 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mu-lab-logo-living {
+    animation: none;
+  }
+}
+
+/* Primary CTA — emphasis on button, form stays static */
+.mu-lab-btn-fate {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.28s ease,
+    filter 0.22s ease;
+}
+
+.mu-lab-btn-fate:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+  box-shadow:
+    0 0 0 1px rgba(247, 231, 206, 0.42),
+    0 14px 42px rgba(247, 231, 206, 0.2),
+    0 0 52px rgba(247, 231, 206, 0.16);
+}
+
+.mu-lab-btn-fate:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(1.02);
+}
+
 .mu-lab-btn-shimmer::after {
   content: "";
   position: absolute;

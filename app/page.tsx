@@ -1,11 +1,5 @@
 import DailyCosmicDashboard from "@/components/DailyCosmicDashboard";
-import {
-  Floating,
-  GlintWrap,
-  HoverConstellation,
-  ParallaxNebula,
-  Reveal,
-} from "@/components/CinematicCelestial";
+import { GlintWrap, HoverConstellation, ParallaxNebula, Reveal } from "@/components/CinematicCelestial";
 import FortuneForm from "@/components/FortuneForm";
 import { getDailyForecast } from "@/lib/daily-forecast-data";
 import Image from "next/image";
@@ -24,9 +18,13 @@ export default async function Home() {
       <header className="sticky top-0 z-30 bg-[rgba(6,10,22,0.68)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
-            <span className="grid shrink-0 place-items-center rounded-full bg-[var(--background)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
-              <Image src="/logo-brand-v2.png" alt="Mu Lab" width={46} height={46} className="h-[46px] w-[46px] rounded-full" />
-            </span>
+            <Image
+              src="/logo-brand-v2.png"
+              alt="Mu Lab"
+              width={46}
+              height={46}
+              className="mu-lab-logo-living h-[46px] w-[46px] shrink-0 rounded-full object-cover"
+            />
             <p className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
           </div>
           <nav className="hidden items-center gap-2 sm:flex">
@@ -82,7 +80,7 @@ export default async function Home() {
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
           <div
-            className="pointer-events-none absolute -top-8 left-1/2 grid h-[min(52vw,200px)] w-[min(52vw,200px)] -translate-x-1/2 place-items-center rounded-full bg-[var(--background)] shadow-[0_0_46px_rgba(247,231,206,0.24),inset_0_0_0_1px_rgba(255,255,255,0.06)] sm:-top-10 sm:h-[260px] sm:w-[260px]"
+            className="pointer-events-none absolute -top-8 left-1/2 grid h-[min(52vw,200px)] w-[min(52vw,200px)] -translate-x-1/2 place-items-center sm:-top-10 sm:h-[260px] sm:w-[260px]"
             aria-hidden
           >
             <Image
@@ -90,17 +88,15 @@ export default async function Home() {
               alt=""
               width={260}
               height={260}
-              className="h-full w-full rounded-full object-cover"
+              className="mu-lab-logo-living h-full w-full rounded-full object-cover drop-shadow-[0_12px_36px_rgba(0,0,0,0.45)]"
             />
           </div>
-          <Reveal delay={0.1} className="relative min-w-0 w-full">
-            <Floating
-              id="fortune-form"
-              className="relative z-50 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:rounded-[2rem] sm:p-3"
-            >
-              <FortuneForm />
-            </Floating>
-          </Reveal>
+          <div
+            id="fortune-form"
+            className="relative z-50 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:rounded-[2rem] sm:p-3"
+          >
+            <FortuneForm />
+          </div>
         </section>
 
         {/* SECONDARY */}
