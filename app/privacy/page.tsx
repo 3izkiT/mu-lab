@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ParallaxNebula } from "@/components/CinematicCelestial";
 import { getSiteUrl } from "@/lib/site-url";
@@ -62,6 +63,16 @@ export default function PrivacyPage() {
       <div className="pointer-events-none fixed inset-0 z-[3] mu-lab-starfield" aria-hidden />
 
       <section className="relative z-10 mx-auto max-w-4xl px-4 pb-16 pt-12 sm:px-6 lg:px-8 lg:pt-16">
+        <Link href="/" className="mb-6 inline-flex items-center gap-3" aria-label="Go to Mu-Lab homepage">
+          <Image
+            src="/logo-brand-v2.png"
+            alt="Mu Lab"
+            width={40}
+            height={40}
+            className="mu-lab-logo-living h-10 w-10 rounded-full object-cover"
+          />
+          <span className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</span>
+        </Link>
         <div className={`mu-lab-glass rounded-[1.35rem] ${goldBorder} p-7 shadow-[0_16px_42px_rgba(1,4,16,0.42)] backdrop-blur-xl sm:rounded-3xl sm:p-10`}>
           <p className="text-[10px] font-light uppercase tracking-[0.34em] text-[var(--gold)]/70">Mu-Lab Policy</p>
           <h1 className="mt-4 font-serif text-3xl font-light tracking-tight text-[#eef1ff] sm:text-4xl">
@@ -75,7 +86,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="font-serif text-xl text-[#eef1ff]">1. Information We Process</h2>
               <p className="mt-2">
-                ระบบประมวลผลข้อมูลวันเดือนปีเกิด เวลาเกิด และจังหวัดเกิดตามที่ผู้ใช้ระบุ เพื่อสร้างผลวิเคราะห์ผ่าน Mu-Lab Algorithm (Gemini)
+                ระบบประมวลผลข้อมูลวันเดือนปีเกิด เวลาเกิด และจังหวัดเกิดตามที่ผู้ใช้ระบุ เพื่อสร้างผลวิเคราะห์ผ่านระบบวิเคราะห์ของ Mu-Lab
               </p>
             </section>
             <section>

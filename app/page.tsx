@@ -17,7 +17,7 @@ export default async function Home() {
     <main className="relative min-h-screen">
       <header className="sticky top-0 z-30 bg-[rgba(6,10,22,0.68)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3" aria-label="Go to Mu-Lab homepage">
             <Image
               src="/logo-brand-v2.png"
               alt="Mu Lab"
@@ -26,7 +26,7 @@ export default async function Home() {
               className="mu-lab-logo-living h-[46px] w-[46px] shrink-0 rounded-full object-cover"
             />
             <p className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
-          </div>
+          </Link>
           <nav className="hidden items-center gap-2 sm:flex">
             <HoverConstellation>
               <Link
@@ -80,7 +80,7 @@ export default async function Home() {
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
           <div
-            className="pointer-events-none absolute -top-18 left-1/2 grid h-[min(46vw,180px)] w-[min(46vw,180px)] -translate-x-1/2 place-items-center opacity-95 sm:-top-26 sm:h-[238px] sm:w-[238px]"
+            className="pointer-events-none absolute -top-8 left-1/2 grid h-[min(42vw,160px)] w-[min(42vw,160px)] -translate-x-1/2 place-items-center opacity-95 sm:-top-12 sm:h-[210px] sm:w-[210px]"
             aria-hidden
           >
             <Image
@@ -93,7 +93,7 @@ export default async function Home() {
           </div>
           <div
             id="fortune-form"
-            className="relative z-50 mt-6 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:mt-10 sm:rounded-[2rem] sm:p-3"
+            className="relative z-50 mt-14 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:mt-16 sm:rounded-[2rem] sm:p-3"
           >
             <FortuneForm />
           </div>

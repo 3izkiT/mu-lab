@@ -21,7 +21,7 @@ const pridi = Pridi({
 const siteUrl = getSiteUrl();
 
 const siteTitle =
-  "Mu-Lab: ไขรหัสชีวิตรายบุคคลด้วย AI ห้องทดลองโหราศาสตร์ยุคใหม่";
+  "Mu-Lab: ไขรหัสชีวิตรายบุคคลด้วยห้องทดลองโหราศาสตร์ยุคใหม่";
 
 const siteDescription =
   "ดูดวงส่วนตัวแบบพรีเมียม — วิเคราะห์ลักขณาและดวงชะตาจากวันเวลาและจังหวัดเกิด พร้อมคำแนะจาก Mu-Lab Algorithm";
