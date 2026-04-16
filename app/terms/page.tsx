@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ParallaxNebula } from "@/components/CinematicCelestial";
+import {
+  POLICY_LAST_UPDATED,
+  TERMS_INTRO,
+  TERMS_SECTIONS,
+} from "@/lib/policy-content";
 import { getSiteUrl } from "@/lib/site-url";
 
 const siteUrl = getSiteUrl();
@@ -79,40 +84,17 @@ export default function TermsPage() {
             Terms of Service
           </h1>
           <p className="mt-4 text-sm font-light leading-relaxed text-[#dbe1ff]/80">
-            เงื่อนไขการใช้งานนี้กำหนดกรอบการให้บริการของ Mu-Lab เพื่อให้ประสบการณ์การวิเคราะห์ส่วนบุคคลมีความปลอดภัย โปร่งใส และเหมาะสมกับการใช้งานเชิงพยากรณ์ร่วมสมัย
+            {TERMS_INTRO}
           </p>
+          <p className="mt-2 text-xs text-[#dbe1ff]/65">อัปเดตล่าสุด: {POLICY_LAST_UPDATED}</p>
 
           <div className="mt-8 space-y-6 text-sm font-light leading-relaxed text-[#dbe1ff]/78">
-            <section>
-              <h2 className="font-serif text-xl text-[#eef1ff]">1. Nature of Service</h2>
-              <p className="mt-2">
-                Mu-Lab ให้บริการวิเคราะห์แนวโน้มชีวิตและพลังงานประจ าวันในรูปแบบข้อมูลเชิงตีความ ผู้ใช้ยอมรับว่าผลลัพธ์เป็นแนวทางประกอบการตัดสินใจ ไม่ใช่คำรับรองผลลัพธ์ที่แน่นอน
-              </p>
-            </section>
-            <section>
-              <h2 className="font-serif text-xl text-[#eef1ff]">2. Data Processing Scope</h2>
-              <p className="mt-2">
-                ข้อมูลวันเดือนปีเกิด เวลาเกิด และจังหวัดเกิดที่ผู้ใช้กรอก จะถูกประมวลผลผ่านระบบวิเคราะห์ของ Mu-Lab เพื่อสร้างคำพยากรณ์เฉพาะบุคคลเท่านั้น
-              </p>
-            </section>
-            <section>
-              <h2 className="font-serif text-xl text-[#eef1ff]">3. Storage Limitation</h2>
-              <p className="mt-2">
-                ระบบปัจจุบันไม่ได้เก็บข้อมูลส่วนบุคคลดังกล่าวไว้ในฐานข้อมูลถาวรเพื่อการทำโปรไฟล์ผู้ใช้ระยะยาว โดยการประมวลผลมุ่งเน้นที่ผลลัพธ์คำพยากรณ์ในบริบทของคำขอแต่ละครั้ง
-              </p>
-            </section>
-            <section>
-              <h2 className="font-serif text-xl text-[#eef1ff]">4. Responsible Use</h2>
-              <p className="mt-2">
-                ผู้ใช้ตกลงใช้งานบริการอย่างสุจริต ไม่ส่งข้อมูลเท็จหรือใช้ระบบในลักษณะที่ละเมิดสิทธิผู้อื่น และเคารพข้อกำหนดทางกฎหมายที่เกี่ยวข้อง
-              </p>
-            </section>
-            <section>
-              <h2 className="font-serif text-xl text-[#eef1ff]">5. Updates to Terms</h2>
-              <p className="mt-2">
-                Mu-Lab อาจปรับปรุงข้อกำหนดนี้ตามการพัฒนาบริการ โดยจะเผยแพร่เวอร์ชันล่าสุดบนหน้านี้เสมอ
-              </p>
-            </section>
+            {TERMS_SECTIONS.map((section) => (
+              <section key={section.id}>
+                <h2 className="font-serif text-xl text-[#eef1ff]">{section.title}</h2>
+                <p className="mt-2">{section.body}</p>
+              </section>
+            ))}
           </div>
 
           <div className="mt-10 flex flex-wrap gap-2">
@@ -121,6 +103,18 @@ export default function TermsPage() {
               className={`rounded-full ${goldBorder} bg-[rgba(247,231,206,0.08)] px-4 py-1.5 text-xs font-light tracking-wide text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.16)]`}
             >
               View Privacy Policy
+            </Link>
+            <Link
+              href="/cookie-policy"
+              className={`rounded-full ${goldBorder} bg-[rgba(247,231,206,0.08)] px-4 py-1.5 text-xs font-light tracking-wide text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.16)]`}
+            >
+              View Cookie Policy
+            </Link>
+            <Link
+              href="/data-request"
+              className={`rounded-full ${goldBorder} bg-[rgba(247,231,206,0.08)] px-4 py-1.5 text-xs font-light tracking-wide text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.16)]`}
+            >
+              Data Request Form
             </Link>
             <Link
               href="/"

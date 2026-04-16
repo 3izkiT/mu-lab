@@ -46,7 +46,7 @@ export default async function Home() {
             </HoverConstellation>
             <HoverConstellation>
               <Link
-                href="#about"
+                href="/the-science-behind-mu-lab"
                 className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
               >
                 เกี่ยวกับ Mu-Lab
@@ -61,6 +61,31 @@ export default async function Home() {
               </Link>
             </HoverConstellation>
           </nav>
+          <details className="group relative sm:hidden">
+            <summary className="list-none rounded-full border border-white/15 px-4 py-2 text-sm text-zinc-200">
+              เมนู
+            </summary>
+            <div className="absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-white/12 bg-[#071024]/95 p-2 backdrop-blur-xl">
+              <Link href="#fortune-form" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
+                ดูดวงทันที
+              </Link>
+              <Link href="#services" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
+                บริการและแพ็กเกจ
+              </Link>
+              <Link
+                href="/the-science-behind-mu-lab"
+                className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]"
+              >
+                เกี่ยวกับ Mu-Lab
+              </Link>
+              <Link
+                href="#fortune-form"
+                className="mt-1 block rounded-xl bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-3 py-2 text-center text-sm font-semibold text-[#241d16]"
+              >
+                เริ่มวิเคราะห์
+              </Link>
+            </div>
+          </details>
         </div>
       </header>
 
@@ -68,41 +93,43 @@ export default async function Home() {
       <div className="pointer-events-none fixed inset-0 z-[3] mu-lab-starfield" aria-hidden />
 
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl px-4 pb-28 pt-14 sm:px-8 sm:pt-20 lg:px-10 lg:pt-24">
-        {/* HERO: form-first */}
-        <section className="relative z-40 min-w-0 overflow-visible rounded-[1.35rem] p-4 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:rounded-[2rem] sm:p-8 lg:p-10">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-55"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 28% 36%, rgba(104,118,218,0.35) 0%, rgba(58,70,150,0.12) 34%, transparent 60%), radial-gradient(circle at 70% 28%, rgba(159,92,205,0.18) 0%, transparent 40%), radial-gradient(circle at 64% 70%, rgba(247,231,206,0.1) 0%, transparent 38%), radial-gradient(circle at 52% 62%, rgba(22,36,84,0.45) 0%, rgba(6,12,30,0.55) 45%, rgba(3,7,17,0.65) 100%)",
-            }}
-            aria-hidden
-          />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
-          <div
-            className="pointer-events-none absolute left-1/2 top-2 z-[70] grid h-[min(42vw,160px)] w-[min(42vw,160px)] -translate-x-1/2 place-items-center opacity-95 sm:top-3 sm:h-[210px] sm:w-[210px]"
-            aria-hidden
-          >
-            <Image
-              src="/logo-brand-v2.png"
-              alt=""
-              width={260}
-              height={260}
-              className="mu-lab-logo-solid mu-lab-logo-living mu-lab-logo-floating h-full w-full rounded-full object-cover drop-shadow-[0_16px_44px_rgba(0,0,0,0.52)]"
-            />
+        {/* HERO: desktop 60/40 split, mobile stacked */}
+        <section className="relative z-40 grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-5 lg:gap-5">
+          <div className="relative min-w-0 lg:col-span-3">
+            <div className="relative min-w-0 overflow-visible rounded-[1.35rem] p-4 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:rounded-[2rem] sm:p-8 lg:p-9">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-55"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle at 28% 36%, rgba(104,118,218,0.35) 0%, rgba(58,70,150,0.12) 34%, transparent 60%), radial-gradient(circle at 70% 28%, rgba(159,92,205,0.18) 0%, transparent 40%), radial-gradient(circle at 64% 70%, rgba(247,231,206,0.1) 0%, transparent 38%), radial-gradient(circle at 52% 62%, rgba(22,36,84,0.45) 0%, rgba(6,12,30,0.55) 45%, rgba(3,7,17,0.65) 100%)",
+                }}
+                aria-hidden
+              />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
+              <div
+                className="pointer-events-none absolute left-1/2 top-2 z-[70] grid h-[min(42vw,160px)] w-[min(42vw,160px)] -translate-x-1/2 place-items-center opacity-95 sm:top-3 sm:h-[210px] sm:w-[210px]"
+                aria-hidden
+              >
+                <Image
+                  src="/logo-brand-v2.png"
+                  alt=""
+                  width={260}
+                  height={260}
+                  className="mu-lab-logo-solid mu-lab-logo-living mu-lab-logo-floating h-full w-full rounded-full object-cover drop-shadow-[0_16px_44px_rgba(0,0,0,0.52)]"
+                />
+              </div>
+              <div
+                id="fortune-form"
+                className="relative z-40 mt-28 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:mt-36 sm:rounded-[2rem] sm:p-3"
+              >
+                <FortuneForm />
+              </div>
+            </div>
           </div>
-          <div
-            id="fortune-form"
-            className="relative z-40 mt-28 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:mt-36 sm:rounded-[2rem] sm:p-3"
-          >
-            <FortuneForm />
-          </div>
+          <Reveal delay={0.2} className="min-w-0 lg:col-span-2">
+            <DailyCosmicDashboard data={daily} compact />
+          </Reveal>
         </section>
-
-        {/* SECONDARY */}
-        <Reveal delay={0.35} className="relative z-10 mt-4">
-          <DailyCosmicDashboard data={daily} />
-        </Reveal>
 
         <Reveal delay={0.45} className={`mt-8 rounded-[1.6rem] p-10 sm:rounded-[2rem] sm:p-12 ${glassPanel}`}>
           <h2 className="font-serif text-3xl tracking-[0.05em] text-[#eef1ff] sm:text-4xl">Why Mu-Lab</h2>
@@ -214,6 +241,18 @@ export default async function Home() {
               className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs uppercase tracking-[0.1em] text-[#d9f2e9] transition hover:bg-white/[0.06]"
             >
               Privacy
+            </Link>
+            <Link
+              href="/cookie-policy"
+              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs uppercase tracking-[0.1em] text-[#d9f2e9] transition hover:bg-white/[0.06]"
+            >
+              Cookies
+            </Link>
+            <Link
+              href="/data-request"
+              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs uppercase tracking-[0.1em] text-[#d9f2e9] transition hover:bg-white/[0.06]"
+            >
+              Data Request
             </Link>
           </div>
         </div>

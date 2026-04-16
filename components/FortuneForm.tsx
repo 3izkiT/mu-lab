@@ -160,7 +160,8 @@ export default function FortuneForm() {
   );
 
   const isStepOneValid = formData.fullName.trim() !== "" && formData.gender !== "";
-  const isStepTwoValid = formData.birthDate !== "";
+  const isThaiDateFormat = (value: string) => /^\d{2}\/\d{2}\/\d{4}$/.test(value.trim());
+  const isStepTwoValid = isThaiDateFormat(formData.birthDate);
   const isStepThreeValid =
     formData.birthHour !== "" &&
     formData.birthMinute !== "" &&
@@ -247,16 +248,27 @@ export default function FortuneForm() {
             ? payload.meters
             : defaultLuckMeters();
         setLuckMeters(meters);
-        const saveResponse = await fetch("/api/analysis/save", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: message.trim(),
-            meters,
-          }),
-        });
-        const saved = (await saveResponse.json()) as { id?: string };
-        if (saved.id) {
+        let saved: { id?: string } | null = null;
+        try {
+          const saveResponse = await fetch("/api/analysis/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: message.trim(),
+              meters,
+            }),
+          });
+          if (saveResponse.ok) {
+            try {
+              saved = (await saveResponse.json()) as { id?: string };
+            } catch {
+              saved = null;
+            }
+          }
+        } catch {
+          saved = null;
+        }
+        if (saved?.id) {
           router.push(`/analysis/${saved.id}`);
           return;
         }
@@ -569,27 +581,27 @@ export default function FortuneForm() {
       )}
 
       <div
-        className={`min-w-0 px-4 py-8 sm:px-12 sm:py-12 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}
+        className={`min-w-0 px-4 py-5 sm:px-8 sm:py-6 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}
       >
-        <div className="mb-10 sm:mb-12">
+        <div className="mb-5 sm:mb-6">
           <CelestialHeadingRow icon={Atom} breathe>
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.18em] text-[var(--gold)]/84 sm:text-xs">Session</p>
-              <h2 className="mt-4 break-words font-serif text-3xl font-medium tracking-[0.04em] text-[#f2f5ff] sm:text-4xl">
+              <h2 className="mt-3 break-words font-serif text-3xl font-medium tracking-[0.04em] text-[#f2f5ff] sm:text-[2rem]">
                 ข้อมูลดวง
               </h2>
-              <p className="mt-4 text-base font-normal text-[#e8eeff]/88">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
+              <p className="mt-2 text-sm font-normal text-[#e8eeff]/88 sm:text-[15px]">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
             </div>
           </CelestialHeadingRow>
         </div>
 
-        <div className="space-y-10">
-          <section className="mu-lab-glass rounded-2xl p-5 sm:p-8">
-            <p className="mb-7 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
+        <div className="space-y-5">
+          <section className="mu-lab-glass rounded-2xl p-4 sm:p-5">
+            <p className="mb-5 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
               <Fingerprint className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
               ข้อมูลพื้นฐาน
             </p>
-            <div className="grid min-w-0 gap-6 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <label className="group block min-w-0 sm:col-span-2">
                 <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <User
@@ -606,7 +618,7 @@ export default function FortuneForm() {
                     setFormData((prev) => ({ ...prev, fullName: event.target.value }))
                   }
                   placeholder="เช่น อรทัย ใจดี"
-                  className="mu-lab-input w-full min-w-0 px-4 py-4 text-base placeholder:text-[#dbe1ff]/45"
+                  className="mu-lab-input w-full min-w-0 px-4 py-3.5 text-base placeholder:text-[#dbe1ff]/45"
                 />
               </label>
 
@@ -624,7 +636,7 @@ export default function FortuneForm() {
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, gender: event.target.value }))
                   }
-                  className="mu-lab-input w-full min-w-0 cursor-pointer appearance-none px-4 py-4 text-base"
+                  className="mu-lab-input w-full min-w-0 cursor-pointer appearance-none px-4 py-3.5 text-base"
                 >
                   <option value="" className="bg-[#0a101c] text-zinc-400">
                     เลือกเพศ
@@ -651,23 +663,25 @@ export default function FortuneForm() {
                   วันเกิด
                 </span>
                 <input
-                  type="date"
+                  type="text"
+                  inputMode="numeric"
                   value={formData.birthDate}
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, birthDate: event.target.value }))
                   }
-                  className="mu-lab-input w-full min-w-0 px-4 py-4 text-base scheme-dark"
+                  placeholder="DD/MM/YYYY"
+                  className="mu-lab-input w-full min-w-0 px-4 py-3.5 text-base scheme-dark"
                 />
               </label>
             </div>
           </section>
 
-          <section className="mu-lab-glass rounded-2xl p-5 sm:p-8">
-            <p className="mb-7 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
+          <section className="mu-lab-glass rounded-2xl p-4 sm:p-5">
+            <p className="mb-5 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
               <Dna className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
               ข้อมูลเวลาและสถานที่เกิด
             </p>
-            <div className="grid min-w-0 gap-6 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <div className="group min-w-0 sm:col-span-2">
                 <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <Clock
@@ -677,7 +691,7 @@ export default function FortuneForm() {
                   />
                   เวลาเกิด (ชั่วโมง · นาที)
                 </span>
-                <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-3">
+                <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-2.5">
                   <input
                     type="number"
                     min={0}
@@ -687,7 +701,7 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthHour: event.target.value }))
                     }
                     placeholder="0–23"
-                    className="mu-lab-input min-w-0 w-full px-3 py-3.5 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-4"
+                    className="mu-lab-input min-w-0 w-full px-3 py-3 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-3.5"
                   />
                   <input
                     type="number"
@@ -698,7 +712,7 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthMinute: event.target.value }))
                     }
                     placeholder="0–59"
-                    className="mu-lab-input min-w-0 w-full px-3 py-3.5 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-4"
+                    className="mu-lab-input min-w-0 w-full px-3 py-3 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-3.5"
                   />
                 </div>
               </div>
@@ -734,7 +748,7 @@ export default function FortuneForm() {
           </motion.p>
         )}
 
-        <div className="mu-lab-glass mt-8 rounded-2xl border border-[rgba(247,231,206,0.18)] px-4 py-3 sm:px-5">
+        <div className="mu-lab-glass mt-6 rounded-2xl border border-[rgba(247,231,206,0.18)] px-4 py-2.5 sm:px-5">
           <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-[#e8eeff]/84">
             <input
               type="checkbox"
@@ -771,7 +785,7 @@ export default function FortuneForm() {
           </label>
         </div>
 
-        <div className="mt-6 flex w-full min-w-0 flex-col gap-3 sm:mt-8 sm:flex-row sm:justify-end">
+        <div className="mt-5 flex w-full min-w-0 flex-col gap-3 sm:mt-6 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={handleSubmit}
