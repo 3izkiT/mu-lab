@@ -19,12 +19,20 @@ import {
   UserRound,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { CelestialHeadingRow, CelestialIcon } from "@/components/CelestialIcon";
 import LuckMeters from "@/components/LuckMeters";
 import ProvinceCommand from "@/components/ProvinceCommand";
 import { CELESTIAL_STROKE } from "@/lib/celestial-icon-tokens";
 import { defaultLuckMeters, type LuckMetersData } from "@/lib/fortune-parse";
+import {
+  POLICY_LAST_UPDATED,
+  PRIVACY_INTRO,
+  PRIVACY_SECTIONS,
+  TERMS_INTRO,
+  TERMS_SECTIONS,
+} from "@/lib/policy-content";
 
 type FormData = {
   fullName: string;
@@ -132,6 +140,7 @@ const markdownComponents = {
 };
 
 export default function FortuneForm() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
   const [illusionProgress, setIllusionProgress] = useState(0);
@@ -168,6 +177,25 @@ export default function FortuneForm() {
 
   const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
+  const requestFortune = async () => {
+    let lastResponse: Response | null = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const response = await fetch("/api/fortune", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        lastResponse = response;
+        if (response.ok) return response;
+      } catch {
+        // retry once on transient network failure
+      }
+      if (attempt === 0) await sleep(350);
+    }
+    return lastResponse;
+  };
+
   const handleSubmit = async () => {
     if (!isStepOneValid || !isStepTwoValid || !isStepThreeValid) return;
     if (!acceptedTerms) {
@@ -184,11 +212,12 @@ export default function FortuneForm() {
     setLuckMeters(null);
 
     try {
-      const response = await fetch("/api/fortune", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await requestFortune();
+      if (!response) {
+        setErrorMessage("สภาวะดวงดาวไม่เอื้ออำนวย กรุณาลองใหม่อีกครั้ง");
+        track("fortune_result_network_error");
+        return;
+      }
 
       let payload: { message?: string; meters?: LuckMetersData } = {};
       try {
@@ -210,21 +239,28 @@ export default function FortuneForm() {
 
       const message = payload?.message;
       if (typeof message === "string" && message.trim()) {
-        setFortuneResult(message.trim());
-        setLuckMeters(
+        const meters =
           payload.meters &&
             typeof payload.meters.career === "number" &&
             typeof payload.meters.wealth === "number" &&
             typeof payload.meters.love === "number"
             ? payload.meters
-            : defaultLuckMeters(),
-        );
-        setResultSessionId(
-          typeof crypto !== "undefined" && "randomUUID" in crypto
-            ? crypto.randomUUID()
-            : String(Date.now()),
-        );
-        setCopyDone(false);
+            : defaultLuckMeters();
+        setLuckMeters(meters);
+        const saveResponse = await fetch("/api/analysis/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: message.trim(),
+            meters,
+          }),
+        });
+        const saved = (await saveResponse.json()) as { id?: string };
+        if (saved.id) {
+          router.push(`/analysis/${saved.id}`);
+          return;
+        }
+        setFortuneResult(message.trim());
         track("fortune_result_ok");
       } else {
         setErrorMessage("สภาวะดวงดาวไม่เอื้ออำนวย กรุณาลองใหม่อีกครั้ง");
@@ -255,6 +291,18 @@ export default function FortuneForm() {
     return () => window.clearInterval(timer);
   }, [showTransition]);
 
+  useEffect(() => {
+    if (!showTransition) return;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, [showTransition]);
+
   if (showTransition) {
     return (
       <AnimatePresence>
@@ -263,7 +311,7 @@ export default function FortuneForm() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.45 }}
-          className="fixed inset-0 z-[120] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(76,92,192,0.3)_0%,rgba(8,14,35,0.94)_64%,#030711_100%)]"
+          className="fixed inset-0 z-[120] overflow-hidden bg-[#030711]"
           role="status"
           aria-live="polite"
         >
@@ -298,7 +346,7 @@ export default function FortuneForm() {
             </svg>
           </div>
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+          <div className="absolute inset-0 grid place-items-center px-6">
             <motion.div
               className="relative flex h-32 w-32 items-center justify-center rounded-full"
               animate={{
@@ -326,7 +374,10 @@ export default function FortuneForm() {
               />
             </motion.div>
 
-            <p className="mt-10 flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
+          </div>
+
+          <div className="absolute inset-x-0 top-[calc(50%+88px)] flex flex-col items-center px-6 text-center">
+            <p className="flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
               <span className="mu-lab-icon-breathe inline-flex text-[var(--gold)]" aria-hidden>
                 <Sparkles className="h-3.5 w-3.5" strokeWidth={CELESTIAL_STROKE} />
               </span>
@@ -725,9 +776,9 @@ export default function FortuneForm() {
             type="button"
             onClick={handleSubmit}
             disabled={!isFormValid || isLoading}
-            className="mu-lab-btn-shimmer mu-lab-btn-fate relative inline-flex min-h-[52px] w-full max-w-full items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ebd3a8_48%,#d6b379_100%)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#201911] shadow-[0_0_34px_rgba(247,231,206,0.26)] disabled:cursor-not-allowed disabled:opacity-35 sm:w-auto sm:min-w-[220px] sm:px-8 sm:tracking-[0.16em]"
+            className="mu-lab-btn-shimmer mu-lab-btn-fate relative inline-flex min-h-[52px] w-full max-w-full items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ebd3a8_48%,#d6b379_100%)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-[#201911] shadow-[0_0_34px_rgba(247,231,206,0.26)] disabled:cursor-not-allowed disabled:opacity-35 sm:w-auto sm:min-w-[220px] sm:px-8 sm:text-base sm:tracking-[0.14em]"
           >
-            <span className="relative z-10">Reveal My Fate</span>
+            <span className="relative z-10">เปิดคำทำนาย</span>
           </button>
         </div>
       </div>
@@ -786,20 +837,28 @@ export default function FortuneForm() {
 
               <div className="max-h-[68vh] overflow-y-auto px-5 py-4 text-sm leading-relaxed text-[#dbe1ff]/85">
                 {policyTab === "terms" ? (
-                  <div className="space-y-3">
-                    <p className="text-[var(--gold)]">สรุปเงื่อนไขการใช้งาน</p>
-                    <p>1) ผลวิเคราะห์เป็นข้อมูลเชิงตีความเพื่อช่วยประกอบการตัดสินใจ ไม่ใช่คำรับรองผลลัพธ์แบบแน่นอน</p>
-                    <p>2) ข้อมูลที่กรอกใช้เพื่อประมวลผลคำขอครั้งนั้นเท่านั้น</p>
-                    <p>3) ห้ามใช้บริการในทางที่ละเมิดสิทธิผู้อื่นหรือผิดกฎหมาย</p>
-                    <p>4) ระบบอาจมีการปรับปรุงเงื่อนไขตามการพัฒนาบริการ</p>
+                  <div className="space-y-4">
+                    <p className="font-medium text-[var(--gold)]">สรุปเงื่อนไขการใช้งาน</p>
+                    <p>{TERMS_INTRO}</p>
+                    {TERMS_SECTIONS.map((section) => (
+                      <div key={section.id} className="space-y-1">
+                        <p className="font-semibold text-[#eef3ff]">{section.title}</p>
+                        <p className="text-[#dbe1ff]/86">{section.body}</p>
+                      </div>
+                    ))}
+                    <p className="text-xs text-[#dbe1ff]/65">อัปเดตล่าสุด: {POLICY_LAST_UPDATED}</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <p className="text-[var(--gold)]">สรุปนโยบายความเป็นส่วนตัว</p>
-                    <p>1) ข้อมูลวันเกิด เวลาเกิด และจังหวัดเกิด ใช้เพื่อการวิเคราะห์ดวงตามคำขอของผู้ใช้</p>
-                    <p>2) ข้อมูลไม่ถูกนำไปขายต่อหรือใช้ทำโฆษณาเจาะกลุ่ม</p>
-                    <p>3) ระบบจำกัดการเข้าถึงข้อมูลเท่าที่จำเป็นต่อการให้บริการ</p>
-                    <p>4) หากมีการเปลี่ยนนโยบาย จะอัปเดตให้ตรวจสอบได้เสมอ</p>
+                  <div className="space-y-4">
+                    <p className="font-medium text-[var(--gold)]">สรุปนโยบายความเป็นส่วนตัว</p>
+                    <p>{PRIVACY_INTRO}</p>
+                    {PRIVACY_SECTIONS.map((section) => (
+                      <div key={section.id} className="space-y-1">
+                        <p className="font-semibold text-[#eef3ff]">{section.title}</p>
+                        <p className="text-[#dbe1ff]/86">{section.body}</p>
+                      </div>
+                    ))}
+                    <p className="text-xs text-[#dbe1ff]/65">อัปเดตล่าสุด: {POLICY_LAST_UPDATED}</p>
                   </div>
                 )}
               </div>
