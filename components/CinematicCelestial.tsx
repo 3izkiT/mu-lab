@@ -2,6 +2,7 @@
 
 import {
   motion,
+  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -46,6 +47,9 @@ export function ParallaxNebula() {
   const y = useSpring(my, { stiffness: 48, damping: 22, mass: 0.55 });
   const xBack = useTransform(x, (v) => v * -0.32);
   const yBack = useTransform(y, (v) => v * -0.32);
+  const bgPosX = useTransform(x, (v) => 50 + v * 0.22);
+  const bgPosY = useTransform(y, (v) => 42 + v * 0.18);
+  const nebulaBackgroundPosition = useMotionTemplate`${bgPosX}% ${bgPosY}%`;
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -67,13 +71,10 @@ export function ParallaxNebula() {
       <motion.div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
-          x: reduceMotion ? 0 : x,
-          y: reduceMotion ? 0 : y,
-          scale: reduceMotion ? 1 : 1.04,
           backgroundColor: "#03050f",
           backgroundImage: "url(/bg-nebula.jpg)",
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: nebulaBackgroundPosition,
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
         }}
