@@ -80,7 +80,7 @@ export default async function Home() {
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
           <div
-            className="pointer-events-none absolute -top-16 left-1/2 grid h-[min(42vw,160px)] w-[min(42vw,160px)] -translate-x-1/2 place-items-center opacity-70 sm:-top-24 sm:h-[220px] sm:w-[220px]"
+            className="pointer-events-none absolute -top-18 left-1/2 grid h-[min(46vw,180px)] w-[min(46vw,180px)] -translate-x-1/2 place-items-center opacity-95 sm:-top-26 sm:h-[238px] sm:w-[238px]"
             aria-hidden
           >
             <Image
@@ -88,7 +88,7 @@ export default async function Home() {
               alt=""
               width={260}
               height={260}
-              className="mu-lab-logo-living h-full w-full rounded-full object-cover drop-shadow-[0_12px_36px_rgba(0,0,0,0.45)]"
+              className="mu-lab-logo-living mu-lab-logo-floating h-full w-full rounded-full object-cover drop-shadow-[0_16px_44px_rgba(0,0,0,0.52)]"
             />
           </div>
           <div

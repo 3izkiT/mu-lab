@@ -194,20 +194,40 @@ body {
   0%,
   100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 6px rgba(247, 231, 206, 0.12));
+    filter: drop-shadow(0 0 8px rgba(247, 231, 206, 0.14));
   }
   50% {
-    transform: scale(1.028);
-    filter: drop-shadow(0 0 20px rgba(247, 231, 206, 0.28));
+    transform: scale(1.038);
+    filter: drop-shadow(0 0 30px rgba(247, 231, 206, 0.38));
   }
 }
 
 .mu-lab-logo-living {
   animation: mu-lab-logo-breathe 4.2s ease-in-out infinite;
+  filter: contrast(1.08) saturate(1.08);
+}
+
+@keyframes mu-lab-logo-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+.mu-lab-logo-floating {
+  animation:
+    mu-lab-logo-breathe 4.2s ease-in-out infinite,
+    mu-lab-logo-float 6.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .mu-lab-logo-living {
+    animation: none;
+  }
+  .mu-lab-logo-floating {
     animation: none;
   }
 }

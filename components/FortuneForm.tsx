@@ -133,6 +133,7 @@ export default function FortuneForm() {
   const [resultSessionId, setResultSessionId] = useState("");
   const [copyDone, setCopyDone] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [formData, setFormData] = useState<FormData>(initialData);
 
   const parsedSections = useMemo(
@@ -147,7 +148,7 @@ export default function FortuneForm() {
     formData.birthMinute !== "" &&
     formData.birthProvince.trim() !== "";
 
-  const isFormValid = isStepOneValid && isStepTwoValid && isStepThreeValid;
+  const isFormValid = isStepOneValid && isStepTwoValid && isStepThreeValid && acceptedTerms;
   const currentIllusionStatus =
     ILLUSION_STATUS_LINES[
       Math.min(
@@ -159,7 +160,11 @@ export default function FortuneForm() {
   const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
   const handleSubmit = async () => {
-    if (!isFormValid) return;
+    if (!isStepOneValid || !isStepTwoValid || !isStepThreeValid) return;
+    if (!acceptedTerms) {
+      setErrorMessage("กรุณายอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัวก่อนทำนาย");
+      return;
+    }
 
     const startedAt = Date.now();
     setIsLoading(true);
@@ -338,6 +343,7 @@ export default function FortuneForm() {
 
   const handleReset = () => {
     setFormData(initialData);
+    setAcceptedTerms(false);
     setFortuneResult(null);
     setLuckMeters(null);
     setResultSessionId("");
@@ -500,24 +506,24 @@ export default function FortuneForm() {
         <div className="mb-10 sm:mb-12">
           <CelestialHeadingRow icon={Atom} breathe>
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--gold)]/78">Session</p>
-              <h2 className="mt-4 break-words font-serif text-2xl font-medium tracking-[0.05em] text-[#eef1ff] sm:text-4xl">
+              <p className="text-sm font-medium uppercase tracking-[0.18em] text-[var(--gold)]/84 sm:text-xs">Session</p>
+              <h2 className="mt-4 break-words font-serif text-3xl font-medium tracking-[0.04em] text-[#f2f5ff] sm:text-4xl">
                 ข้อมูลดวง
               </h2>
-              <p className="mt-4 text-base font-light text-[#dbe1ff]/78">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
+              <p className="mt-4 text-base font-normal text-[#e8eeff]/88">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
             </div>
           </CelestialHeadingRow>
         </div>
 
         <div className="space-y-10">
           <section className="mu-lab-glass rounded-2xl p-5 sm:p-8">
-            <p className="mb-7 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">
+            <p className="mb-7 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
               <Fingerprint className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
               ข้อมูลพื้นฐาน
             </p>
             <div className="grid min-w-0 gap-6 sm:grid-cols-2">
               <label className="group block min-w-0 sm:col-span-2">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <User
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -537,7 +543,7 @@ export default function FortuneForm() {
               </label>
 
               <label className="group block min-w-0">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <UserRound
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -568,7 +574,7 @@ export default function FortuneForm() {
               </label>
 
               <label className="group block min-w-0">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <Calendar
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -589,13 +595,13 @@ export default function FortuneForm() {
           </section>
 
           <section className="mu-lab-glass rounded-2xl p-5 sm:p-8">
-            <p className="mb-7 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">
+            <p className="mb-7 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
               <Dna className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
               ข้อมูลเวลาและสถานที่เกิด
             </p>
             <div className="grid min-w-0 gap-6 sm:grid-cols-2">
               <div className="group min-w-0 sm:col-span-2">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <Clock
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -630,7 +636,7 @@ export default function FortuneForm() {
               </div>
 
               <div className="group min-w-0 sm:col-span-2">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <MapPin
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -660,7 +666,28 @@ export default function FortuneForm() {
           </motion.p>
         )}
 
-        <div className="mt-10 flex w-full min-w-0 flex-col gap-3 sm:mt-12 sm:flex-row sm:justify-end">
+        <div className="mt-8 rounded-2xl border border-[rgba(247,231,206,0.18)] bg-[rgba(255,255,255,0.03)] px-4 py-3 sm:px-5">
+          <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-[#e8eeff]/84">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(event) => setAcceptedTerms(event.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-[var(--gold)]"
+            />
+            <span>
+              ฉันยอมรับ{" "}
+              <a href="/terms" className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]">
+                เงื่อนไขการใช้งาน
+              </a>{" "}
+              และ{" "}
+              <a href="/privacy" className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]">
+                นโยบายความเป็นส่วนตัว
+              </a>
+            </span>
+          </label>
+        </div>
+
+        <div className="mt-6 flex w-full min-w-0 flex-col gap-3 sm:mt-8 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={handleSubmit}
