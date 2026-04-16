@@ -24,6 +24,8 @@ type HoverConstellationProps = {
 type FloatingProps = {
   children: ReactNode;
   className?: string;
+  /** Anchor id for in-page links (e.g. #fortune-form) */
+  id?: string;
 };
 
 type GlintWrapProps = {
@@ -94,10 +96,11 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
   );
 }
 
-export function Floating({ children, className }: FloatingProps) {
+export function Floating({ children, className, id }: FloatingProps) {
   const reduceMotion = useReducedMotion();
   return (
     <motion.div
+      id={id}
       animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
       transition={reduceMotion ? undefined : { duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
       className={className}
