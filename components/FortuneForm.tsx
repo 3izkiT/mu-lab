@@ -286,14 +286,16 @@ export default function FortuneForm() {
                 animate={{ opacity: [0.42, 0.95, 0.5] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
               />
-              <Image
-                src="/logo-loader-v2.png"
-                alt="Mu Lab loader"
-                width={96}
-                height={96}
-                className="relative z-10 h-24 w-24 rounded-full object-cover"
-                priority
-              />
+              <span className="relative z-10 grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-[var(--background)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+                <Image
+                  src="/logo-loader-v2.png"
+                  alt="Mu Lab loader"
+                  width={96}
+                  height={96}
+                  className="h-24 w-24 rounded-full object-cover"
+                  priority
+                />
+              </span>
             </motion.div>
 
             <p className="mt-10 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">

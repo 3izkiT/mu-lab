@@ -24,7 +24,9 @@ export default async function Home() {
       <header className="sticky top-0 z-30 bg-[rgba(6,10,22,0.68)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
-            <Image src="/logo-brand-v2.png" alt="Mu Lab" width={46} height={46} className="h-[46px] w-[46px] rounded-full" />
+            <span className="grid shrink-0 place-items-center rounded-full bg-[var(--background)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+              <Image src="/logo-brand-v2.png" alt="Mu Lab" width={46} height={46} className="h-[46px] w-[46px] rounded-full" />
+            </span>
             <p className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
           </div>
           <nav className="hidden items-center gap-2 sm:flex">
@@ -92,13 +94,16 @@ export default async function Home() {
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.9)_0%,rgba(5,8,19,0.72)_48%,rgba(5,8,19,0.52)_100%)]" />
-          <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2" aria-hidden>
+          <div
+            className="pointer-events-none absolute -top-10 left-1/2 grid h-[260px] w-[260px] -translate-x-1/2 place-items-center rounded-full bg-[var(--background)] shadow-[0_0_46px_rgba(247,231,206,0.24),inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+            aria-hidden
+          >
             <Image
               src="/logo-brand-v2.png"
               alt=""
               width={260}
               height={260}
-              className="h-[260px] w-[260px] rounded-full shadow-[0_0_46px_rgba(247,231,206,0.24)]"
+              className="h-[260px] w-[260px] rounded-full"
             />
           </div>
           <Reveal delay={0.1} className="relative">

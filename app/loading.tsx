@@ -7,16 +7,18 @@ export default function Loading() {
       <div className="pointer-events-none absolute inset-0 mu-lab-blueprint" aria-hidden />
 
       <div className="mu-lab-glass flex flex-col items-center gap-6 rounded-[1.8rem] px-12 py-10">
-        <div className="relative">
+        <div className="relative grid h-[104px] w-[104px] place-items-center">
           <div className="absolute inset-0 animate-ping rounded-full bg-[var(--gold)]/20" />
-          <Image
-            src="/logo-loader-v2.png"
-            alt="Mu Lab loading"
-            width={104}
-            height={104}
-            className="relative h-[104px] w-[104px] rounded-full object-cover"
-            priority
-          />
+          <span className="relative grid h-[104px] w-[104px] place-items-center overflow-hidden rounded-full bg-[var(--background)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+            <Image
+              src="/logo-loader-v2.png"
+              alt="Mu Lab loading"
+              width={104}
+              height={104}
+              className="h-[104px] w-[104px] rounded-full object-cover"
+              priority
+            />
+          </span>
         </div>
         <p className="font-serif text-sm tracking-[0.12em] text-[var(--gold)]/90">Initializing Mu-Lab Orbit...</p>
       </div>
