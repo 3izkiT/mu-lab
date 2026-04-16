@@ -141,6 +141,8 @@ export default function FortuneForm() {
   const [copyDone, setCopyDone] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [isPolicyOpen, setIsPolicyOpen] = useState(false);
+  const [policyTab, setPolicyTab] = useState<"terms" | "privacy">("terms");
   const [formData, setFormData] = useState<FormData>(initialData);
 
   const parsedSections = useMemo(
@@ -357,6 +359,11 @@ export default function FortuneForm() {
     setCopyDone(false);
     setErrorMessage(null);
     setIsLoading(false);
+  };
+
+  const openPolicyModal = (tab: "terms" | "privacy") => {
+    setPolicyTab(tab);
+    setIsPolicyOpen(true);
   };
 
   const handleCopyLink = async () => {
@@ -686,13 +693,29 @@ export default function FortuneForm() {
             />
             <span>
               ฉันยอมรับ{" "}
-              <a href="/terms" className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  openPolicyModal("terms");
+                }}
+                className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]"
+              >
                 เงื่อนไขการใช้งาน
-              </a>{" "}
+              </button>{" "}
               และ{" "}
-              <a href="/privacy" className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  openPolicyModal("privacy");
+                }}
+                className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]"
+              >
                 นโยบายความเป็นส่วนตัว
-              </a>
+              </button>
             </span>
           </label>
         </div>
@@ -708,6 +731,82 @@ export default function FortuneForm() {
           </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isPolicyOpen ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[160] flex items-center justify-center bg-black/70 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Policy modal"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="mu-lab-glass max-h-[82vh] w-full max-w-2xl overflow-hidden rounded-2xl border border-[rgba(247,231,206,0.25)]"
+            >
+              <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPolicyTab("terms")}
+                    className={`rounded-full px-3 py-1.5 text-xs tracking-[0.08em] ${
+                      policyTab === "terms"
+                        ? "bg-[rgba(247,231,206,0.2)] text-[var(--gold)]"
+                        : "bg-transparent text-[#dbe1ff]/70"
+                    }`}
+                  >
+                    เงื่อนไขการใช้งาน
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPolicyTab("privacy")}
+                    className={`rounded-full px-3 py-1.5 text-xs tracking-[0.08em] ${
+                      policyTab === "privacy"
+                        ? "bg-[rgba(247,231,206,0.2)] text-[var(--gold)]"
+                        : "bg-transparent text-[#dbe1ff]/70"
+                    }`}
+                  >
+                    นโยบายความเป็นส่วนตัว
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPolicyOpen(false)}
+                  className="rounded-full border border-white/15 px-3 py-1 text-xs text-[#dbe1ff]/80 hover:border-[var(--gold)]/40 hover:text-[var(--gold)]"
+                >
+                  ปิด
+                </button>
+              </div>
+
+              <div className="max-h-[68vh] overflow-y-auto px-5 py-4 text-sm leading-relaxed text-[#dbe1ff]/85">
+                {policyTab === "terms" ? (
+                  <div className="space-y-3">
+                    <p className="text-[var(--gold)]">สรุปเงื่อนไขการใช้งาน</p>
+                    <p>1) ผลวิเคราะห์เป็นข้อมูลเชิงตีความเพื่อช่วยประกอบการตัดสินใจ ไม่ใช่คำรับรองผลลัพธ์แบบแน่นอน</p>
+                    <p>2) ข้อมูลที่กรอกใช้เพื่อประมวลผลคำขอครั้งนั้นเท่านั้น</p>
+                    <p>3) ห้ามใช้บริการในทางที่ละเมิดสิทธิผู้อื่นหรือผิดกฎหมาย</p>
+                    <p>4) ระบบอาจมีการปรับปรุงเงื่อนไขตามการพัฒนาบริการ</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-[var(--gold)]">สรุปนโยบายความเป็นส่วนตัว</p>
+                    <p>1) ข้อมูลวันเกิด เวลาเกิด และจังหวัดเกิด ใช้เพื่อการวิเคราะห์ดวงตามคำขอของผู้ใช้</p>
+                    <p>2) ข้อมูลไม่ถูกนำไปขายต่อหรือใช้ทำโฆษณาเจาะกลุ่ม</p>
+                    <p>3) ระบบจำกัดการเข้าถึงข้อมูลเท่าที่จำเป็นต่อการให้บริการ</p>
+                    <p>4) หากมีการเปลี่ยนนโยบาย จะอัปเดตให้ตรวจสอบได้เสมอ</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }
