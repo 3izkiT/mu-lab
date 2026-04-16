@@ -247,9 +247,9 @@ export default function FortuneForm() {
 
     const start = Date.now();
     const timer = window.setInterval(() => {
-      const ratio = Math.min(1, (Date.now() - start) / ILLUSION_DURATION_MS);
+      // Keep transition visuals alive while waiting for API (loop 0..1 continuously).
+      const ratio = ((Date.now() - start) % ILLUSION_DURATION_MS) / ILLUSION_DURATION_MS;
       setIllusionProgress(ratio);
-      if (ratio >= 1) window.clearInterval(timer);
     }, 45);
 
     return () => window.clearInterval(timer);
@@ -260,7 +260,7 @@ export default function FortuneForm() {
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: illusionProgress > 0.92 ? 1 - (illusionProgress - 0.92) / 0.08 : 1 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.45 }}
           className="fixed inset-0 z-[120] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(76,92,192,0.3)_0%,rgba(8,14,35,0.94)_64%,#030711_100%)]"
