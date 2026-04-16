@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Compass,
   Atom,
   Calendar,
   Clock,
@@ -12,6 +13,7 @@ import {
   Hexagon,
   Link2,
   MapPin,
+  Orbit,
   Sparkles,
   User,
   UserRound,
@@ -85,13 +87,18 @@ function parseFortuneMarkdown(markdown: string): ParsedSection[] {
   return sections;
 }
 
-const sectionIndexLabel = (key: SectionKey, index: number) => {
-  const n = String(index + 1).padStart(2, "0");
-  if (key === "character") return `${n} · นิสัย`;
-  if (key === "luck") return `${n} · ชะตากรรม`;
-  if (key === "action") return `${n} · แผน`;
-  return `${n}`;
-};
+function SectionGlyph({ sectionKey }: { sectionKey: SectionKey }) {
+  if (sectionKey === "character") {
+    return <Fingerprint className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+  }
+  if (sectionKey === "luck") {
+    return <Orbit className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+  }
+  if (sectionKey === "action") {
+    return <Compass className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+  }
+  return <Sparkles className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+}
 
 const ILLUSION_DURATION_MS = 3000;
 const ILLUSION_STATUS_LINES = [
@@ -410,10 +417,13 @@ export default function FortuneForm() {
               >
                 <div className="mb-4 flex min-w-0 items-start justify-between gap-3 border-b border-white/[0.05] pb-4 sm:items-baseline">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/75">
-                      {sectionIndexLabel(section.key, index)}
-                    </p>
-                    <h3 className="mt-1.5 font-serif text-lg font-semibold tracking-tight text-white sm:text-xl">
+                    <div className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(247,231,206,0.24)] bg-[rgba(247,231,206,0.08)] px-3 py-1.5">
+                      <SectionGlyph sectionKey={section.key} />
+                      <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--gold)]/85">
+                        Section {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h3 className="mt-2.5 font-serif text-lg font-semibold tracking-tight text-white sm:text-xl">
                       {section.title}
                     </h3>
                   </div>
