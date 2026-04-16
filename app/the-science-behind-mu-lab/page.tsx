@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ParallaxNebula } from "@/components/CinematicCelestial";
 import { getSiteUrl } from "@/lib/site-url";
 
 const siteUrl = getSiteUrl();
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-const goldBorder = "border border-[rgba(247,231,206,0.14)]";
+const goldBorder = "border border-[rgba(247,231,206,0.22)]";
 
 const faqs = [
   {
@@ -97,19 +98,16 @@ export default function SciencePage() {
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-      <div
-        className="pointer-events-none fixed inset-0 bg-[linear-gradient(165deg,#fbfdff_0%,#f5f8ff_36%,#eef3ff_68%,#e9eefc_100%)]"
-        aria-hidden
-      />
-      <div className="pointer-events-none fixed inset-0 mu-lab-starfield" aria-hidden />
+      <ParallaxNebula />
+      <div className="pointer-events-none fixed inset-0 z-[3] mu-lab-starfield" aria-hidden />
 
       <section className="relative z-10 mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 lg:px-8 lg:pt-16">
-        <div className={`rounded-[1.35rem] ${goldBorder} bg-white/82 p-7 shadow-[0_16px_42px_rgba(26,35,126,0.08)] backdrop-blur-xl sm:rounded-3xl sm:p-10`}>
-          <p className="text-[10px] font-light uppercase tracking-[0.34em] text-zinc-500">Mu-Lab Knowledge</p>
-          <h1 className="mt-4 font-serif text-3xl font-light tracking-tight text-[#1a237e] sm:text-4xl">
+        <div className={`mu-lab-glass rounded-[1.35rem] ${goldBorder} p-7 shadow-[0_16px_42px_rgba(1,4,16,0.42)] backdrop-blur-xl sm:rounded-3xl sm:p-10`}>
+          <p className="text-[10px] font-light uppercase tracking-[0.34em] text-[var(--gold)]/70">Mu-Lab Knowledge</p>
+          <h1 className="mt-4 font-serif text-3xl font-light tracking-tight text-[#eef1ff] sm:text-4xl">
             The Science Behind Mu-Lab
           </h1>
-          <p className="mt-4 max-w-3xl text-sm font-light leading-relaxed text-[#1a237e]/80">
+          <p className="mt-4 max-w-3xl text-sm font-light leading-relaxed text-[#dbe1ff]/80">
             หน้านี้อธิบายแนวคิดการทำงานของ Mu-Lab ในมุมวิทยาศาสตร์ผสมโหราศาสตร์: การอ่านองศาดาวเชิงเวลา การแปลงสัญญาณเป็นพลังงานรายมิติ และการสังเคราะห์ผลด้วยตรรกะเชิงภาษาให้เข้าใจง่าย
           </p>
 
@@ -117,10 +115,10 @@ export default function SciencePage() {
             {faqs.map((item) => (
               <article
                 key={item.q}
-                className={`rounded-2xl ${goldBorder} bg-white p-5 shadow-[0_8px_20px_rgba(26,35,126,0.06)]`}
+                className={`mu-lab-glass rounded-2xl ${goldBorder} p-5`}
               >
-                <h2 className="font-serif text-xl text-[#1a237e]">{item.q}</h2>
-                <p className="mt-2 text-sm font-light leading-relaxed text-[#1a237e]/80">{item.a}</p>
+                <h2 className="font-serif text-xl text-[#eef1ff]">{item.q}</h2>
+                <p className="mt-2 text-sm font-light leading-relaxed text-[#dbe1ff]/80">{item.a}</p>
               </article>
             ))}
           </div>
@@ -128,19 +126,19 @@ export default function SciencePage() {
           <div className="mt-10 flex flex-wrap gap-2">
             <Link
               href="/terms"
-              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
+              className={`rounded-full ${goldBorder} bg-[rgba(247,231,206,0.08)] px-4 py-1.5 text-xs font-light tracking-wide text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.16)]`}
             >
               Terms of Service
             </Link>
             <Link
               href="/privacy"
-              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
+              className={`rounded-full ${goldBorder} bg-[rgba(247,231,206,0.08)] px-4 py-1.5 text-xs font-light tracking-wide text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.16)]`}
             >
               Privacy Policy
             </Link>
             <Link
               href="/"
-              className={`rounded-full ${goldBorder} bg-white px-4 py-1.5 text-xs font-light tracking-wide text-[#1a237e]/80 transition hover:bg-[#fffaf2]`}
+              className={`rounded-full ${goldBorder} bg-[rgba(247,231,206,0.08)] px-4 py-1.5 text-xs font-light tracking-wide text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.16)]`}
             >
               Back to Mu-Lab
             </Link>
