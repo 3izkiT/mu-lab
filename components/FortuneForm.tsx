@@ -369,7 +369,7 @@ export default function FortuneForm() {
         initial={{ opacity: 0, y: 24, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full min-w-0 max-w-full overflow-hidden rounded-[1.25rem] border border-[rgba(247,231,206,0.14)] bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-[1px] shadow-[0_40px_120px_rgba(0,0,0,0.55)] sm:rounded-3xl"
+        className="relative w-full min-w-0 max-w-full overflow-hidden rounded-[1.25rem] border border-[rgba(247,231,206,0.14)] bg-[#0a1024] p-[1px] shadow-[0_40px_120px_rgba(0,0,0,0.55)] sm:rounded-3xl"
       >
         <div className="mu-lab-glass rounded-[1.2rem] px-4 py-7 sm:rounded-[1.9rem] sm:px-10 sm:py-11">
           <div className="mx-auto mb-8 flex flex-col items-center text-center">
@@ -666,7 +666,7 @@ export default function FortuneForm() {
           </motion.p>
         )}
 
-        <div className="mt-8 rounded-2xl border border-[rgba(247,231,206,0.18)] bg-[rgba(255,255,255,0.03)] px-4 py-3 sm:px-5">
+        <div className="mu-lab-glass mt-8 rounded-2xl border border-[rgba(247,231,206,0.18)] px-4 py-3 sm:px-5">
           <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-[#e8eeff]/84">
             <input
               type="checkbox"
