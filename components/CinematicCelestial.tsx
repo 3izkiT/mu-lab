@@ -42,10 +42,10 @@ export function ParallaxNebula() {
   const reduceMotion = useReducedMotion();
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const x = useSpring(mx, { stiffness: 40, damping: 18, mass: 0.6 });
-  const y = useSpring(my, { stiffness: 40, damping: 18, mass: 0.6 });
-  const xBack = useTransform(x, (v) => v * -0.35);
-  const yBack = useTransform(y, (v) => v * -0.35);
+  const x = useSpring(mx, { stiffness: 48, damping: 22, mass: 0.55 });
+  const y = useSpring(my, { stiffness: 48, damping: 22, mass: 0.55 });
+  const xBack = useTransform(x, (v) => v * -0.32);
+  const yBack = useTransform(y, (v) => v * -0.32);
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -53,8 +53,8 @@ export function ParallaxNebula() {
     const onMove = (event: MouseEvent) => {
       const px = event.clientX / window.innerWidth - 0.5;
       const py = event.clientY / window.innerHeight - 0.5;
-      mx.set(px * 20);
-      my.set(py * 20);
+      mx.set(px * 16);
+      my.set(py * 12);
     };
 
     window.addEventListener("mousemove", onMove);
@@ -63,18 +63,43 @@ export function ParallaxNebula() {
 
   return (
     <>
+      {/* Fixed nebula plate — subtle mouse parallax for depth */}
       <motion.div
-        className="pointer-events-none fixed inset-0"
+        className="pointer-events-none fixed inset-0 z-0"
         style={{
           x: reduceMotion ? 0 : x,
           y: reduceMotion ? 0 : y,
+          scale: reduceMotion ? 1 : 1.04,
+          backgroundColor: "#03050f",
+          backgroundImage: "url(/bg-nebula.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+        }}
+        aria-hidden
+      />
+      {/* Luxury read legibility: center ~40% black → edges ~80% midnight navy */}
+      <div
+        className="pointer-events-none fixed inset-0 z-[1]"
+        style={{
           background:
-            "radial-gradient(68% 52% at 28% 20%, rgba(109,124,226,0.2) 0%, transparent 66%), radial-gradient(46% 38% at 78% 18%, rgba(154,95,215,0.18) 0%, transparent 65%), radial-gradient(62% 48% at 52% 74%, rgba(62,98,158,0.16) 0%, transparent 68%)",
+            "radial-gradient(ellipse 115% 110% at 50% 42%, rgba(0,0,0,0.4) 0%, rgba(6,9,22,0.68) 55%, rgba(4,7,18,0.8) 100%)",
         }}
         aria-hidden
       />
       <motion.div
-        className="pointer-events-none fixed inset-0 mu-lab-blueprint"
+        className="pointer-events-none fixed inset-0 z-[2]"
+        style={{
+          x: reduceMotion ? 0 : x,
+          y: reduceMotion ? 0 : y,
+          background:
+            "radial-gradient(68% 52% at 28% 20%, rgba(109,124,226,0.14) 0%, transparent 66%), radial-gradient(46% 38% at 78% 18%, rgba(154,95,215,0.12) 0%, transparent 65%)",
+        }}
+        aria-hidden
+      />
+      <motion.div
+        className="pointer-events-none fixed inset-0 z-[2] mu-lab-blueprint"
         style={{ x: reduceMotion ? 0 : xBack, y: reduceMotion ? 0 : yBack }}
         aria-hidden
       />

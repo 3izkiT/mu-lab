@@ -41,22 +41,22 @@ export default function DailyCosmicDashboard({ data }: Props) {
         </div>
       </div>
 
-      <p className="mb-6 rounded-2xl bg-white/[0.04] px-6 py-4 text-base font-light leading-relaxed text-[#dbe1ff] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+      <p className="mu-lab-glass mb-6 rounded-2xl px-6 py-4 text-base font-light leading-relaxed text-[#dbe1ff]">
         <span className="font-medium text-[var(--gold)]">Live Energy Reading:</span> {data.weatherTag}
       </p>
 
       <DailyEnergyGauges scores={data.scores} animateKey={animateKey} />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-4">
-        <article className="rounded-2xl bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] lg:col-span-2">
+        <article className="mu-lab-glass rounded-2xl p-5 lg:col-span-2">
           <p className="text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">Daily Lab Note</p>
           <p className="mt-1.5 text-base font-light text-[#d9f2e9]/92">{hasLabNote ? data.labNote : emptyStateText}</p>
         </article>
-        <article className="rounded-2xl bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <article className="mu-lab-glass rounded-2xl p-5">
           <p className="text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">Ritual</p>
           <p className="mt-1.5 text-base font-light text-[#d9f2e9]/92">{hasRitual ? data.ritualOfTheDay : emptyStateText}</p>
         </article>
-        <article className="rounded-2xl bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <article className="mu-lab-glass rounded-2xl p-5">
           <p className="text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">Lucky</p>
           <p className="mt-1.5 text-base font-light text-[#d9f2e9]/92">
             {hasLuckyColor ? data.luckyColor : "Silver Mist"} · {hasLuckyItem ? data.luckyItem : "Minimal silver accessory"}

@@ -348,7 +348,7 @@ export default function FortuneForm() {
         transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         className="relative overflow-hidden rounded-[1.35rem] border border-[rgba(247,231,206,0.14)] bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-[1px] shadow-[0_40px_120px_rgba(0,0,0,0.55)] sm:rounded-3xl"
       >
-        <div className="rounded-[1.3rem] bg-[#060a12]/80 px-5 py-8 backdrop-blur-2xl sm:rounded-[1.9rem] sm:px-10 sm:py-11">
+        <div className="mu-lab-glass rounded-[1.3rem] px-5 py-8 sm:rounded-[1.9rem] sm:px-10 sm:py-11">
           <div className="mx-auto mb-8 flex flex-col items-center text-center">
             <div className="h-px w-20 bg-gradient-to-r from-transparent via-[var(--gold)]/50 to-transparent" />
             <p className="mt-6 text-[10px] font-medium uppercase tracking-[0.4em] text-zinc-600">
@@ -377,7 +377,7 @@ export default function FortuneForm() {
                   duration: 0.48,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="rounded-2xl border border-[rgba(247,231,206,0.12)] bg-white/[0.03] px-5 py-5 shadow-[inset_0_1px_0_rgba(247,231,206,0.05)] sm:rounded-3xl sm:px-7 sm:py-6"
+                className="mu-lab-glass rounded-2xl border border-[rgba(247,231,206,0.12)] px-5 py-5 sm:rounded-3xl sm:px-7 sm:py-6"
               >
                 <div className="mb-4 flex items-baseline justify-between gap-3 border-b border-white/[0.05] pb-4">
                   <div>
@@ -427,7 +427,7 @@ export default function FortuneForm() {
   }
 
   return (
-    <div className="relative overflow-visible rounded-[1.6rem] bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_26px_66px_rgba(1,4,16,0.45)] backdrop-blur-[12px] sm:rounded-[2rem]">
+    <div className="mu-lab-glass relative overflow-visible rounded-[1.6rem] sm:rounded-[2rem]">
       {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -472,7 +472,7 @@ export default function FortuneForm() {
         </div>
 
         <div className="space-y-10">
-          <section className="rounded-2xl bg-white/[0.03] p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-8">
+          <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
             <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลพื้นฐาน</p>
             <div className="grid gap-6 sm:grid-cols-2">
               <label className="block sm:col-span-2">
@@ -532,7 +532,7 @@ export default function FortuneForm() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-white/[0.03] p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-8">
+          <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
             <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลเวลาและสถานที่เกิด</p>
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="sm:col-span-2">

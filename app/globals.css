@@ -49,11 +49,7 @@
 }
 
 body {
-  background:
-    radial-gradient(70% 55% at 22% 20%, rgba(90, 70, 170, 0.24) 0%, transparent 65%),
-    radial-gradient(50% 42% at 80% 18%, rgba(110, 60, 160, 0.2) 0%, transparent 66%),
-    radial-gradient(58% 45% at 54% 70%, rgba(56, 60, 138, 0.18) 0%, transparent 68%),
-    linear-gradient(160deg, #1a1042 0%, #130a35 55%, #0d0824 100%);
+  background-color: #03050f;
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
