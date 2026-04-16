@@ -80,7 +80,7 @@ export default async function Home() {
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
           <div
-            className="pointer-events-none absolute -top-8 left-1/2 grid h-[min(52vw,200px)] w-[min(52vw,200px)] -translate-x-1/2 place-items-center sm:-top-10 sm:h-[260px] sm:w-[260px]"
+            className="pointer-events-none absolute -top-16 left-1/2 grid h-[min(42vw,160px)] w-[min(42vw,160px)] -translate-x-1/2 place-items-center opacity-70 sm:-top-24 sm:h-[220px] sm:w-[220px]"
             aria-hidden
           >
             <Image
@@ -93,7 +93,7 @@ export default async function Home() {
           </div>
           <div
             id="fortune-form"
-            className="relative z-50 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:rounded-[2rem] sm:p-3"
+            className="relative z-50 mt-6 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:mt-10 sm:rounded-[2rem] sm:p-3"
           >
             <FortuneForm />
           </div>
