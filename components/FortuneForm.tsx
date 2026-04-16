@@ -176,10 +176,12 @@ export default function FortuneForm() {
         body: JSON.stringify(formData),
       });
 
-      const payload = (await response.json()) as {
-        message?: string;
-        meters?: LuckMetersData;
-      };
+      let payload: { message?: string; meters?: LuckMetersData } = {};
+      try {
+        payload = (await response.json()) as typeof payload;
+      } catch {
+        payload = {};
+      }
       const elapsed = Date.now() - startedAt;
       const remaining = Math.max(0, ILLUSION_DURATION_MS - elapsed);
       if (remaining > 0) await sleep(remaining);

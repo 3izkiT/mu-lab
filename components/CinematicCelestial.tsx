@@ -76,7 +76,6 @@ export function ParallaxNebula() {
           backgroundSize: "cover",
           backgroundPosition: nebulaBackgroundPosition,
           backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
         }}
         aria-hidden
       />

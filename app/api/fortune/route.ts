@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { readGeminiApiKey } from "@/lib/gemini-env";
+import { readGeminiApiKey, readGeminiChatModel } from "@/lib/gemini-env";
+import { extractGeminiResponseText } from "@/lib/gemini-response-text";
 import { splitMetersFromFortuneText } from "@/lib/fortune-parse";
 
 type FortuneRequestBody = {
@@ -110,16 +111,40 @@ export async function POST(request: Request) {
 สำคัญ: บรรทัดแรกของคำตอบต้องเป็น [METERS: ตัวเลข, ตัวเลข, ตัวเลข] (การงาน, การเงิน, ความรัก) แล้วบรรทัดว่าง แล้วตามด้วย ## ลักษณะนิสัย ทันที`;
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      systemInstruction: MU_LAB_SYSTEM_PROMPT,
-    });
+    const modelCandidates = [
+      readGeminiChatModel(),
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-1.5-flash-latest",
+    ].filter((name, i, arr) => name.length > 0 && arr.indexOf(name) === i);
 
-    const result = await model.generateContent(userPrompt);
-    const response = result.response;
-    const text = response.text();
+    let text = "";
+    let lastModelTried = "";
+    let lastError: unknown;
+
+    for (const modelName of modelCandidates) {
+      lastModelTried = modelName;
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction: MU_LAB_SYSTEM_PROMPT,
+        });
+        const result = await model.generateContent(userPrompt);
+        const extracted = extractGeminiResponseText(result.response);
+        if (extracted.trim()) {
+          text = extracted;
+          if (process.env.NODE_ENV === "development") {
+            console.log("[fortune] ok model:", modelName, "chars:", text.length);
+          }
+          break;
+        }
+      } catch (err) {
+        lastError = err;
+      }
+    }
 
     if (!text?.trim()) {
+      console.error("[fortune] no text from Gemini", { lastModelTried, lastError });
       return NextResponse.json(
         { message: "สภาวะดวงดาวไม่เอื้ออำนวย กรุณาลองใหม่อีกครั้ง" },
         { status: 502 },

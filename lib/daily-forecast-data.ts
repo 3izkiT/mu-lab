@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { readGeminiApiKey } from "@/lib/gemini-env";
+import { readGeminiApiKey, readGeminiChatModel } from "@/lib/gemini-env";
+import { extractGeminiResponseText } from "@/lib/gemini-response-text";
 
 export type DailyForecastPayload = {
   dateKey: string;
@@ -63,7 +64,7 @@ async function generateDailyFromGemini(dateKey: string): Promise<DailyForecastPa
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: readGeminiChatModel(),
     systemInstruction: DAILY_SYSTEM,
   });
 
@@ -74,7 +75,7 @@ async function generateDailyFromGemini(dateKey: string): Promise<DailyForecastPa
 ตอบเป็น JSON ตามที่กำหนดเท่านั้น`;
 
   const result = await model.generateContent(userPrompt);
-  const text = result.response.text();
+  const text = extractGeminiResponseText(result.response);
   if (!text?.trim()) throw new Error("empty");
 
   const raw = extractJsonObject(text);
