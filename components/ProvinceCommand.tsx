@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, MapPin } from "lucide-react";
+import { CELESTIAL_STROKE } from "@/lib/celestial-icon-tokens";
 import { Command } from "cmdk";
 import { getProvincesForCommand } from "@/constants/provinces";
 
@@ -32,13 +33,21 @@ export default function ProvinceCommand({ value, onChange, disabled }: ProvinceC
         aria-expanded={open}
         aria-haspopup="listbox"
         onClick={() => !disabled && setOpen((o) => !o)}
-        className="mu-lab-input flex w-full items-center justify-between gap-3 rounded-2xl py-3.5 pl-4 pr-3 text-left text-sm text-zinc-100 disabled:opacity-40"
+        className="group mu-lab-input flex w-full items-center justify-between gap-3 rounded-2xl py-3.5 pl-4 pr-3 text-left text-sm text-zinc-100 disabled:opacity-40"
       >
-        <span className={value ? "text-zinc-100" : "text-zinc-600"}>
-          {value || "ค้นหาหรือเลือกจังหวัด..."}
+        <span className="flex min-w-0 flex-1 items-center gap-2.5">
+          <MapPin
+            strokeWidth={CELESTIAL_STROKE}
+            className={`h-4 w-4 shrink-0 transition-colors group-focus-within:text-[var(--gold)] ${open ? "text-[var(--gold)]" : "text-[var(--icon-muted)]"}`}
+            aria-hidden
+          />
+          <span className={`min-w-0 truncate ${value ? "text-zinc-100" : "text-zinc-600"}`}>
+            {value || "ค้นหาหรือเลือกจังหวัด..."}
+          </span>
         </span>
         <ChevronDown
-          className={`h-4 w-4 shrink-0 text-[var(--gold)]/80 transition ${open ? "rotate-180" : ""}`}
+          strokeWidth={CELESTIAL_STROKE}
+          className={`mu-lab-icon-interactive h-4 w-4 shrink-0 text-[var(--gold)]/85 transition-transform ${open ? "rotate-180" : ""}`}
           aria-hidden
         />
       </button>
@@ -70,7 +79,9 @@ export default function ProvinceCommand({ value, onChange, disabled }: ProvinceC
                   className="flex min-h-[44px] cursor-pointer items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm text-zinc-200 outline-none data-[selected=true]:bg-[rgba(247,231,206,0.08)] aria-selected:bg-[rgba(247,231,206,0.1)] sm:min-h-0"
                 >
                   <span>{p}</span>
-                  {value === p ? <Check className="h-4 w-4 shrink-0 text-[var(--gold)]" /> : null}
+                  {value === p ? (
+                    <Check strokeWidth={CELESTIAL_STROKE} className="h-4 w-4 shrink-0 text-[var(--gold)]" />
+                  ) : null}
                 </Command.Item>
               ))}
             </Command.Group>

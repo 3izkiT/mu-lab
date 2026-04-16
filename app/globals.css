@@ -7,6 +7,8 @@
   --gold-soft: rgba(247, 231, 206, 0.22);
   --cosmic-blue: #130a35;
   --cosmic-blue-soft: rgba(86, 66, 166, 0.2);
+  /* Fine-line input icons — midnight blue, lift to gold on focus-within */
+  --icon-muted: #5b6582;
 }
 
 @theme inline {
@@ -46,6 +48,46 @@
     transform: scale(1.45);
     opacity: 0;
   }
+}
+
+@keyframes mu-lab-icon-breathe {
+  0%,
+  100% {
+    opacity: 0.62;
+    filter: drop-shadow(0 0 5px rgba(247, 231, 206, 0.12));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(247, 231, 206, 0.32));
+  }
+}
+
+@keyframes mu-lab-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mu-lab-icon-breathe {
+  animation: mu-lab-icon-breathe 3.4s ease-in-out infinite;
+}
+
+.mu-lab-orbit-spin {
+  animation: mu-lab-orbit-spin 72s linear infinite;
+}
+
+.mu-lab-icon-interactive {
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.mu-lab-icon-interactive:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 10px rgba(247, 231, 206, 0.45));
 }
 
 body {

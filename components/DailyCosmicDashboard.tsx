@@ -1,5 +1,10 @@
-import type { DailyForecastPayload } from "@/lib/daily-forecast-data";
+"use client";
+
+import { FlaskConical, Infinity, Orbit, Sparkles } from "lucide-react";
 import DailyEnergyGauges from "@/components/DailyEnergyGauges";
+import { CelestialHeadingRow } from "@/components/CelestialIcon";
+import type { DailyForecastPayload } from "@/lib/daily-forecast-data";
+import { CELESTIAL_STROKE } from "@/lib/celestial-icon-tokens";
 
 type Props = {
   data: DailyForecastPayload;
@@ -19,12 +24,14 @@ export default function DailyCosmicDashboard({ data }: Props) {
       aria-labelledby="daily-cosmic-heading"
     >
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2
-          id="daily-cosmic-heading"
-          className="font-serif text-xl font-medium tracking-tight text-[#ecfbf5] sm:text-2xl"
-        >
-          Cosmic Weather
-        </h2>
+        <CelestialHeadingRow icon={Orbit} orbitSlow className="sm:flex-1">
+          <h2
+            id="daily-cosmic-heading"
+            className="font-serif text-xl font-medium tracking-tight text-[#ecfbf5] sm:text-2xl"
+          >
+            Cosmic Weather
+          </h2>
+        </CelestialHeadingRow>
         <div className="flex flex-wrap items-center gap-2 text-sm text-[#d9f2e9]/78">
           <time dateTime={data.dateKey}>วันที่ {data.dateKey}</time>
           <span>·</span>
@@ -49,15 +56,24 @@ export default function DailyCosmicDashboard({ data }: Props) {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-4">
         <article className="mu-lab-glass rounded-2xl p-5 lg:col-span-2">
-          <p className="text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">Daily Lab Note</p>
+          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">
+            <FlaskConical className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
+            Daily Lab Note
+          </p>
           <p className="mt-1.5 text-base font-light text-[#d9f2e9]/92">{hasLabNote ? data.labNote : emptyStateText}</p>
         </article>
         <article className="mu-lab-glass rounded-2xl p-5">
-          <p className="text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">Ritual</p>
+          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
+            Ritual
+          </p>
           <p className="mt-1.5 text-base font-light text-[#d9f2e9]/92">{hasRitual ? data.ritualOfTheDay : emptyStateText}</p>
         </article>
         <article className="mu-lab-glass rounded-2xl p-5">
-          <p className="text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">Lucky</p>
+          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[var(--gold)]/75">
+            <Infinity className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
+            Lucky
+          </p>
           <p className="mt-1.5 text-base font-light text-[#d9f2e9]/92">
             {hasLuckyColor ? data.luckyColor : "Silver Mist"} · {hasLuckyItem ? data.luckyItem : "Minimal silver accessory"}
           </p>

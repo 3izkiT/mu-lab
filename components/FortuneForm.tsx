@@ -3,11 +3,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link2 } from "lucide-react";
+import {
+  Atom,
+  Calendar,
+  Clock,
+  Dna,
+  Fingerprint,
+  Hexagon,
+  Link2,
+  MapPin,
+  Sparkles,
+  User,
+  UserRound,
+} from "lucide-react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
+import { CelestialHeadingRow, CelestialIcon } from "@/components/CelestialIcon";
 import LuckMeters from "@/components/LuckMeters";
 import ProvinceCommand from "@/components/ProvinceCommand";
+import { CELESTIAL_STROKE } from "@/lib/celestial-icon-tokens";
 import { defaultLuckMeters, type LuckMetersData } from "@/lib/fortune-parse";
 
 type FormData = {
@@ -298,7 +312,10 @@ export default function FortuneForm() {
               </span>
             </motion.div>
 
-            <p className="mt-10 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
+            <p className="mt-10 flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
+              <span className="mu-lab-icon-breathe inline-flex text-[var(--gold)]" aria-hidden>
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={CELESTIAL_STROKE} />
+              </span>
               Quantum Calculation
             </p>
             <AnimatePresence mode="wait">
@@ -351,10 +368,14 @@ export default function FortuneForm() {
         <div className="mu-lab-glass rounded-[1.3rem] px-5 py-8 sm:rounded-[1.9rem] sm:px-10 sm:py-11">
           <div className="mx-auto mb-8 flex flex-col items-center text-center">
             <div className="h-px w-20 bg-gradient-to-r from-transparent via-[var(--gold)]/50 to-transparent" />
-            <p className="mt-6 text-[10px] font-medium uppercase tracking-[0.4em] text-zinc-600">
+            <p className="mt-6 flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.4em] text-zinc-600">
+              <Sparkles className="h-3.5 w-3.5 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
               Mu-Lab Analysis
             </p>
-            <h2 className="mt-2 font-serif text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl">
+            <h2 className="mt-2 flex items-center justify-center gap-2.5 font-serif text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl">
+              <span className="mu-lab-icon-breathe inline-flex text-[var(--gold)]" aria-hidden>
+                <Sparkles className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} />
+              </span>
               คำทำนายของคุณ
             </h2>
             <p className="mt-2 max-w-md text-xs font-light leading-relaxed text-zinc-500">
@@ -388,9 +409,13 @@ export default function FortuneForm() {
                       {section.title}
                     </h3>
                   </div>
-                  <span className="select-none text-lg font-extralight text-zinc-700" aria-hidden>
-                    ✦
-                  </span>
+                  <CelestialIcon
+                    icon={Hexagon}
+                    size={18}
+                    interactive
+                    className="opacity-[0.85]"
+                    aria-hidden
+                  />
                 </div>
                 <div className="max-w-none">
                   <ReactMarkdown components={markdownComponents}>{section.content}</ReactMarkdown>
@@ -417,7 +442,11 @@ export default function FortuneForm() {
               onClick={handleCopyLink}
               className="flex w-full items-center justify-center gap-2 rounded-full border border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.06)] px-6 py-2.5 text-xs font-light tracking-wide text-[var(--gold)] transition hover:border-[rgba(247,231,206,0.35)] hover:bg-[rgba(247,231,206,0.1)] sm:w-auto"
             >
-              <Link2 className="h-3.5 w-3.5 opacity-90" aria-hidden />
+              <Link2
+                strokeWidth={CELESTIAL_STROKE}
+                className="mu-lab-icon-interactive h-3.5 w-3.5 text-[var(--gold)]"
+                aria-hidden
+              />
               {copyDone ? "คัดลอกลิงก์แล้ว" : "คัดลอกลิงก์แชร์ให้เพื่อน"}
             </button>
           </motion.div>
@@ -449,7 +478,10 @@ export default function FortuneForm() {
             <span className="relative text-[10px] font-light uppercase tracking-[0.48em] text-zinc-500">Mu-Lab</span>
           </div>
           <div className="space-y-2">
-            <p className="text-[10px] font-medium uppercase tracking-[0.42em] text-zinc-600">
+            <p className="flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.42em] text-zinc-600">
+              <span className="mu-lab-icon-breathe inline-flex text-[var(--gold)]" aria-hidden>
+                <Atom className="h-3.5 w-3.5" strokeWidth={CELESTIAL_STROKE} />
+              </span>
               Aligning Frequencies
             </p>
             <p className="max-w-xs text-sm font-light leading-relaxed text-zinc-200 sm:text-base">
@@ -462,21 +494,31 @@ export default function FortuneForm() {
 
       <div className={`p-10 sm:p-12 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}>
         <div className="mb-12">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--gold)]/78">Session</p>
-            <h2 className="mt-4 font-serif text-3xl font-medium tracking-[0.05em] text-[#eef1ff] sm:text-4xl">
-              ข้อมูลดวง
-            </h2>
-            <p className="mt-4 text-base font-light text-[#dbe1ff]/78">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
-          </div>
+          <CelestialHeadingRow icon={Atom} breathe className="items-start">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--gold)]/78">Session</p>
+              <h2 className="mt-4 font-serif text-3xl font-medium tracking-[0.05em] text-[#eef1ff] sm:text-4xl">
+                ข้อมูลดวง
+              </h2>
+              <p className="mt-4 text-base font-light text-[#dbe1ff]/78">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
+            </div>
+          </CelestialHeadingRow>
         </div>
 
         <div className="space-y-10">
           <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
-            <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลพื้นฐาน</p>
+            <p className="mb-7 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">
+              <Fingerprint className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
+              ข้อมูลพื้นฐาน
+            </p>
             <div className="grid gap-6 sm:grid-cols-2">
-              <label className="block sm:col-span-2">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+              <label className="group block sm:col-span-2">
+                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                  <User
+                    strokeWidth={CELESTIAL_STROKE}
+                    className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
+                    aria-hidden
+                  />
                   ชื่อ-นามสกุล
                 </span>
                 <input
@@ -490,8 +532,13 @@ export default function FortuneForm() {
                 />
               </label>
 
-              <label className="block">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+              <label className="group block">
+                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                  <UserRound
+                    strokeWidth={CELESTIAL_STROKE}
+                    className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
+                    aria-hidden
+                  />
                   เพศ
                 </span>
                 <select
@@ -516,8 +563,13 @@ export default function FortuneForm() {
                 </select>
               </label>
 
-              <label className="block">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+              <label className="group block">
+                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                  <Calendar
+                    strokeWidth={CELESTIAL_STROKE}
+                    className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
+                    aria-hidden
+                  />
                   วันเกิด
                 </span>
                 <input
@@ -533,10 +585,18 @@ export default function FortuneForm() {
           </section>
 
           <section className="mu-lab-glass rounded-2xl p-7 sm:p-8">
-            <p className="mb-7 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">ข้อมูลเวลาและสถานที่เกิด</p>
+            <p className="mb-7 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">
+              <Dna className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
+              ข้อมูลเวลาและสถานที่เกิด
+            </p>
             <div className="grid gap-6 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+              <div className="group sm:col-span-2">
+                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                  <Clock
+                    strokeWidth={CELESTIAL_STROKE}
+                    className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
+                    aria-hidden
+                  />
                   เวลาเกิด (ชั่วโมง · นาที)
                 </span>
                 <div className="grid grid-cols-2 gap-3">
@@ -565,8 +625,13 @@ export default function FortuneForm() {
                 </div>
               </div>
 
-              <div className="sm:col-span-2">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+              <div className="group sm:col-span-2">
+                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                  <MapPin
+                    strokeWidth={CELESTIAL_STROKE}
+                    className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
+                    aria-hidden
+                  />
                   จังหวัดที่เกิด
                 </span>
                 <ProvinceCommand
