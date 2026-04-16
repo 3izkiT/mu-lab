@@ -23,8 +23,8 @@ export default function DailyCosmicDashboard({ data }: Props) {
       className="mu-lab-glass col-span-12 rounded-[1.6rem] p-8 sm:rounded-[2rem] sm:p-10"
       aria-labelledby="daily-cosmic-heading"
     >
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <CelestialHeadingRow icon={Orbit} orbitSlow className="sm:flex-1">
+      <div className="mb-8 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CelestialHeadingRow icon={Orbit} orbitSlow className="min-w-0 sm:min-w-0 sm:flex-1">
           <h2
             id="daily-cosmic-heading"
             className="font-serif text-xl font-medium tracking-tight text-[#ecfbf5] sm:text-2xl"
@@ -32,7 +32,7 @@ export default function DailyCosmicDashboard({ data }: Props) {
             Cosmic Weather
           </h2>
         </CelestialHeadingRow>
-        <div className="flex flex-wrap items-center gap-2 text-sm text-[#d9f2e9]/78">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-[#d9f2e9]/78">
           <time dateTime={data.dateKey}>วันที่ {data.dateKey}</time>
           <span>·</span>
           <span>Bangkok Time</span>

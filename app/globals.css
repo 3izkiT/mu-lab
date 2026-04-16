@@ -151,6 +151,9 @@ body {
 
 /* Glass + champagne focus */
 .mu-lab-input {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
   border: none;
   border-bottom: 1px solid rgba(247, 231, 206, 0.28);
   background: rgba(255, 255, 255, 0.02);

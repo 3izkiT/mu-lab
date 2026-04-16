@@ -26,7 +26,7 @@ export default function ProvinceCommand({ value, onChange, disabled }: ProvinceC
   }, []);
 
   return (
-    <div ref={rootRef} className="relative z-[80]">
+    <div ref={rootRef} className="relative z-[80] w-full min-w-0">
       <button
         type="button"
         disabled={disabled}

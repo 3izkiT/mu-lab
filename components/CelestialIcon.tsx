@@ -98,16 +98,16 @@ export function CelestialHeadingRow({
   );
 
   return (
-    <div className={`flex items-center gap-3 ${className}`.trim()}>
+    <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-3 ${className}`.trim()}>
       <motion.span
-        className="inline-flex"
+        className="inline-flex shrink-0 sm:mt-0.5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
         {inner}
       </motion.span>
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="min-w-0 w-full flex-1 sm:w-auto">{children}</div>
     </div>
   );
 }

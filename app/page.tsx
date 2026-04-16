@@ -20,7 +20,7 @@ export default async function Home() {
   const daily = await getDailyForecast();
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
+    <main className="relative min-h-screen overflow-x-hidden">
       <header className="sticky top-0 z-30 bg-[rgba(6,10,22,0.68)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
@@ -69,9 +69,9 @@ export default async function Home() {
       <ParallaxNebula />
       <div className="pointer-events-none fixed inset-0 z-[3] mu-lab-starfield" aria-hidden />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6 pb-28 pt-16 sm:px-8 sm:pt-20 lg:px-10 lg:pt-24">
+      <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl px-4 pb-28 pt-14 sm:px-8 sm:pt-20 lg:px-10 lg:pt-24">
         {/* HERO: form-first */}
-        <section className="relative z-40 overflow-visible rounded-[2rem] p-6 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:p-8 lg:p-10">
+        <section className="relative z-40 min-w-0 overflow-visible rounded-[1.35rem] p-4 shadow-[0_40px_90px_rgba(0,0,0,0.5)] sm:rounded-[2rem] sm:p-8 lg:p-10">
           <div
             className="pointer-events-none absolute inset-0 opacity-55"
             style={{
@@ -82,7 +82,7 @@ export default async function Home() {
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
           <div
-            className="pointer-events-none absolute -top-10 left-1/2 grid h-[260px] w-[260px] -translate-x-1/2 place-items-center rounded-full bg-[var(--background)] shadow-[0_0_46px_rgba(247,231,206,0.24),inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+            className="pointer-events-none absolute -top-8 left-1/2 grid h-[min(52vw,200px)] w-[min(52vw,200px)] -translate-x-1/2 place-items-center rounded-full bg-[var(--background)] shadow-[0_0_46px_rgba(247,231,206,0.24),inset_0_0_0_1px_rgba(255,255,255,0.06)] sm:-top-10 sm:h-[260px] sm:w-[260px]"
             aria-hidden
           >
             <Image
@@ -90,13 +90,13 @@ export default async function Home() {
               alt=""
               width={260}
               height={260}
-              className="h-[260px] w-[260px] rounded-full"
+              className="h-full w-full rounded-full object-cover"
             />
           </div>
-          <Reveal delay={0.1} className="relative">
+          <Reveal delay={0.1} className="relative min-w-0 w-full">
             <Floating
               id="fortune-form"
-              className="relative z-50 rounded-[1.6rem] p-2 sm:rounded-[2rem] sm:p-3"
+              className="relative z-50 w-full min-w-0 rounded-[1.35rem] p-1.5 sm:rounded-[2rem] sm:p-3"
             >
               <FortuneForm />
             </Floating>
