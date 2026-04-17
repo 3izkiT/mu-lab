@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ParallaxNebula } from "@/components/CinematicCelestial";
 import { DailyHoroscopeArticleView } from "@/components/DailyHoroscopeArticleView";
+import { listDailyHoroscopeArchives } from "@/lib/daily-horoscope-archive";
 import { getDailyHoroscopeArticle } from "@/lib/daily-horoscope-article-data";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -27,6 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DailyHoroscopePage() {
   const article = await getDailyHoroscopeArticle();
+  const recent = await listDailyHoroscopeArchives(30);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -38,6 +40,7 @@ export default async function DailyHoroscopePage() {
         siteUrl={siteUrl}
         canonicalPath="/daily-horoscope"
         variant="today"
+        recentDateKeys={recent.map((r) => r.dateKey)}
       />
     </main>
   );

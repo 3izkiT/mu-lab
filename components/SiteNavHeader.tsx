@@ -59,6 +59,11 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
             </Link>
           </HoverConstellation>
           <HoverConstellation>
+            <Link href="/login" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
+              Log in
+            </Link>
+          </HoverConstellation>
+          <HoverConstellation>
             <Link
               href="/#fortune-form"
               className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_28px_rgba(247,231,206,0.26)] transition hover:brightness-105"
@@ -89,6 +94,9 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
               className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]"
             >
               เกี่ยวกับ Mu-Lab
+            </Link>
+            <Link href="/login" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
+              Log in
             </Link>
             <Link
               href="/#fortune-form"

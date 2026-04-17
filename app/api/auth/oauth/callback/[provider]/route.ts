@@ -26,28 +26,9 @@ async function exchangeGoogleCode(code: string) {
   return { providerId: profile.sub, email: profile.email ?? null, name: profile.name ?? "Google User" };
 }
 
-async function exchangeFacebookCode(code: string) {
-  const cfg = getOAuthConfig("facebook");
-  if (!cfg.clientId || !cfg.clientSecret) throw new Error("facebook_not_configured");
-  const tokenUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
-  tokenUrl.search = new URLSearchParams({
-    client_id: cfg.clientId,
-    client_secret: cfg.clientSecret,
-    redirect_uri: getCallbackUrl("facebook"),
-    code,
-  }).toString();
-  const token = await fetch(tokenUrl).then((r) => r.json() as Promise<{ access_token?: string }>);
-  if (!token.access_token) throw new Error("facebook_token_failed");
-  const profileUrl = new URL("https://graph.facebook.com/me");
-  profileUrl.search = new URLSearchParams({ fields: "id,name,email", access_token: token.access_token }).toString();
-  const profile = await fetch(profileUrl).then((r) => r.json() as Promise<{ id?: string; email?: string; name?: string }>);
-  if (!profile.id) throw new Error("facebook_profile_failed");
-  return { providerId: profile.id, email: profile.email ?? null, name: profile.name ?? "Facebook User" };
-}
-
 export async function GET(request: Request, { params }: { params: Promise<{ provider: string }> }) {
   const { provider } = await params;
-  if (provider !== "google" && provider !== "facebook") {
+  if (provider !== "google") {
     return NextResponse.redirect("/login?error=provider");
   }
   const p = provider as SocialProvider;
@@ -63,7 +44,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ prov
 
   let profile: { providerId: string; email: string | null; name: string };
   try {
-    profile = p === "google" ? await exchangeGoogleCode(code) : await exchangeFacebookCode(code);
+    profile = await exchangeGoogleCode(code);
   } catch {
     return NextResponse.redirect(`/login?error=${p}_config`);
   }

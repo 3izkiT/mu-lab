@@ -21,15 +21,24 @@ type Props = {
   /** path เช่น /daily-horoscope หรือ /daily-horoscope/2026-04-17 */
   canonicalPath: string;
   variant: "today" | "archive";
+  /** สำหรับเมนูตัวเลขวันที่ด้านล่าง (เรียงล่าสุดก่อน) */
+  recentDateKeys?: string[];
 };
 
-export function DailyHoroscopeArticleView({ article, siteUrl, canonicalPath, variant }: Props) {
+function thaiDayNumber(dateKey: string) {
+  const iso = `${dateKey}T12:00:00+07:00`;
+  return new Date(iso).toLocaleDateString("th-TH", { timeZone: "Asia/Bangkok", day: "numeric" });
+}
+
+export function DailyHoroscopeArticleView({ article, siteUrl, canonicalPath, variant, recentDateKeys = [] }: Props) {
   const { forecast } = article;
   const dateLabel = formatThaiArticleDateLabel(article.dateKey);
   const canonicalUrl = `${siteUrl}${canonicalPath === "/" ? "" : canonicalPath}`;
   const shareText = `${article.headlineTh} · ดูดวงรายวัน Mu-Lab`;
   const encodedUrl = encodeURIComponent(canonicalUrl);
   const encodedText = encodeURIComponent(shareText);
+
+  const menuKeys = Array.from(new Set([article.dateKey, ...recentDateKeys])).slice(0, 31);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -60,12 +69,6 @@ export function DailyHoroscopeArticleView({ article, siteUrl, canonicalPath, var
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-full border border-white/12 bg-white/[0.02] px-3 py-1 font-light text-[#dbe1ff]/72">{dateLabel}</span>
-            <Link
-              href="/daily-horoscope/archive"
-              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1 font-light text-[var(--gold)]/85 transition hover:bg-[rgba(247,231,206,0.08)]"
-            >
-              ดูย้อนหลังตามวันที่
-            </Link>
           </div>
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             <a
@@ -169,24 +172,40 @@ export function DailyHoroscopeArticleView({ article, siteUrl, canonicalPath, var
             </div>
           </div>
 
-          <p className="mt-8 text-center text-xs font-light text-[#dbe1ff]/45">
-            {variant === "today" ? (
-              <>
-                อัปเดตชุดพลังงานรายวันตามปฏิทินกรุงเทพฯ · รีเฟรชแคชอัตโนมัติราว 06:05 น. (เวลาไทย) ผ่าน Cron · บันทึกคลัง (upsert) ทุกครั้งที่โหลดบทความวันนี้
-                {" · "}
-                <Link href="/daily-horoscope/archive" className="text-[var(--gold)]/75 underline-offset-2 hover:underline">
-                  คลังย้อนหลัง
-                </Link>
-              </>
-            ) : (
-              <>
-                บทความจากคลัง Mu-Lab — เนื้อหาตรงกับวันที่เผยแพร่ ({article.dateKey}) ·{" "}
-                <Link href="/daily-horoscope" className="text-[var(--gold)]/75 underline-offset-2 hover:underline">
+          <div className="mt-10 rounded-2xl border border-white/[0.08] bg-[rgba(5,10,24,0.35)] p-4 sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--gold)]/70">คลังย้อนหลัง</p>
+              {variant === "archive" ? (
+                <Link href="/daily-horoscope" className="text-xs font-light text-[var(--gold)]/80 underline-offset-2 hover:underline">
                   ไปฉบับวันนี้
                 </Link>
-              </>
-            )}
-          </p>
+              ) : null}
+            </div>
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+              {menuKeys.map((k) => {
+                const active = k === article.dateKey;
+                const href = active && variant === "today" ? "/daily-horoscope" : `/daily-horoscope/${k}`;
+                return (
+                  <Link
+                    key={k}
+                    href={href}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm transition ${
+                      active
+                        ? "border-[rgba(247,231,206,0.55)] bg-[rgba(247,231,206,0.16)] text-[var(--gold)] shadow-[0_0_18px_rgba(247,231,206,0.18)]"
+                        : "border-white/12 bg-white/[0.02] text-[#dbe1ff]/75 hover:bg-white/[0.08]"
+                    }`}
+                    aria-label={`บทความวันที่ ${k}`}
+                    title={formatThaiArticleDateLabel(k)}
+                  >
+                    {thaiDayNumber(k)}
+                  </Link>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-center text-xs font-light text-[#dbe1ff]/40">
+              อัปเดตตามปฏิทินกรุงเทพฯ (UTC+7) — เลือกวันที่เพื่ออ่านย้อนหลัง
+            </p>
+          </div>
         </article>
       </section>
     </>

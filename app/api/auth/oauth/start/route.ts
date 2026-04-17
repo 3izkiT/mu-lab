@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const provider = searchParams.get("provider") as SocialProvider | null;
   const nextPath = searchParams.get("next") || "/vault";
-  if (provider !== "google" && provider !== "facebook") {
+  if (provider !== "google") {
     return NextResponse.json({ message: "provider not supported" }, { status: 400 });
   }
 
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const authUrl = buildOAuthStartUrl(provider, state);
   if (!authUrl) {
     return NextResponse.json(
-      { message: `${provider} login not configured`, missingEnv: provider === "google" ? "GOOGLE_CLIENT_ID" : "FACEBOOK_CLIENT_ID" },
+      { message: `${provider} login not configured`, missingEnv: "GOOGLE_CLIENT_ID" },
       { status: 503 },
     );
   }

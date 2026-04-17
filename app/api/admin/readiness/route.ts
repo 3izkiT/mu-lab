@@ -29,8 +29,6 @@ export async function GET(request: NextRequest) {
     "NEXT_PUBLIC_SITE_URL",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
-    "FACEBOOK_CLIENT_ID",
-    "FACEBOOK_CLIENT_SECRET",
     "STRIPE_WEBHOOK_SECRET",
   ] as const;
 

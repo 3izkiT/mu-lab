@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ParallaxNebula } from "@/components/CinematicCelestial";
 import { DailyHoroscopeArticleView } from "@/components/DailyHoroscopeArticleView";
 import { getBangkokDateKey } from "@/lib/daily-forecast-data";
-import { getDailyHoroscopeArchiveByDateKey, isValidArchiveDateKey } from "@/lib/daily-horoscope-archive";
+import { getDailyHoroscopeArchiveByDateKey, isValidArchiveDateKey, listDailyHoroscopeArchives } from "@/lib/daily-horoscope-archive";
 import { getDailyHoroscopeArticle } from "@/lib/daily-horoscope-article-data";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -59,6 +59,7 @@ export default async function DailyHoroscopeArchivePage({ params }: PageProps) {
   if (!resolved) notFound();
 
   const { article, variant } = resolved;
+  const recent = await listDailyHoroscopeArchives(30);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -70,6 +71,7 @@ export default async function DailyHoroscopeArchivePage({ params }: PageProps) {
         siteUrl={siteUrl}
         canonicalPath={`/daily-horoscope/${dateKey}`}
         variant={variant}
+        recentDateKeys={recent.map((r) => r.dateKey)}
       />
     </main>
   );
