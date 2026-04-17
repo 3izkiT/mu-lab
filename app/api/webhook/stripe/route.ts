@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+
+type WebhookTx = Pick<typeof prisma, "checkoutSession" | "purchase" | "subscription">;
 
 type WebhookBody = {
   eventType?: string;
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, unlocked: false });
   }
 
-  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  await prisma.$transaction(async (tx: WebhookTx) => {
     await tx.checkoutSession.update({
       where: { id: sessionId },
       data: { status: "completed", providerRef: body.providerRef || null },
