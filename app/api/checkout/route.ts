@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
+import { rateLimitOrThrow } from "@/lib/rate-limit";
 
 type CheckoutBody = {
   purchaseType?: "deep-insight" | "premium-monthly" | "tarot-deep";
@@ -11,6 +12,19 @@ type CheckoutBody = {
 
 export async function POST(request: Request) {
   await ensureMvpUsers();
+  try {
+    rateLimitOrThrow(request, { keyPrefix: "checkout", limit: 8, windowMs: 60_000 });
+  } catch (err) {
+    const retryAfterSeconds = (err as any)?.retryAfterSeconds as number | undefined;
+    return NextResponse.json(
+      { message: "too many requests" },
+      {
+        status: 429,
+        headers: retryAfterSeconds ? { "retry-after": String(retryAfterSeconds) } : undefined,
+      },
+    );
+  }
+
   const cookieStore = await cookies();
   const userId = cookieStore.get("mu_lab_uid")?.value;
 

@@ -4,6 +4,12 @@ import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
 export async function POST(request: Request) {
+  const allowDemoLogin = process.env.ALLOW_DEMO_LOGIN === "1";
+  const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+  if (isProd && !allowDemoLogin) {
+    return NextResponse.json({ message: "disabled" }, { status: 403 });
+  }
+
   await ensureMvpUsers();
   const body = (await request.json()) as { userId?: string; nextPath?: string };
   const userId = body.userId?.trim() || "demo-user";

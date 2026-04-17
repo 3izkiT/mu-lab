@@ -9,6 +9,7 @@ export default function LoginPage() {
   const nextPath = params.get("next") || "/vault";
   const error = params.get("error");
   const [loading, setLoading] = useState(false);
+  const allowDemoLogin = process.env.NEXT_PUBLIC_ALLOW_DEMO_LOGIN === "1";
 
   const handleDemoLogin = async () => {
     setLoading(true);
@@ -49,14 +50,16 @@ export default function LoginPage() {
               เข้าสู่ระบบด้วย Facebook
             </a>
           </div>
-          <button
-            type="button"
-            onClick={handleDemoLogin}
-            disabled={loading}
-            className="mt-6 rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] disabled:opacity-50"
-          >
-            {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ Demo"}
-          </button>
+          {allowDemoLogin ? (
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="mt-6 rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] disabled:opacity-50"
+            >
+              {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ Demo"}
+            </button>
+          ) : null}
           <Link
             href="/"
             className="mt-3 inline-block rounded-full border border-white/25 px-5 py-2 text-sm text-[#dbe1ff]/85 transition hover:bg-white/[0.08]"
