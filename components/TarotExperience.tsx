@@ -87,11 +87,9 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/80">Quantum Tarot</p>
       <h1 className="mt-3 font-serif text-3xl text-[#eef1ff]">Sacred Geometry Deck</h1>
       <p className="mt-3 text-sm text-[#dbe1ff]/82">ฟรีวันละ 1 ครั้ง/คน แล้วปลดล็อกโหมดเจาะลึกได้ด้วยแพ็กเกจ 79 บาท</p>
-      {result ? (
-        <p className="mt-2 text-xs text-[#dbe1ff]/62">
-          สิทธิ์ฟรีคงเหลือวันนี้: {result.freeRemainingToday}/{result.freeLimitPerDay}
-        </p>
-      ) : null}
+      <p className="mt-2 text-xs text-[#dbe1ff]/62">
+        สิทธิ์ฟรีคงเหลือวันนี้: {result?.freeRemainingToday ?? 1}/{result?.freeLimitPerDay ?? 1}
+      </p>
 
       <label className="mt-6 block text-sm text-[#dbe1ff]/85">
         คำถามของคุณ

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -27,7 +28,7 @@ export default function LoginPage() {
           <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/80">Member Zone</p>
           <h1 className="mt-3 font-serif text-3xl text-[#eef1ff]">เข้าสู่ระบบ Mu-Lab</h1>
           <p className="mt-3 text-sm text-[#dbe1ff]/80">
-            MVP นี้เปิดโหมด demo login เพื่อทดสอบ flow การเก็บสิทธิ์และ paywall end-to-end
+            เลือกวิธีเข้าสู่ระบบเพื่อเข้าถึงพื้นที่สมาชิก ประวัติการทำนาย และสิทธิ์การใช้งานของคุณ
           </p>
           {error ? (
             <p className="mt-3 text-xs text-rose-300">
@@ -56,6 +57,12 @@ export default function LoginPage() {
           >
             {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ Demo"}
           </button>
+          <Link
+            href="/"
+            className="mt-3 inline-block rounded-full border border-white/25 px-5 py-2 text-sm text-[#dbe1ff]/85 transition hover:bg-white/[0.08]"
+          >
+            ปิดและกลับหน้าหลัก
+          </Link>
         </div>
       </div>
     </main>

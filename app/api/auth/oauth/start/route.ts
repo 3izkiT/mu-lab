@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { buildOAuthStartUrl, type SocialProvider } from "@/lib/social-auth";
+import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -23,14 +24,14 @@ export async function GET(request: Request) {
   response.cookies.set("mu_oauth_state", state, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(request),
     path: "/",
     maxAge: 60 * 10,
   });
   response.cookies.set("mu_oauth_next", nextPath, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(request),
     path: "/",
     maxAge: 60 * 10,
   });

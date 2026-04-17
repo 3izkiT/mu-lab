@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
+import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
 export async function POST(request: Request) {
   await ensureMvpUsers();
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   response.cookies.set("mu_lab_uid", userId, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(request),
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
   });

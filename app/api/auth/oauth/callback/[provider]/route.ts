@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getCallbackUrl, getOAuthConfig, type SocialProvider } from "@/lib/social-auth";
+import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
 async function exchangeGoogleCode(code: string) {
   const cfg = getOAuthConfig("google");
@@ -78,7 +79,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ prov
   response.cookies.set("mu_lab_uid", userId, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(request),
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
   });
