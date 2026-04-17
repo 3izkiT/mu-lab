@@ -21,7 +21,7 @@ export default function Loading() {
             alt="Mu Lab loading"
             width={104}
             height={104}
-            className="mu-lab-logo-living h-[104px] w-[104px] rounded-full object-cover drop-shadow-[0_10px_28px_rgba(0,0,0,0.5)]"
+            className="mu-lab-logo-solid mu-lab-logo-living h-[104px] w-[104px] rounded-full object-cover drop-shadow-[0_10px_28px_rgba(0,0,0,0.5)]"
             priority
           />
         </div>

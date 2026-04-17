@@ -72,7 +72,7 @@ export function ParallaxNebula() {
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           backgroundColor: "#03050f",
-          backgroundImage: "url(/hero-nebula.png)",
+          backgroundImage: "url(/bg-nebula-user.png)",
           backgroundSize: "cover",
           backgroundPosition: nebulaBackgroundPosition,
           backgroundRepeat: "no-repeat",

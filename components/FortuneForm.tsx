@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Compass,
   Atom,
   Calendar,
   Clock,
@@ -12,17 +13,26 @@ import {
   Hexagon,
   Link2,
   MapPin,
+  Orbit,
   Sparkles,
   User,
   UserRound,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { CelestialHeadingRow, CelestialIcon } from "@/components/CelestialIcon";
 import LuckMeters from "@/components/LuckMeters";
 import ProvinceCommand from "@/components/ProvinceCommand";
 import { CELESTIAL_STROKE } from "@/lib/celestial-icon-tokens";
 import { defaultLuckMeters, type LuckMetersData } from "@/lib/fortune-parse";
+import {
+  POLICY_LAST_UPDATED,
+  PRIVACY_INTRO,
+  PRIVACY_SECTIONS,
+  TERMS_INTRO,
+  TERMS_SECTIONS,
+} from "@/lib/policy-content";
 
 type FormData = {
   fullName: string;
@@ -85,15 +95,23 @@ function parseFortuneMarkdown(markdown: string): ParsedSection[] {
   return sections;
 }
 
-const sectionIndexLabel = (key: SectionKey, index: number) => {
-  const n = String(index + 1).padStart(2, "0");
-  if (key === "character") return `${n} · นิสัย`;
-  if (key === "luck") return `${n} · ชะตากรรม`;
-  if (key === "action") return `${n} · แผน`;
-  return `${n}`;
-};
+function SectionGlyph({ sectionKey }: { sectionKey: SectionKey }) {
+  if (sectionKey === "character") {
+    return <Fingerprint className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+  }
+  if (sectionKey === "luck") {
+    return <Orbit className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+  }
+  if (sectionKey === "action") {
+    return <Compass className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+  }
+  return <Sparkles className="h-6 w-6 text-[var(--gold)] sm:h-7 sm:w-7" strokeWidth={CELESTIAL_STROKE} aria-hidden />;
+}
 
 const ILLUSION_DURATION_MS = 3000;
+const FORTUNE_REQUEST_TIMEOUT_MS = 25000;
+const SAVE_REQUEST_TIMEOUT_MS = 8000;
+const TRANSITION_FAILSAFE_MS = 32000;
 const ILLUSION_STATUS_LINES = [
   "Aligning Natal Coordinates...",
   "Synthesizing Quantum Fate...",
@@ -125,6 +143,7 @@ const markdownComponents = {
 };
 
 export default function FortuneForm() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
   const [illusionProgress, setIllusionProgress] = useState(0);
@@ -133,6 +152,9 @@ export default function FortuneForm() {
   const [resultSessionId, setResultSessionId] = useState("");
   const [copyDone, setCopyDone] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [isPolicyOpen, setIsPolicyOpen] = useState(false);
+  const [policyTab, setPolicyTab] = useState<"terms" | "privacy">("terms");
   const [formData, setFormData] = useState<FormData>(initialData);
 
   const parsedSections = useMemo(
@@ -141,13 +163,14 @@ export default function FortuneForm() {
   );
 
   const isStepOneValid = formData.fullName.trim() !== "" && formData.gender !== "";
-  const isStepTwoValid = formData.birthDate !== "";
+  const isThaiDateFormat = (value: string) => /^\d{2}\/\d{2}\/\d{4}$/.test(value.trim());
+  const isStepTwoValid = isThaiDateFormat(formData.birthDate);
   const isStepThreeValid =
     formData.birthHour !== "" &&
     formData.birthMinute !== "" &&
     formData.birthProvince.trim() !== "";
 
-  const isFormValid = isStepOneValid && isStepTwoValid && isStepThreeValid;
+  const isFormValid = isStepOneValid && isStepTwoValid && isStepThreeValid && acceptedTerms;
   const currentIllusionStatus =
     ILLUSION_STATUS_LINES[
       Math.min(
@@ -158,8 +181,49 @@ export default function FortuneForm() {
 
   const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
+  const fetchWithTimeout = async (
+    input: RequestInfo | URL,
+    init: RequestInit,
+    timeoutMs: number,
+  ) => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(input, { ...init, signal: controller.signal });
+    } finally {
+      window.clearTimeout(timer);
+    }
+  };
+
+  const requestFortune = async () => {
+    let lastResponse: Response | null = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const response = await fetchWithTimeout(
+          "/api/fortune",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          },
+          FORTUNE_REQUEST_TIMEOUT_MS,
+        );
+        lastResponse = response;
+        if (response.ok) return response;
+      } catch {
+        // retry once on transient network failure
+      }
+      if (attempt === 0) await sleep(350);
+    }
+    return lastResponse;
+  };
+
   const handleSubmit = async () => {
-    if (!isFormValid) return;
+    if (!isStepOneValid || !isStepTwoValid || !isStepThreeValid) return;
+    if (!acceptedTerms) {
+      setErrorMessage("กรุณายอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัวก่อนทำนาย");
+      return;
+    }
 
     const startedAt = Date.now();
     setIsLoading(true);
@@ -170,11 +234,12 @@ export default function FortuneForm() {
     setLuckMeters(null);
 
     try {
-      const response = await fetch("/api/fortune", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await requestFortune();
+      if (!response) {
+        setErrorMessage("สภาวะดวงดาวไม่เอื้ออำนวย กรุณาลองใหม่อีกครั้ง");
+        track("fortune_result_network_error");
+        return;
+      }
 
       let payload: { message?: string; meters?: LuckMetersData } = {};
       try {
@@ -196,21 +261,43 @@ export default function FortuneForm() {
 
       const message = payload?.message;
       if (typeof message === "string" && message.trim()) {
-        setFortuneResult(message.trim());
-        setLuckMeters(
+        const meters =
           payload.meters &&
             typeof payload.meters.career === "number" &&
             typeof payload.meters.wealth === "number" &&
             typeof payload.meters.love === "number"
             ? payload.meters
-            : defaultLuckMeters(),
-        );
-        setResultSessionId(
-          typeof crypto !== "undefined" && "randomUUID" in crypto
-            ? crypto.randomUUID()
-            : String(Date.now()),
-        );
-        setCopyDone(false);
+            : defaultLuckMeters();
+        setLuckMeters(meters);
+        let saved: { id?: string } | null = null;
+        try {
+          const saveResponse = await fetchWithTimeout(
+            "/api/analysis/save",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                message: message.trim(),
+                meters,
+              }),
+            },
+            SAVE_REQUEST_TIMEOUT_MS,
+          );
+          if (saveResponse.ok) {
+            try {
+              saved = (await saveResponse.json()) as { id?: string };
+            } catch {
+              saved = null;
+            }
+          }
+        } catch {
+          saved = null;
+        }
+        if (saved?.id) {
+          router.push(`/analysis/${saved.id}`);
+          return;
+        }
+        setFortuneResult(message.trim());
         track("fortune_result_ok");
       } else {
         setErrorMessage("สภาวะดวงดาวไม่เอื้ออำนวย กรุณาลองใหม่อีกครั้ง");
@@ -233,23 +320,47 @@ export default function FortuneForm() {
 
     const start = Date.now();
     const timer = window.setInterval(() => {
-      const ratio = Math.min(1, (Date.now() - start) / ILLUSION_DURATION_MS);
+      // Keep transition visuals alive while waiting for API (loop 0..1 continuously).
+      const ratio = ((Date.now() - start) % ILLUSION_DURATION_MS) / ILLUSION_DURATION_MS;
       setIllusionProgress(ratio);
-      if (ratio >= 1) window.clearInterval(timer);
     }, 45);
 
     return () => window.clearInterval(timer);
   }, [showTransition]);
+
+  useEffect(() => {
+    if (!showTransition) return;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, [showTransition]);
+
+  useEffect(() => {
+    if (!showTransition || !isLoading) return;
+    const watchdog = window.setTimeout(() => {
+      setErrorMessage("การประมวลผลใช้เวลานานกว่าปกติ กรุณาลองกดอีกครั้ง");
+      setShowTransition(false);
+      setIsLoading(false);
+      track("fortune_transition_failsafe");
+    }, TRANSITION_FAILSAFE_MS);
+
+    return () => window.clearTimeout(watchdog);
+  }, [isLoading, showTransition]);
 
   if (showTransition) {
     return (
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: illusionProgress > 0.92 ? 1 - (illusionProgress - 0.92) / 0.08 : 1 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.45 }}
-          className="fixed inset-0 z-[120] overflow-hidden bg-[radial-gradient(circle_at_center,rgba(76,92,192,0.3)_0%,rgba(8,14,35,0.94)_64%,#030711_100%)]"
+          className="fixed inset-0 z-[120] overflow-hidden bg-[#030711]"
           role="status"
           aria-live="polite"
         >
@@ -284,7 +395,7 @@ export default function FortuneForm() {
             </svg>
           </div>
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+          <div className="absolute inset-0 grid place-items-center px-6">
             <motion.div
               className="relative flex h-32 w-32 items-center justify-center rounded-full"
               animate={{
@@ -307,12 +418,15 @@ export default function FortuneForm() {
                 alt="Mu Lab loader"
                 width={96}
                 height={96}
-                className="mu-lab-logo-living relative z-10 h-24 w-24 rounded-full object-cover drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+                className="mu-lab-logo-solid mu-lab-logo-living relative z-10 h-24 w-24 rounded-full object-cover drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
                 priority
               />
             </motion.div>
 
-            <p className="mt-10 flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
+          </div>
+
+          <div className="absolute inset-x-0 top-[calc(50%+88px)] flex flex-col items-center px-6 text-center">
+            <p className="flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/76">
               <span className="mu-lab-icon-breathe inline-flex text-[var(--gold)]" aria-hidden>
                 <Sparkles className="h-3.5 w-3.5" strokeWidth={CELESTIAL_STROKE} />
               </span>
@@ -338,12 +452,18 @@ export default function FortuneForm() {
 
   const handleReset = () => {
     setFormData(initialData);
+    setAcceptedTerms(false);
     setFortuneResult(null);
     setLuckMeters(null);
     setResultSessionId("");
     setCopyDone(false);
     setErrorMessage(null);
     setIsLoading(false);
+  };
+
+  const openPolicyModal = (tab: "terms" | "privacy") => {
+    setPolicyTab(tab);
+    setIsPolicyOpen(true);
   };
 
   const handleCopyLink = async () => {
@@ -363,7 +483,7 @@ export default function FortuneForm() {
         initial={{ opacity: 0, y: 24, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full min-w-0 max-w-full overflow-hidden rounded-[1.25rem] border border-[rgba(247,231,206,0.14)] bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-[1px] shadow-[0_40px_120px_rgba(0,0,0,0.55)] sm:rounded-3xl"
+        className="relative w-full min-w-0 max-w-full overflow-hidden rounded-[1.25rem] border border-[rgba(247,231,206,0.14)] bg-[#0a1024] p-[1px] shadow-[0_40px_120px_rgba(0,0,0,0.55)] sm:rounded-3xl"
       >
         <div className="mu-lab-glass rounded-[1.2rem] px-4 py-7 sm:rounded-[1.9rem] sm:px-10 sm:py-11">
           <div className="mx-auto mb-8 flex flex-col items-center text-center">
@@ -404,10 +524,13 @@ export default function FortuneForm() {
               >
                 <div className="mb-4 flex min-w-0 items-start justify-between gap-3 border-b border-white/[0.05] pb-4 sm:items-baseline">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/75">
-                      {sectionIndexLabel(section.key, index)}
-                    </p>
-                    <h3 className="mt-1.5 font-serif text-lg font-semibold tracking-tight text-white sm:text-xl">
+                    <div className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(247,231,206,0.24)] bg-[rgba(247,231,206,0.08)] px-3 py-1.5">
+                      <SectionGlyph sectionKey={section.key} />
+                      <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--gold)]/85">
+                        Section {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h3 className="mt-2.5 font-serif text-lg font-semibold tracking-tight text-white sm:text-xl">
                       {section.title}
                     </h3>
                   </div>
@@ -495,29 +618,29 @@ export default function FortuneForm() {
       )}
 
       <div
-        className={`min-w-0 px-4 py-8 sm:px-12 sm:py-12 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}
+        className={`min-w-0 px-4 py-5 sm:px-8 sm:py-6 ${isLoading ? "pointer-events-none select-none opacity-[0.22]" : ""}`}
       >
-        <div className="mb-10 sm:mb-12">
+        <div className="mb-5 sm:mb-6">
           <CelestialHeadingRow icon={Atom} breathe>
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--gold)]/78">Session</p>
-              <h2 className="mt-4 break-words font-serif text-2xl font-medium tracking-[0.05em] text-[#eef1ff] sm:text-4xl">
+              <p className="text-sm font-medium uppercase tracking-[0.18em] text-[var(--gold)]/84 sm:text-xs">Session</p>
+              <h2 className="mt-3 break-words font-serif text-3xl font-medium tracking-[0.04em] text-[#f2f5ff] sm:text-[2rem]">
                 ข้อมูลดวง
               </h2>
-              <p className="mt-4 text-base font-light text-[#dbe1ff]/78">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
+              <p className="mt-2 text-sm font-normal text-[#e8eeff]/88 sm:text-[15px]">กรอกข้อมูลครั้งเดียวให้ครบ แล้วรับผลวิเคราะห์ทันที</p>
             </div>
           </CelestialHeadingRow>
         </div>
 
-        <div className="space-y-10">
-          <section className="mu-lab-glass rounded-2xl p-5 sm:p-8">
-            <p className="mb-7 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">
+        <div className="space-y-5">
+          <section className="mu-lab-glass rounded-2xl p-4 sm:p-5">
+            <p className="mb-5 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
               <Fingerprint className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
               ข้อมูลพื้นฐาน
             </p>
-            <div className="grid min-w-0 gap-6 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <label className="group block min-w-0 sm:col-span-2">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <User
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -532,12 +655,12 @@ export default function FortuneForm() {
                     setFormData((prev) => ({ ...prev, fullName: event.target.value }))
                   }
                   placeholder="เช่น อรทัย ใจดี"
-                  className="mu-lab-input w-full min-w-0 px-4 py-4 text-base placeholder:text-[#dbe1ff]/45"
+                  className="mu-lab-input w-full min-w-0 px-4 py-3.5 text-base placeholder:text-[#dbe1ff]/45"
                 />
               </label>
 
               <label className="group block min-w-0">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <UserRound
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -550,7 +673,7 @@ export default function FortuneForm() {
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, gender: event.target.value }))
                   }
-                  className="mu-lab-input w-full min-w-0 cursor-pointer appearance-none px-4 py-4 text-base"
+                  className="mu-lab-input w-full min-w-0 cursor-pointer appearance-none px-4 py-3.5 text-base"
                 >
                   <option value="" className="bg-[#0a101c] text-zinc-400">
                     เลือกเพศ
@@ -568,7 +691,7 @@ export default function FortuneForm() {
               </label>
 
               <label className="group block min-w-0">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <Calendar
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -577,25 +700,27 @@ export default function FortuneForm() {
                   วันเกิด
                 </span>
                 <input
-                  type="date"
+                  type="text"
+                  inputMode="numeric"
                   value={formData.birthDate}
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, birthDate: event.target.value }))
                   }
-                  className="mu-lab-input w-full min-w-0 px-4 py-4 text-base scheme-dark"
+                  placeholder="DD/MM/YYYY"
+                  className="mu-lab-input w-full min-w-0 px-4 py-3.5 text-base scheme-dark"
                 />
               </label>
             </div>
           </section>
 
-          <section className="mu-lab-glass rounded-2xl p-5 sm:p-8">
-            <p className="mb-7 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">
+          <section className="mu-lab-glass rounded-2xl p-4 sm:p-5">
+            <p className="mb-5 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--gold)]/86">
               <Dna className="h-3.5 w-3.5 shrink-0 text-[var(--gold)]" strokeWidth={CELESTIAL_STROKE} aria-hidden />
               ข้อมูลเวลาและสถานที่เกิด
             </p>
-            <div className="grid min-w-0 gap-6 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <div className="group min-w-0 sm:col-span-2">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <Clock
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -603,7 +728,7 @@ export default function FortuneForm() {
                   />
                   เวลาเกิด (ชั่วโมง · นาที)
                 </span>
-                <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-3">
+                <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-2.5">
                   <input
                     type="number"
                     min={0}
@@ -613,7 +738,7 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthHour: event.target.value }))
                     }
                     placeholder="0–23"
-                    className="mu-lab-input min-w-0 w-full px-3 py-3.5 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-4"
+                    className="mu-lab-input min-w-0 w-full px-3 py-3 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-3.5"
                   />
                   <input
                     type="number"
@@ -624,13 +749,13 @@ export default function FortuneForm() {
                       setFormData((prev) => ({ ...prev, birthMinute: event.target.value }))
                     }
                     placeholder="0–59"
-                    className="mu-lab-input min-w-0 w-full px-3 py-3.5 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-4"
+                    className="mu-lab-input min-w-0 w-full px-3 py-3 text-base placeholder:text-[#dbe1ff]/45 sm:px-4 sm:py-3.5"
                   />
                 </div>
               </div>
 
               <div className="group min-w-0 sm:col-span-2">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[#d9f2e9]/74">
+                <span className="mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.06em] text-[#e4ebff]/88">
                   <MapPin
                     strokeWidth={CELESTIAL_STROKE}
                     className="h-3.5 w-3.5 shrink-0 text-[var(--icon-muted)] transition-colors group-focus-within:text-[var(--gold)]"
@@ -660,17 +785,138 @@ export default function FortuneForm() {
           </motion.p>
         )}
 
-        <div className="mt-10 flex w-full min-w-0 flex-col gap-3 sm:mt-12 sm:flex-row sm:justify-end">
+        <div className="mu-lab-glass mt-6 rounded-2xl border border-[rgba(247,231,206,0.18)] px-4 py-2.5 sm:px-5">
+          <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-[#e8eeff]/84">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(event) => setAcceptedTerms(event.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-[var(--gold)]"
+            />
+            <span>
+              ฉันยอมรับ{" "}
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  openPolicyModal("terms");
+                }}
+                className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]"
+              >
+                เงื่อนไขการใช้งาน
+              </button>{" "}
+              และ{" "}
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  openPolicyModal("privacy");
+                }}
+                className="text-[var(--gold)] underline underline-offset-4 hover:text-[#fff0d8]"
+              >
+                นโยบายความเป็นส่วนตัว
+              </button>
+            </span>
+          </label>
+        </div>
+
+        <div className="mt-5 flex w-full min-w-0 flex-col gap-3 sm:mt-6 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={handleSubmit}
             disabled={!isFormValid || isLoading}
-            className="mu-lab-btn-shimmer mu-lab-btn-fate relative inline-flex min-h-[52px] w-full max-w-full items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ebd3a8_48%,#d6b379_100%)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#201911] shadow-[0_0_34px_rgba(247,231,206,0.26)] disabled:cursor-not-allowed disabled:opacity-35 sm:w-auto sm:min-w-[220px] sm:px-8 sm:tracking-[0.16em]"
+            className="mu-lab-btn-shimmer mu-lab-btn-fate relative inline-flex min-h-[52px] w-full max-w-full items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ebd3a8_48%,#d6b379_100%)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-[#201911] shadow-[0_0_34px_rgba(247,231,206,0.26)] disabled:cursor-not-allowed disabled:opacity-35 sm:w-auto sm:min-w-[220px] sm:px-8 sm:text-base sm:tracking-[0.14em]"
           >
-            <span className="relative z-10">Reveal My Fate</span>
+            <span className="relative z-10">เปิดคำทำนาย</span>
           </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isPolicyOpen ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[160] flex items-center justify-center bg-black/70 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Policy modal"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="mu-lab-glass max-h-[82vh] w-full max-w-2xl overflow-hidden rounded-2xl border border-[rgba(247,231,206,0.25)]"
+            >
+              <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPolicyTab("terms")}
+                    className={`rounded-full px-3 py-1.5 text-xs tracking-[0.08em] ${
+                      policyTab === "terms"
+                        ? "bg-[rgba(247,231,206,0.2)] text-[var(--gold)]"
+                        : "bg-transparent text-[#dbe1ff]/70"
+                    }`}
+                  >
+                    เงื่อนไขการใช้งาน
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPolicyTab("privacy")}
+                    className={`rounded-full px-3 py-1.5 text-xs tracking-[0.08em] ${
+                      policyTab === "privacy"
+                        ? "bg-[rgba(247,231,206,0.2)] text-[var(--gold)]"
+                        : "bg-transparent text-[#dbe1ff]/70"
+                    }`}
+                  >
+                    นโยบายความเป็นส่วนตัว
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPolicyOpen(false)}
+                  className="rounded-full border border-white/15 px-3 py-1 text-xs text-[#dbe1ff]/80 hover:border-[var(--gold)]/40 hover:text-[var(--gold)]"
+                >
+                  ปิด
+                </button>
+              </div>
+
+              <div className="max-h-[68vh] overflow-y-auto px-5 py-4 text-sm leading-relaxed text-[#dbe1ff]/85">
+                {policyTab === "terms" ? (
+                  <div className="space-y-4">
+                    <p className="font-medium text-[var(--gold)]">สรุปเงื่อนไขการใช้งาน</p>
+                    <p>{TERMS_INTRO}</p>
+                    {TERMS_SECTIONS.map((section) => (
+                      <div key={section.id} className="space-y-1">
+                        <p className="font-semibold text-[#eef3ff]">{section.title}</p>
+                        <p className="text-[#dbe1ff]/86">{section.body}</p>
+                      </div>
+                    ))}
+                    <p className="text-xs text-[#dbe1ff]/65">อัปเดตล่าสุด: {POLICY_LAST_UPDATED}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="font-medium text-[var(--gold)]">สรุปนโยบายความเป็นส่วนตัว</p>
+                    <p>{PRIVACY_INTRO}</p>
+                    {PRIVACY_SECTIONS.map((section) => (
+                      <div key={section.id} className="space-y-1">
+                        <p className="font-semibold text-[#eef3ff]">{section.title}</p>
+                        <p className="text-[#dbe1ff]/86">{section.body}</p>
+                      </div>
+                    ))}
+                    <p className="text-xs text-[#dbe1ff]/65">อัปเดตล่าสุด: {POLICY_LAST_UPDATED}</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

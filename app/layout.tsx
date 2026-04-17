@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { Pridi, Prompt } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
@@ -21,7 +21,7 @@ const pridi = Pridi({
 const siteUrl = getSiteUrl();
 
 const siteTitle =
-  "Mu-Lab: ไขรหัสชีวิตรายบุคคลด้วย AI ห้องทดลองโหราศาสตร์ยุคใหม่";
+  "Mu-Lab: ไขรหัสชีวิตรายบุคคลด้วยห้องทดลองโหราศาสตร์ยุคใหม่";
 
 const siteDescription =
   "ดูดวงส่วนตัวแบบพรีเมียม — วิเคราะห์ลักขณาและดวงชะตาจากวันเวลาและจังหวัดเกิด พร้อมคำแนะจาก Mu-Lab Algorithm";
@@ -65,6 +65,11 @@ export const metadata: Metadata = {
     icon: "/icon.png",
     apple: "/apple-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

@@ -18,7 +18,7 @@ type LuckMetersProps = {
 
 export default function LuckMeters({ meters, animateKey }: LuckMetersProps) {
   return (
-    <div className="mb-8 rounded-2xl border border-[rgba(247,231,206,0.12)] bg-[rgba(247,231,206,0.03)] p-4 shadow-[inset_0_1px_0_rgba(247,231,206,0.06)] sm:p-5">
+    <div className="mu-lab-glass mb-8 rounded-2xl border border-[rgba(247,231,206,0.12)] p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between gap-2">
         <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--gold)]/80">
           Lab metrics
