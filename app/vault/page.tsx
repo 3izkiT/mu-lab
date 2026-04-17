@@ -37,7 +37,7 @@ export default async function VaultPage() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {history.map((item) => (
+          {history.map((item: { id: string; createdAt: Date; summary: string }) => (
             <Link key={item.id} href={`/analysis/${item.id}`} className="mu-lab-glass rounded-2xl p-4">
               <p className="text-xs text-[var(--gold)]/80">{new Date(item.createdAt).toLocaleString("th-TH")}</p>
               <p className="mt-2 line-clamp-3 text-sm text-[#e8eeff]/88">{item.summary}</p>
