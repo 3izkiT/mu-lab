@@ -1,0 +1,27 @@
+# ทางเลือกเมื่อไม่ใช้ Vercel Cron หรืออยากยิงซ้ำจาก CI
+# ตั้งค่า: Repository variable CRON_REVALIDATE_URL (เช่น https://www.example.com)
+#         + Repository secret CRON_SECRET (ค่าเดียวกับใน Vercel / .env)
+# ถ้าไม่ตั้งค่า workflow จะข้าม (ไม่ error) — ใช้เฉพาะ Vercel Cron อย่างเดียวก็ได้
+name: Daily content revalidate
+
+on:
+  schedule:
+    # ~06:25 น. Asia/Bangkok (UTC+7) — ช้ากว่า vercel.json เล็กน้อยเพื่อไม่ชนกับรอบ Vercel
+    - cron: "25 23 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/cron/daily-content
+        env:
+          CRON_REVALIDATE_URL: ${{ vars.CRON_REVALIDATE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "${CRON_REVALIDATE_URL}" ] || [ -z "${CRON_SECRET}" ]; then
+            echo "Skip: set repo variable CRON_REVALIDATE_URL and secret CRON_SECRET (optional if Vercel Cron handles this)."
+            exit 0
+          fi
+          BASE="${CRON_REVALIDATE_URL%/}"
+          curl --fail-with-body -sS -H "Authorization: Bearer ${CRON_SECRET}" "${BASE}/api/cron/daily-content"

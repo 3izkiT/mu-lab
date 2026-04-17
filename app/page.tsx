@@ -1,6 +1,7 @@
 import DailyCosmicDashboard from "@/components/DailyCosmicDashboard";
-import { GlintWrap, HoverConstellation, ParallaxNebula, Reveal } from "@/components/CinematicCelestial";
+import { ParallaxNebula, Reveal } from "@/components/CinematicCelestial";
 import FortuneForm from "@/components/FortuneForm";
+import { SiteNavHeader } from "@/components/SiteNavHeader";
 import { getDailyForecast } from "@/lib/daily-forecast-data";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,79 +16,7 @@ export default async function Home() {
 
   return (
     <main className="relative min-h-screen">
-      <header className="sticky top-0 z-30 bg-[rgba(6,10,22,0.68)] backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
-          <Link href="/" className="flex items-center gap-3" aria-label="Go to Mu-Lab homepage">
-            <Image
-              src="/logo-brand-v2.png"
-              alt="Mu Lab"
-              width={46}
-              height={46}
-              className="mu-lab-logo-solid mu-lab-logo-living h-[46px] w-[46px] shrink-0 rounded-full object-cover"
-            />
-            <p className="font-serif text-2xl tracking-tight text-[var(--gold)]">Mu-Lab</p>
-          </Link>
-          <nav className="hidden items-center gap-2 sm:flex">
-            <HoverConstellation>
-              <Link
-                href="#fortune-form"
-                className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-              >
-                ดูดวงทันที
-              </Link>
-            </HoverConstellation>
-            <HoverConstellation>
-              <Link
-                href="#services"
-                className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-              >
-                บริการและแพ็กเกจ
-              </Link>
-            </HoverConstellation>
-            <HoverConstellation>
-              <Link
-                href="/the-science-behind-mu-lab"
-                className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-              >
-                เกี่ยวกับ Mu-Lab
-              </Link>
-            </HoverConstellation>
-            <HoverConstellation>
-              <Link
-                href="#fortune-form"
-                className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_28px_rgba(247,231,206,0.26)] transition hover:brightness-105"
-              >
-                <GlintWrap>เริ่มวิเคราะห์</GlintWrap>
-              </Link>
-            </HoverConstellation>
-          </nav>
-          <details className="group relative sm:hidden">
-            <summary className="list-none rounded-full border border-white/15 px-4 py-2 text-sm text-zinc-200">
-              เมนู
-            </summary>
-            <div className="absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-white/12 bg-[#071024]/95 p-2 backdrop-blur-xl">
-              <Link href="#fortune-form" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-                ดูดวงทันที
-              </Link>
-              <Link href="#services" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-                บริการและแพ็กเกจ
-              </Link>
-              <Link
-                href="/the-science-behind-mu-lab"
-                className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]"
-              >
-                เกี่ยวกับ Mu-Lab
-              </Link>
-              <Link
-                href="#fortune-form"
-                className="mt-1 block rounded-xl bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-3 py-2 text-center text-sm font-semibold text-[#241d16]"
-              >
-                เริ่มวิเคราะห์
-              </Link>
-            </div>
-          </details>
-        </div>
-      </header>
+      <SiteNavHeader logoLarge />
 
       <ParallaxNebula />
       <div className="pointer-events-none fixed inset-0 z-[3] mu-lab-starfield" aria-hidden />
@@ -224,6 +153,12 @@ export default async function Home() {
             <p className="mt-1 text-sm text-[#d9f2e9]/75">Cosmic intelligence for practical decisions.</p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Link
+              href="/daily-horoscope"
+              className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs uppercase tracking-[0.1em] text-[#d9f2e9] transition hover:bg-white/[0.06]"
+            >
+              Daily
+            </Link>
             <Link
               href="/the-science-behind-mu-lab"
               className="rounded-full border border-[rgba(247,231,206,0.28)] px-3 py-1.5 text-xs uppercase tracking-[0.1em] text-[#d9f2e9] transition hover:bg-white/[0.06]"

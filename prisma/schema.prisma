@@ -95,3 +95,17 @@ model WebhookEvent {
   status    String
   createdAt DateTime @default(now())
 }
+
+/** สแนปช็อตบทความดูดวงรายวัน (ปฏิทินกรุงเทพฯ) สำหรับอ่านย้อนหลังและ URL ถาวร */
+model DailyHoroscopeArchive {
+  dateKey      String   @id
+  headlineTh   String
+  intro        String
+  sectionsJson String
+  forecastJson String
+  source       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([updatedAt])
+}

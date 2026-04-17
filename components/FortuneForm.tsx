@@ -109,6 +109,9 @@ function SectionGlyph({ sectionKey }: { sectionKey: SectionKey }) {
 }
 
 const ILLUSION_DURATION_MS = 3000;
+const FORTUNE_REQUEST_TIMEOUT_MS = 25000;
+const SAVE_REQUEST_TIMEOUT_MS = 8000;
+const TRANSITION_FAILSAFE_MS = 32000;
 const ILLUSION_STATUS_LINES = [
   "Aligning Natal Coordinates...",
   "Synthesizing Quantum Fate...",
@@ -178,15 +181,33 @@ export default function FortuneForm() {
 
   const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
+  const fetchWithTimeout = async (
+    input: RequestInfo | URL,
+    init: RequestInit,
+    timeoutMs: number,
+  ) => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(input, { ...init, signal: controller.signal });
+    } finally {
+      window.clearTimeout(timer);
+    }
+  };
+
   const requestFortune = async () => {
     let lastResponse: Response | null = null;
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
-        const response = await fetch("/api/fortune", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
+        const response = await fetchWithTimeout(
+          "/api/fortune",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          },
+          FORTUNE_REQUEST_TIMEOUT_MS,
+        );
         lastResponse = response;
         if (response.ok) return response;
       } catch {
@@ -250,14 +271,18 @@ export default function FortuneForm() {
         setLuckMeters(meters);
         let saved: { id?: string } | null = null;
         try {
-          const saveResponse = await fetch("/api/analysis/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              message: message.trim(),
-              meters,
-            }),
-          });
+          const saveResponse = await fetchWithTimeout(
+            "/api/analysis/save",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                message: message.trim(),
+                meters,
+              }),
+            },
+            SAVE_REQUEST_TIMEOUT_MS,
+          );
           if (saveResponse.ok) {
             try {
               saved = (await saveResponse.json()) as { id?: string };
@@ -314,6 +339,18 @@ export default function FortuneForm() {
       document.body.style.overflow = prevBodyOverflow;
     };
   }, [showTransition]);
+
+  useEffect(() => {
+    if (!showTransition || !isLoading) return;
+    const watchdog = window.setTimeout(() => {
+      setErrorMessage("การประมวลผลใช้เวลานานกว่าปกติ กรุณาลองกดอีกครั้ง");
+      setShowTransition(false);
+      setIsLoading(false);
+      track("fortune_transition_failsafe");
+    }, TRANSITION_FAILSAFE_MS);
+
+    return () => window.clearTimeout(watchdog);
+  }, [isLoading, showTransition]);
 
   if (showTransition) {
     return (
