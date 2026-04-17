@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 
-export type FeatureType = "deep-insight" | "premium" | "tarot-draw";
+export type FeatureType = "deep-insight" | "premium" | "tarot-draw" | "tarot-deep";
 
 export async function getCurrentUser() {
   await ensureMvpUsers();
@@ -44,6 +44,14 @@ export async function checkFeatureAccess(userId: string, featureType: FeatureTyp
   if (featureType === "tarot-draw") {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     return (user?.credits ?? 0) >= 10;
+  }
+
+  if (featureType === "tarot-deep") {
+    if (!targetId) return false;
+    const count = await prisma.purchase.count({
+      where: { userId, featureType: "tarot-deep", targetId, status: "completed" },
+    });
+    return count > 0;
   }
 
   return false;

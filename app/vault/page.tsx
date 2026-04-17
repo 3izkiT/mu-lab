@@ -11,6 +11,11 @@ export default async function VaultPage() {
     orderBy: { createdAt: "desc" },
     take: 12,
   });
+  const tarotHistory = await prisma.tarotReading.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+  });
   const isPremium = await checkFeatureAccess(user.id, "premium");
 
   return (
@@ -46,6 +51,25 @@ export default async function VaultPage() {
           {history.length === 0 ? (
             <div className="mu-lab-glass rounded-2xl p-4 text-sm text-[#dbe1ff]/75">ยังไม่มีประวัติการวิเคราะห์</div>
           ) : null}
+        </div>
+
+        <div className="mu-lab-glass rounded-2xl p-6">
+          <h2 className="font-serif text-2xl text-[#eef1ff]">ประวัติการเปิดไพ่ยิปซี</h2>
+          <p className="mt-2 text-sm text-[#dbe1ff]/80">อ่านย้อนหลังได้จาก Preview เดิม และกลับไปปลดล็อกโหมดเจาะลึกได้ทุกเมื่อ</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {tarotHistory.map((item) => (
+              <Link key={item.id} href={`/tarot?readingId=${encodeURIComponent(item.id)}`} className="rounded-2xl border border-white/10 bg-[rgba(5,10,24,0.45)] p-4">
+                <p className="text-xs text-[var(--gold)]/80">{new Date(item.createdAt).toLocaleString("th-TH")}</p>
+                <p className="mt-2 line-clamp-2 text-sm text-[#e8eeff]/88">{item.question}</p>
+                <p className="mt-2 line-clamp-3 text-xs text-[#dbe1ff]/72">{item.preview}</p>
+              </Link>
+            ))}
+            {tarotHistory.length === 0 ? (
+              <div className="rounded-2xl border border-white/10 bg-[rgba(5,10,24,0.45)] p-4 text-sm text-[#dbe1ff]/70">
+                ยังไม่มีประวัติไพ่ยิปซี
+              </div>
+            ) : null}
+          </div>
         </div>
       </section>
     </main>

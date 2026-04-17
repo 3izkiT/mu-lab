@@ -18,6 +18,8 @@ model User {
   purchases     Purchase[]
   subscriptions Subscription[]
   sessions      CheckoutSession[]
+  tarotReadings TarotReading[]
+  tarotUsages   TarotDailyUsage[]
 }
 
 model Analysis {
@@ -108,4 +110,28 @@ model DailyHoroscopeArchive {
   updatedAt    DateTime @updatedAt
 
   @@index([updatedAt])
+}
+
+model TarotReading {
+  id         String   @id
+  userId     String
+  dateKey    String
+  question   String
+  cardsJson  String
+  preview    String
+  deepInsight String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model TarotDailyUsage {
+  id        String   @id
+  userId    String
+  dateKey   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dateKey])
 }

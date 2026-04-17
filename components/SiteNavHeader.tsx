@@ -41,6 +41,11 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
             </Link>
           </HoverConstellation>
           <HoverConstellation>
+            <Link href="/tarot" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
+              ไพ่ยิปซี
+            </Link>
+          </HoverConstellation>
+          <HoverConstellation>
             <Link href="/#services" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
               บริการและแพ็กเกจ
             </Link>
@@ -72,6 +77,9 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
             </Link>
             <Link href="/daily-horoscope" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
               ดูดวงรายวัน
+            </Link>
+            <Link href="/tarot" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
+              ไพ่ยิปซี
             </Link>
             <Link href="/#services" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
               บริการและแพ็กเกจ

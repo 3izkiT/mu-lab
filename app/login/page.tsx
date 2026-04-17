@@ -6,6 +6,7 @@ import { useState } from "react";
 export default function LoginPage() {
   const params = useSearchParams();
   const nextPath = params.get("next") || "/vault";
+  const error = params.get("error");
   const [loading, setLoading] = useState(false);
 
   const handleDemoLogin = async () => {
@@ -28,6 +29,25 @@ export default function LoginPage() {
           <p className="mt-3 text-sm text-[#dbe1ff]/80">
             MVP นี้เปิดโหมด demo login เพื่อทดสอบ flow การเก็บสิทธิ์และ paywall end-to-end
           </p>
+          {error ? (
+            <p className="mt-3 text-xs text-rose-300">
+              เข้าสู่ระบบโซเชียลไม่สำเร็จ ({error}) — ตรวจ env OAuth หรือ callback URL แล้วลองใหม่
+            </p>
+          ) : null}
+          <div className="mt-5 grid gap-2">
+            <a
+              href={`/api/auth/oauth/start?provider=google&next=${encodeURIComponent(nextPath)}`}
+              className="rounded-full border border-white/25 px-5 py-2 text-sm text-[#e9eefc] transition hover:bg-white/[0.08]"
+            >
+              เข้าสู่ระบบด้วย Google
+            </a>
+            <a
+              href={`/api/auth/oauth/start?provider=facebook&next=${encodeURIComponent(nextPath)}`}
+              className="rounded-full border border-white/25 px-5 py-2 text-sm text-[#e9eefc] transition hover:bg-white/[0.08]"
+            >
+              เข้าสู่ระบบด้วย Facebook
+            </a>
+          </div>
           <button
             type="button"
             onClick={handleDemoLogin}

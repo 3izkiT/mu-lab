@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 
 type CheckoutBody = {
-  purchaseType?: "deep-insight" | "premium-monthly";
+  purchaseType?: "deep-insight" | "premium-monthly" | "tarot-deep";
   analysisId?: string;
 };
 
@@ -23,7 +23,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "purchaseType is required" }, { status: 400 });
   }
 
-  const amountTHB = body.purchaseType === "deep-insight" ? 99 : 199;
+  const amountTHB =
+    body.purchaseType === "deep-insight"
+      ? 99
+      : body.purchaseType === "tarot-deep"
+        ? 79
+        : 199;
   const sessionId = nanoid(12);
   await prisma.checkoutSession.create({
     data: {
