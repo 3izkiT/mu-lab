@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 type WebhookTx = Pick<typeof prisma, "checkoutSession" | "purchase" | "subscription">;
 

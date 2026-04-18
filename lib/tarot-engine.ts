@@ -1,6 +1,8 @@
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { getBangkokDateKey } from "@/lib/daily-forecast-data";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const DECK = [
   "The Fool",

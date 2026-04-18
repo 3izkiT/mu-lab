@@ -4,6 +4,8 @@ import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { rateLimitOrThrow } from "@/lib/rate-limit";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 type CheckoutBody = {
   purchaseType?: "deep-insight" | "premium-monthly" | "tarot-deep";

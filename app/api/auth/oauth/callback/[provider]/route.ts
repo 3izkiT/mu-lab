@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getCallbackUrl, getOAuthConfig, type SocialProvider } from "@/lib/social-auth";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 async function exchangeGoogleCode(code: string) {
   const cfg = getOAuthConfig("google");

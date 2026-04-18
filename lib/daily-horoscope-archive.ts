@@ -1,6 +1,8 @@
 import type { DailyForecastPayload } from "@/lib/daily-forecast-data";
 import type { BirthWeekdayId, DailyHoroscopeArticle, DailyHoroscopeSection } from "@/lib/daily-horoscope-article-data";
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 type LooseSection = { id: string; titleTh: string; body: string };
 

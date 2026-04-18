@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
-
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export type FeatureType = "deep-insight" | "premium" | "tarot-draw" | "tarot-deep";
 
 export async function getCurrentUser() {

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export async function POST(request: Request) {
   const allowDemoLogin = process.env.ALLOW_DEMO_LOGIN === "1";
   const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
