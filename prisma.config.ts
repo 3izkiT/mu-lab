@@ -7,7 +7,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Allow build-time prisma generate on platforms without DATABASE_URL set.
+    // Local development defaults to SQLite if DATABASE_URL is not set.
+    // Production should set DATABASE_URL and DATABASE_PROVIDER accordingly.
     url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
   },
 });

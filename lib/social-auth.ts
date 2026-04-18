@@ -9,7 +9,7 @@ function envOrNull(name: string): string | null {
   return value.length ? value : null;
 }
 
-export function getOAuthConfig(provider: SocialProvider) {
+export function getOAuthConfig(_provider: SocialProvider) {
   return {
     clientId: envOrNull("GOOGLE_CLIENT_ID"),
     clientSecret: envOrNull("GOOGLE_CLIENT_SECRET"),
