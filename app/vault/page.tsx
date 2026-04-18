@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getCurrentUser, checkFeatureAccess } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export default async function VaultPage() {
   const user = await getCurrentUser();
   if (!user) return null;

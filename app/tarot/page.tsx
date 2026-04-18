@@ -3,6 +3,8 @@ import { getCurrentUser } from "@/lib/auth-utils";
 import TarotExperience from "@/components/TarotExperience";
 import { getTarotReadingForUser } from "@/lib/tarot-engine";
 
+export const dynamic = 'force-dynamic';
+
 type TarotPageProps = {
   searchParams: Promise<{ readingId?: string }>;
 };
