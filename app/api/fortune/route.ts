@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 import { readGeminiApiKey, readGeminiChatModel } from "@/lib/gemini-env";
 import { extractGeminiResponseText } from "@/lib/gemini-response-text";
 import { splitMetersFromFortuneText } from "@/lib/fortune-parse";
-
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 type FortuneRequestBody = {
   fullName?: string;
   gender?: string;

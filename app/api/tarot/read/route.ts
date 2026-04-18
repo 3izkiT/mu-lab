@@ -3,7 +3,8 @@ import { cookies } from "next/headers";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { createOrGetTarotReading, getTarotReadingForUser } from "@/lib/tarot-engine";
 import { rateLimitOrThrow } from "@/lib/rate-limit";
-
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs"; 
 type ReadBody = { question?: string; readingId?: string };
 
 export async function POST(request: Request) {
