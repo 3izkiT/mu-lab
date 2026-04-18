@@ -4,7 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql" // ต้องเป็นอันนี้เท่านั้น ห้ามเป็น sqlite
+  url      = env("DATABASE_URL")
 }
 
 model User {

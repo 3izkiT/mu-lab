@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import type { DailyForecastPayload } from "@/lib/daily-forecast-data";
 import type { BirthWeekdayId, DailyHoroscopeArticle, DailyHoroscopeSection } from "@/lib/daily-horoscope-article-data";
 import { prisma } from "@/lib/prisma";
