@@ -9,11 +9,21 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    // ต้องเรียกข้างในนี้เท่านั้น
+    // 1. ตรวจสอบ User พื้นฐานก่อน
     await ensureMvpUsers();
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("mu_lab_uid")?.value || GUEST_USER_ID;
 
+    // 2. อ่านคุกกี้แบบ "ระมัดระวัง" (จุดตายอยู่ที่นี่)
+    let userId = GUEST_USER_ID;
+    try {
+      const cookieStore = await cookies();
+      const muUid = cookieStore.get("mu_lab_uid")?.value;
+      if (muUid) userId = muUid;
+    } catch (cookieError) {
+      // ถ้าอ่านคุกกี้ไม่ได้ (เช่น ตอน Build) ให้ใช้ Guest ID ไปเลย ไม่ต้องพัง
+      console.log("Cookie read skipped during build/error");
+    }
+
+    // 3. อ่าน Body
     const body = (await request.json()) as {
       message?: string;
       meters?: { career?: number; wealth?: number; love?: number };
@@ -27,7 +37,7 @@ export async function POST(request: Request) {
     const lines = body.message.trim().split("\n").filter(Boolean);
     const summary = lines.slice(0, 3).join(" ").slice(0, 300);
 
-    // สร้างข้อมูล
+    // 4. บันทึกลงฐานข้อมูล
     const result = await prisma.analysis.create({
       data: {
         id,
@@ -42,7 +52,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ id: result.id });
   } catch (error) {
-    console.error("Prisma Error:", error);
+    // ถ้าพังที่ Prisma หรือส่วนอื่น ให้คืนค่า 500 ไปตามปกติ
+    console.error("Analysis Save Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

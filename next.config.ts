@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const nextConfig = {
+  // บังคับให้ใช้การบิ้วแบบมาตรฐาน ไม่เอาเครื่องยนต์พิเศษที่อาจจะค้างแคช
+  typescript: { ignoreBuildErrors: false },
+  eslint: { ignoreDuringBuilds: false },
+  // เพิ่มบรรทัดนี้เพื่อล้างแคชตอนส่งขึ้นไป
+  generateBuildId: async () => {
+    return `build-${Date.now()}`;
+  },
 };
-
 export default nextConfig;
