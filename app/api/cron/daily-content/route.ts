@@ -3,7 +3,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getBangkokDateKey } from "@/lib/daily-forecast-data";
 import { getDailyHoroscopeArticle } from "@/lib/daily-horoscope-article-data";
-
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 function readCronSecret(): string | null {
   const raw = process.env.CRON_SECRET;
   if (raw == null) return null;

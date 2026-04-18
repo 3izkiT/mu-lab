@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
-
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export async function POST(request: Request) {
   const response = NextResponse.json({ ok: true });
   response.cookies.set("mu_lab_uid", "", {
