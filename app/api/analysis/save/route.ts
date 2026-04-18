@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers, GUEST_USER_ID } from "@/lib/auth-mvp";
+export const runtime = "nodejs"; // บังคับเลยว่าห้ามใช้ Edge
+export const dynamic = "force-dynamic"; // บังคับว่าห้าม Build ล่วงหน้า ให้รันตอนคนใช้งานจริงเท่านั้น
 
 export async function POST(request: Request) {
   await ensureMvpUsers();
