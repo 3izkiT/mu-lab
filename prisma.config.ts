@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { defineConfig } from "prisma/config";
+import { defineConfig } from "@prisma/config"; // เช็กว่ามี @ ด้วยนะครับ
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -7,7 +7,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Allow build-time prisma generate on platforms without DATABASE_URL set.
-    url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
+    url: process.env.DATABASE_URL,
   },
 });
