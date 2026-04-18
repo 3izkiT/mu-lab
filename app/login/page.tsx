@@ -148,8 +148,12 @@ export default function LoginPage() {
           <div className="mt-5 grid gap-2">
             <a
               href={`/api/auth/oauth/start?provider=google&next=${encodeURIComponent(nextPath)}`}
-              className="rounded-full border border-white/25 px-5 py-2 text-sm text-[#e9eefc] transition hover:bg-white/[0.08]"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] transition hover:opacity-95"
             >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="10" r="3" />
+                <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z" />
+              </svg>
               เข้าสู่ระบบด้วย Google
             </a>
           </div>

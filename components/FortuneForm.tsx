@@ -163,8 +163,8 @@ export default function FortuneForm() {
   );
 
   const isStepOneValid = formData.fullName.trim() !== "" && formData.gender !== "";
-  const isThaiDateFormat = (value: string) => /^\d{2}\/\d{2}\/\d{4}$/.test(value.trim());
-  const isStepTwoValid = isThaiDateFormat(formData.birthDate);
+  const isValidDateFormat = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value.trim());
+  const isStepTwoValid = isValidDateFormat(formData.birthDate);
   const isStepThreeValid =
     formData.birthHour !== "" &&
     formData.birthMinute !== "" &&
@@ -294,7 +294,7 @@ export default function FortuneForm() {
           saved = null;
         }
         if (saved?.id) {
-          router.push(`/analysis/${saved.id}`);
+          router.push(`/my-fortune/${saved.id}`);
           return;
         }
         setFortuneResult(message.trim());
@@ -700,13 +700,11 @@ export default function FortuneForm() {
                   วันเกิด
                 </span>
                 <input
-                  type="text"
-                  inputMode="numeric"
+                  type="date"
                   value={formData.birthDate}
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, birthDate: event.target.value }))
                   }
-                  placeholder="DD/MM/YYYY"
                   className="mu-lab-input w-full min-w-0 px-4 py-3.5 text-base scheme-dark"
                 />
               </label>
