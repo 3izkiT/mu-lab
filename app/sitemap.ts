@@ -51,10 +51,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const discoveredRoutes = await collectRoutes(appDir);
   const uniqueRoutes = [...new Set(discoveredRoutes)].filter(isCrawlableRoute);
 
-  return uniqueRoutes.map((route) => ({
-    url: `${SITE_URL}${route === "/" ? "" : route}`,
-    lastModified: new Date(),
-    changeFrequency: route === "/" ? "daily" : "weekly",
-    priority: route === "/" ? 1 : 0.4,
-  }));
+  return uniqueRoutes.map((route) => {
+    let changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never" = "weekly";
+    let priority = 0.6;
+
+    if (route === "/") {
+      changeFrequency = "daily";
+      priority = 1.0;
+    } else if (route === "/daily-horoscope" || route === "/daily-horoscope/archive") {
+      changeFrequency = "daily";
+      priority = 0.9;
+    } else if (["/tarot", "/vault", "/tracking"].some((p) => route.includes(p))) {
+      changeFrequency = "weekly";
+      priority = 0.8;
+    } else if (["/privacy", "/terms", "/cookie-policy"].some((p) => route.includes(p))) {
+      changeFrequency = "monthly";
+      priority = 0.3;
+    }
+
+    return {
+      url: `${SITE_URL}${route === "/" ? "" : route}`,
+      lastModified: new Date(),
+      changeFrequency,
+      priority,
+    };
+  });
 }

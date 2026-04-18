@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import DailyCosmicDashboard from "@/components/DailyCosmicDashboard";
 import { ParallaxNebula, Reveal } from "@/components/CinematicCelestial";
 import FortuneForm from "@/components/FortuneForm";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
 import { getDailyForecast } from "@/lib/daily-forecast-data";
+import { getSiteUrl } from "@/lib/site-url";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,6 +12,20 @@ const glassPanel = "mu-lab-glass";
 
 /** หน้าแรกดึงพยากรณ์รายวันแบบแคช — เนื้อหาเปลี่ยนตามวันในเขต กรุงเทพฯ */
 export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteUrl = getSiteUrl();
+  return {
+    title: "ดูดวงส่วนตัว | ลักขณา ดวงชะตา | Mu-Lab",
+    description: "ดูดวงส่วนตัวแบบพรีเมียมจากลักขณา ชั่วโมงเกิด จังหวัดเกิด พร้อมคำแนะนำจาก Mu-Lab Algorithm",
+    openGraph: {
+      type: "website",
+      url: siteUrl,
+      title: "ดูดวงส่วนตัว | Mu-Lab",
+      description: "วิเคราะห์ลักขณา ดวงชะตา ได้คำแนะนำเพื่อการตัดสินใจ",
+    },
+  };
+}
 
 export default async function Home() {
   const daily = await getDailyForecast();

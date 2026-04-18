@@ -21,10 +21,10 @@ const pridi = Pridi({
 const siteUrl = getSiteUrl();
 
 const siteTitle =
-  "Mu-Lab: ไขรหัสชีวิตรายบุคคลด้วยห้องทดลองโหราศาสตร์ยุคใหม่";
+  "ดูดวงส่วนตัว | ลักขณา ดวงชะตา | Mu-Lab";
 
 const siteDescription =
-  "ดูดวงส่วนตัวแบบพรีเมียม — วิเคราะห์ลักขณาและดวงชะตาจากวันเวลาและจังหวัดเกิด พร้อมคำแนะจาก Mu-Lab Algorithm";
+  "ดูดวงส่วนตัวแบบพรีเมียมจากลักขณา ชั่วโมงเกิด จังหวัดเกิด ดวงชะตา โหรา ได้คำแนะนำจริง พร้อมวิเคราะห์ลึกจาก Mu-Lab";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -34,15 +34,25 @@ export const metadata: Metadata = {
   },
   description: siteDescription,
   keywords: [
-    "Mu-Lab",
     "ดูดวง",
-    "โหราศาสตร์",
+    "ดูดวงส่วนตัว",
     "ลักขณา",
-    "ดวงส่วนตัว",
+    "โหราศาสตร์",
+    "ดวงชะตา",
+    "วิเคราะห์ลักขณา",
+    "ดูดวงออนไลน์",
+    "ทำนายโหรา",
+    "โหรา",
+    "Mu-Lab",
     "ห้องทดลองโหรา",
+    "โหราศาสตร์ไทย",
   ],
   alternates: {
     canonical: "/",
+    languages: {
+      "th-TH": "/",
+      "en-US": "/",
+    },
   },
   openGraph: {
     type: "website",
@@ -51,6 +61,15 @@ export const metadata: Metadata = {
     siteName: "Mu-Lab",
     title: siteTitle,
     description: siteDescription,
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Mu-Lab - ดูดวงส่วนตัวแบบพรีเมียม",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -84,6 +103,7 @@ export default function RootLayout({
     url: siteUrl,
     logo: `${siteUrl}/logo-brand-v2.png`,
     description: siteDescription,
+    image: `${siteUrl}/opengraph-image.png`,
     contactPoint: [
       {
         "@type": "ContactPoint",
@@ -93,6 +113,51 @@ export default function RootLayout({
       },
     ],
     sameAs: ["https://www.facebook.com/mulab", "https://www.tiktok.com/@mulab"],
+    areaServed: {
+      "@type": "Country",
+      name: "Thailand",
+    },
+  };
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "บริการดูดวงส่วนตัว",
+    description: siteDescription,
+    provider: {
+      "@type": "Organization",
+      name: "Mu-Lab",
+      url: siteUrl,
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "Thailand",
+    },
+    availableLanguage: ["th", "en"],
+    serviceType: "Astrology Consultation",
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "ลักขณาคืออะไร",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "ลักขณา คือ ระบบการอ่านดวงในโหราศาสตร์ไทยที่อ้างอิงจากการเกิด",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "ดูดวงส่วนตัวต้องทำไม",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "ดูดวงส่วนตัวช่วยให้คุณเข้าใจตัวเองมากขึ้น และได้คำแนะนำในการตัดสินใจ",
+        },
+      },
+    ],
   };
 
   const webPageJsonLd = {
@@ -120,6 +185,14 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
         <script
           type="application/ld+json"
