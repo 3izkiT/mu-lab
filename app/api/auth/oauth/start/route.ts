@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { buildOAuthStartUrl, type SocialProvider } from "@/lib/social-auth";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const provider = searchParams.get("provider") as SocialProvider | null;

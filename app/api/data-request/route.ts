@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 type RequestBody = {
   requestType?: "access" | "delete" | "rectify" | "withdraw-consent";

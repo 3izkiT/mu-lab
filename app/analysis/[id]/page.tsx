@@ -2,8 +2,6 @@ import Link from "next/link";
 import PaywallOverlay from "@/components/ui/PaywallOverlay";
 import { checkFeatureAccess, getCurrentUser } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 type AnalysisPageProps = {
   params: Promise<{ id: string }>;
