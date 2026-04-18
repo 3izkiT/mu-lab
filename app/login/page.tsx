@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+
+type StoredCredential = { email: string; label: string };
 
 export default function LoginPage() {
   const params = useSearchParams();
@@ -15,6 +17,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [storedCredentials, setStoredCredentials] = useState<StoredCredential[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("mu_lab_stored_credentials");
+      if (stored) {
+        setStoredCredentials(JSON.parse(stored));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleUseStoredCredential = (storedEmail: string) => {
+    setEmail(storedEmail);
+    setPassword("");
+    setMode("login");
+  };
 
   const submitLabel = useMemo(() => {
     if (loading) return "กำลังดำเนินการ...";
@@ -40,6 +60,20 @@ export default function LoginPage() {
         setFormError(data.message || "เข้าสู่ระบบไม่สำเร็จ");
         return;
       }
+      
+      // Store credential for future login
+      try {
+        const stored = localStorage.getItem("mu_lab_stored_credentials");
+        const creds: StoredCredential[] = stored ? JSON.parse(stored) : [];
+        const exists = creds.find(c => c.email === email);
+        if (!exists) {
+          creds.push({ email, label: name || email });
+          localStorage.setItem("mu_lab_stored_credentials", JSON.stringify(creds.slice(-5)));
+        }
+      } catch {
+        // ignore
+      }
+      
       window.location.href = data.redirectUrl || "/vault";
     } finally {
       setLoading(false);
@@ -97,6 +131,22 @@ export default function LoginPage() {
               </button>
             </div>
 
+            {storedCredentials.length > 0 && mode === "login" ? (
+              <div className="mt-4 space-y-2">
+                <p className="text-xs text-[#dbe1ff]/70">เลือกจากการล็อคอินครั้งก่อน</p>
+                {storedCredentials.map((cred, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleUseStoredCredential(cred.email)}
+                    className="w-full rounded-xl border border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.08)] px-3 py-2 text-xs text-[#dbe1ff]/85 transition hover:bg-[rgba(247,231,206,0.14)]"
+                  >
+                    {cred.email}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
             {mode === "register" ? (
               <label className="mt-4 block">
                 <span className="text-xs text-[#dbe1ff]/70">ชื่อที่แสดง (ไม่บังคับ)</span>
@@ -138,7 +188,7 @@ export default function LoginPage() {
               type="button"
               onClick={handleEmailAuth}
               disabled={loading}
-              className="mt-5 w-full rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] disabled:opacity-50"
+              className="mt-5 w-full rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] disabled:opacity-50 transition hover:shadow-lg"
             >
               {submitLabel}
             </button>
@@ -151,8 +201,8 @@ export default function LoginPage() {
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] transition hover:opacity-95"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="10" r="3" />
-                <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z" />
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" opacity="0.3" />
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 6l10 7.5L22 6v-0c0-1.1-.9-2-2-2z" />
               </svg>
               เข้าสู่ระบบด้วย Google
             </a>
