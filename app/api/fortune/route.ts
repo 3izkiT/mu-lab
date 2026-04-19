@@ -170,25 +170,28 @@ export async function POST(request: Request) {
     let lastModelTried = "";
     let lastError: unknown;
 
-    for (const modelName of modelCandidates) {
-      lastModelTried = modelName;
-      try {
-        const model = genAI.getGenerativeModel({
-          model: modelName,
-          systemInstruction: MU_LAB_SYSTEM_PROMPT,
-        });
-        const result = await model.generateContent(userPrompt);
-        const extracted = extractGeminiResponseText(result.response);
-        if (extracted.trim()) {
-          text = extracted;
-          if (process.env.NODE_ENV === "development") {
-            console.log("[fortune] ok model:", modelName, "chars:", text.length);
+    for (let pass = 0; pass < 2; pass += 1) {
+      for (const modelName of modelCandidates) {
+        lastModelTried = modelName;
+        try {
+          const model = genAI.getGenerativeModel({
+            model: modelName,
+            systemInstruction: MU_LAB_SYSTEM_PROMPT,
+          });
+          const result = await model.generateContent(userPrompt);
+          const extracted = extractGeminiResponseText(result.response);
+          if (extracted.trim()) {
+            text = extracted;
+            if (process.env.NODE_ENV === "development") {
+              console.log("[fortune] ok model:", modelName, "chars:", text.length, "pass:", pass);
+            }
+            break;
           }
-          break;
+        } catch (err) {
+          lastError = err;
         }
-      } catch (err) {
-        lastError = err;
       }
+      if (text.trim()) break;
     }
 
     if (!text?.trim()) {

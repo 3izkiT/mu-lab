@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(true);
   const [storedCredentials, setStoredCredentials] = useState<StoredCredential[]>([]);
 
   useEffect(() => {
@@ -62,16 +63,18 @@ export default function LoginPage() {
       }
       
       // Store credential for future login
-      try {
-        const stored = localStorage.getItem("mu_lab_stored_credentials");
-        const creds: StoredCredential[] = stored ? JSON.parse(stored) : [];
-        const exists = creds.find(c => c.email === email);
-        if (!exists) {
-          creds.push({ email, label: name || email });
-          localStorage.setItem("mu_lab_stored_credentials", JSON.stringify(creds.slice(-5)));
+      if (rememberMe) {
+        try {
+          const stored = localStorage.getItem("mu_lab_stored_credentials");
+          const creds: StoredCredential[] = stored ? JSON.parse(stored) : [];
+          const exists = creds.find((c) => c.email === email);
+          if (!exists) {
+            creds.push({ email, label: name || email });
+            localStorage.setItem("mu_lab_stored_credentials", JSON.stringify(creds.slice(-5)));
+          }
+        } catch {
+          // ignore
         }
-      } catch {
-        // ignore
       }
       
       window.location.href = data.redirectUrl || "/vault";
@@ -184,6 +187,16 @@ export default function LoginPage() {
               />
             </label>
 
+            <label className="mt-4 flex items-center gap-3 text-sm text-[#dbe1ff]/75">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border border-white/20 bg-[#050a18] text-[var(--gold)] focus:ring-[var(--gold)]"
+              />
+              <span>จำอีเมลนี้ไว้สำหรับครั้งถัดไป</span>
+            </label>
+
             <button
               type="button"
               onClick={handleEmailAuth}
@@ -200,9 +213,11 @@ export default function LoginPage() {
               href={`/api/auth/oauth/start?provider=google&next=${encodeURIComponent(nextPath)}`}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] transition hover:opacity-95"
             >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" opacity="0.3" />
-                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 6l10 7.5L22 6v-0c0-1.1-.9-2-2-2z" />
+              <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21.35 11.1h-9.7v2.8h5.55c-.2 1.2-1.1 2.8-2.75 3.7l4.05 3c2.35-2.15 3.7-5.4 3.7-9.5 0-.65-.05-1.3-.15-1.9z" fill="#4285F4" />
+                <path d="M11.65 21.9c2.35 0 4.3-.75 5.7-2.05l-4.05-3c-.95.65-2.15 1.05-3.65 1.05-2.8 0-5.15-1.9-6-4.45l-3.15 2.45c1.7 3.35 5.15 5.9 9.15 5.9z" fill="#34A853" />
+                <path d="M5.65 13.4c-.25-.75-.4-1.55-.4-2.4 0-.85.15-1.65.4-2.4l-3.15-2.45C1.15 7.75.5 9.75.5 11.95c0 2.2.65 4.2 1.8 5.8l3.35-2.35z" fill="#FBBC05" />
+                <path d="M11.65 6.1c1.25 0 2.35.45 3.2 1.35l2.35-2.35C15.95 3.5 13.95 2.5 11.65 2.5 7.65 2.5 4.2 5.05 2.5 8.4l3.15 2.45c.85-2.55 3.2-4.75 6-4.75z" fill="#EA4335" />
               </svg>
               เข้าสู่ระบบด้วย Google
             </a>

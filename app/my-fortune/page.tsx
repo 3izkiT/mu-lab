@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth-utils";
+import PaywallOverlay from "@/components/ui/PaywallOverlay";
+import { checkFeatureAccess, getCurrentUser } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -12,9 +13,7 @@ export default async function MyFortunePage({ params }: MyFortunePageProps) {
   const { id } = await params;
   const user = await getCurrentUser();
   
-  // Check authorization
   const analysis = await prisma.analysis.findUnique({ where: { id } });
-  
   if (!analysis || !user || analysis.userId !== user.id) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-20">
@@ -27,6 +26,8 @@ export default async function MyFortunePage({ params }: MyFortunePageProps) {
       </main>
     );
   }
+
+  const hasAccess = await checkFeatureAccess(user.id, "deep-insight", id);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
@@ -55,13 +56,16 @@ export default async function MyFortunePage({ params }: MyFortunePageProps) {
           </div>
         </section>
 
-        <section className="mt-8">
-          <article className="mu-lab-glass rounded-2xl border border-[rgba(247,231,206,0.12)] p-6 sm:p-8">
+        <section className="mt-8 relative">
+          <article className={`mu-lab-glass rounded-2xl border border-[rgba(247,231,206,0.12)] p-6 sm:p-8 ${!hasAccess ? "overflow-hidden" : ""}`}>
             <h2 className="font-serif text-2xl font-semibold text-[#eef1ff] sm:text-3xl">ความเห็นที่ลึกซึ้ง</h2>
             <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-[#dbe1ff]/84 sm:text-base">
-              {analysis.deepInsight}
+              {hasAccess
+                ? analysis.deepInsight
+                : "เนื้อหานี้เป็นส่วนพิเศษสำหรับสมาชิกที่ปลดล็อกเท่านั้น ล๊อกอินและปลดล็อกเพื่ออ่านเพิ่ม"}
             </p>
           </article>
+          {!hasAccess ? <PaywallOverlay analysisId={id} /> : null}
         </section>
 
         <div className="mt-8 flex flex-wrap gap-3">
