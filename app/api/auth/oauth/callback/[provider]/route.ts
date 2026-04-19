@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
+import { prisma, withRetry } from "@/lib/prisma";
 import { getCallbackUrl, getOAuthConfig, type SocialProvider } from "@/lib/social-auth";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
@@ -66,14 +66,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ prov
     const userId = `${p}:${profile.providerId}`;
     try {
       console.log("[OAuth Callback] Creating/updating user:", userId);
-      await prisma.user.upsert({
-        where: { id: userId },
-        update: { name: profile.name, email: profile.email ?? undefined },
-        create: { id: userId, name: profile.name, email: profile.email, credits: 80 },
-      });
+      await withRetry(
+        () => prisma.user.upsert({
+          where: { id: userId },
+          update: { name: profile.name, email: profile.email ?? undefined },
+          create: { id: userId, name: profile.name, email: profile.email, credits: 80 },
+        }),
+        3,
+        2000
+      );
       console.log("[OAuth Callback] User upsert successful");
     } catch (err) {
-      console.error("[OAuth Callback] User upsert error:", err instanceof Error ? err.message : String(err));
+      console.error("[OAuth Callback] User upsert error after retries:", err instanceof Error ? err.message : String(err));
       console.error("[OAuth Callback] Full error:", err);
       return NextResponse.json(
         { error: "database_error", details: err instanceof Error ? err.message : String(err) },
