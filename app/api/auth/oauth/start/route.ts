@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   }
 
   const state = `${provider}.${nanoid(14)}`;
-  const authUrl = buildOAuthStartUrl(provider, state);
+  const authUrl = buildOAuthStartUrl(provider, state, request);
   if (!authUrl) {
     return NextResponse.json(
       { message: `${provider} login not configured`, missingEnv: "GOOGLE_CLIENT_ID" },

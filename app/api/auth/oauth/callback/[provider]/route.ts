@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCallbackUrl, getOAuthConfig, type SocialProvider } from "@/lib/social-auth";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
-async function exchangeGoogleCode(code: string) {
+async function exchangeGoogleCode(code: string, request: Request) {
   const cfg = getOAuthConfig("google");
   if (!cfg.clientId || !cfg.clientSecret) throw new Error("google_not_configured");
   const token = await fetch("https://oauth2.googleapis.com/token", {
@@ -14,7 +14,7 @@ async function exchangeGoogleCode(code: string) {
       code,
       client_id: cfg.clientId,
       client_secret: cfg.clientSecret,
-      redirect_uri: getCallbackUrl("google"),
+      redirect_uri: getCallbackUrl("google", request),
       grant_type: "authorization_code",
     }),
   }).then((r) => r.json() as Promise<{ access_token?: string }>);
@@ -44,8 +44,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ prov
 
   let profile: { providerId: string; email: string | null; name: string };
   try {
-    profile = await exchangeGoogleCode(code);
-  } catch {
+    profile = await exchangeGoogleCode(code, request);
+  } catch (err) {
+    console.error("Google callback exchange error:", err);
     return NextResponse.redirect(`/login?error=${p}_config`);
   }
 
