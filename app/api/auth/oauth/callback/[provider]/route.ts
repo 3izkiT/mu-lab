@@ -51,11 +51,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ prov
   }
 
   const userId = `${p}:${profile.providerId}`;
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: { name: profile.name, email: profile.email ?? undefined },
-    create: { id: userId, name: profile.name, email: profile.email, credits: 80 },
-  });
+  try {
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: { name: profile.name, email: profile.email ?? undefined },
+      create: { id: userId, name: profile.name, email: profile.email, credits: 80 },
+    });
+  } catch (err) {
+    console.error("User upsert error:", err);
+    return NextResponse.redirect(`/login?error=database`);
+  }
 
   const response = NextResponse.redirect(nextPath);
   response.cookies.set("mu_lab_uid", userId, {
