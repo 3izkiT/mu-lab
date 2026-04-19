@@ -26,6 +26,7 @@ import LuckMeters from "@/components/LuckMeters";
 import ProvinceCommand from "@/components/ProvinceCommand";
 import { CELESTIAL_STROKE } from "@/lib/celestial-icon-tokens";
 import { defaultLuckMeters, type LuckMetersData } from "@/lib/fortune-parse";
+import { getThaiBirthSign } from "@/lib/birth-sign";
 import {
   POLICY_LAST_UPDATED,
   PRIVACY_INTRO,
@@ -279,6 +280,9 @@ export default function FortuneForm() {
               body: JSON.stringify({
                 message: message.trim(),
                 meters,
+                birthDate: formData.birthDate,
+                birthHour: formData.birthHour,
+                birthSign: getThaiBirthSign(formData.birthDate),
               }),
             },
             SAVE_REQUEST_TIMEOUT_MS,

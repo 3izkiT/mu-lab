@@ -1,4 +1,4 @@
-import { getSiteUrl } from "@/lib/site-url";
+import { getSiteUrl, normalizeSiteUrl } from "@/lib/site-url";
 
 export type SocialProvider = "google";
 
@@ -16,14 +16,28 @@ export function getOAuthConfig(_provider: SocialProvider) {
   };
 }
 
-export function getCallbackUrl(provider: SocialProvider): string {
+function getRequestSiteUrl(request: Request): string | null {
+  const headers = request.headers;
+  const host = headers.get("x-forwarded-host") || headers.get("host");
+  const proto = headers.get("x-forwarded-proto") || headers.get("x-forwarded-protocol") || headers.get("x-forwarded-server") || headers.get("x-url-scheme") || "https";
+  if (!host) return null;
+  return normalizeSiteUrl(`${proto}://${host}`);
+}
+
+export function getCallbackUrl(provider: SocialProvider, request?: Request): string {
+  if (request) {
+    const siteUrl = getRequestSiteUrl(request);
+    if (siteUrl) {
+      return `${siteUrl}/api/auth/oauth/callback/${provider}`;
+    }
+  }
   return `${getSiteUrl()}/api/auth/oauth/callback/${provider}`;
 }
 
-export function buildOAuthStartUrl(provider: SocialProvider, state: string): string | null {
+export function buildOAuthStartUrl(provider: SocialProvider, state: string, request?: Request): string | null {
   const cfg = getOAuthConfig(provider);
   if (!cfg.clientId) return null;
-  const redirectUri = getCallbackUrl(provider);
+  const redirectUri = getCallbackUrl(provider, request);
   const params = new URLSearchParams({
     client_id: cfg.clientId,
     redirect_uri: redirectUri,

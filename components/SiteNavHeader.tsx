@@ -15,7 +15,7 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-[rgba(6,10,22,0.72)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-8 lg:px-10">
+      <div className="mx-auto flex max-w-6xl items-center justify-between overflow-hidden px-4 py-4 sm:px-8 lg:px-10">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3" aria-label="หน้าแรก Mu-Lab">
           <Image
             src="/logo-brand-v2.png"

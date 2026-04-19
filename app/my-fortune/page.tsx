@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PaywallOverlay from "@/components/ui/PaywallOverlay";
+import { BirthSignDisplay } from "@/components/BirthSignDisplay";
 import { checkFeatureAccess, getCurrentUser } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
@@ -67,6 +68,8 @@ export default async function MyFortunePage({ params }: MyFortunePageProps) {
           </article>
           {!hasAccess ? <PaywallOverlay analysisId={id} /> : null}
         </section>
+
+        {analysis.birthSign && <BirthSignDisplay signName={analysis.birthSign} />}
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Link 

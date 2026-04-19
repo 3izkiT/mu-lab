@@ -13,6 +13,9 @@ export async function POST(request: Request) {
   const body = (await request.json()) as {
     message?: string;
     meters?: { career?: number; wealth?: number; love?: number };
+    birthDate?: string;
+    birthSign?: string;
+    birthHour?: string;
   };
 
   if (!body.message?.trim()) {
@@ -32,6 +35,9 @@ export async function POST(request: Request) {
       career: body.meters?.career ?? 50,
       wealth: body.meters?.wealth ?? 50,
       love: body.meters?.love ?? 50,
+      birthDate: body.birthDate || null,
+      birthHour: body.birthHour || null,
+      birthSign: body.birthSign || null,
     },
   });
 
