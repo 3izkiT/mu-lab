@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { Pridi, Prompt } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
+import { DatabaseInitializer } from "@/components/DatabaseInitializer";
 import "./globals.css";
 
 const prompt = Prompt({
@@ -198,6 +199,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
         />
+        <DatabaseInitializer />
         {children}
         <Analytics />
       </body>
