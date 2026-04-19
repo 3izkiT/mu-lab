@@ -7,5 +7,9 @@ const nextConfig = {
   generateBuildId: async () => {
     return `build-${Date.now()}`;
   },
+  // Enable instrumentation hook for database sync on server startup
+  experimental: {
+    instrumentationHook: true,
+  },
 };
 export default nextConfig;
