@@ -15,7 +15,7 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-[rgba(6,10,22,0.72)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between overflow-hidden px-4 py-4 sm:px-8 lg:px-10">
+      <div className="mx-auto flex max-w-6xl items-center justify-between overflow-visible px-4 py-4 sm:px-8 lg:px-10">
         {/* Logo */}
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3" aria-label="หน้าแรก Mu-Lab">
           <Image
@@ -94,10 +94,10 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
 
           {/* Mobile Menu Dropdown */}
           <details className="group relative">
-            <summary className="list-none rounded-full border border-white/15 px-3 py-2 text-xs sm:text-sm text-zinc-200">
+            <summary className="list-none rounded-full border border-white/15 px-3 py-2 text-xs sm:text-sm text-zinc-200 cursor-pointer">
               เมนู
             </summary>
-            <div className="absolute right-0 z-[60] mt-2 max-h-[min(70vh,24rem)] w-[min(100vw-2rem,16rem)] overflow-y-auto overscroll-contain rounded-2xl border border-white/12 bg-[#071024]/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+            <div className="absolute right-0 z-[9999] top-full mt-2 max-h-[min(70vh,24rem)] w-[min(100vw-2rem,16rem)] overflow-y-auto overscroll-contain rounded-2xl border border-white/12 bg-[#071024]/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl">
               <Link href="/#fortune-form" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
                 ดูดวงทันที
               </Link>
