@@ -131,6 +131,7 @@ export async function POST(request: Request) {
       birthProvince: birthProvince.trim(),
     };
     safeFallback = normalizedBody;
+    const birthSign = getThaiBirthSign(normalizedBody.birthDate);
 
     if (!apiKey) {
       return NextResponse.json(buildLocalFallback(normalizedBody, birthSign), { status: 200 });
@@ -207,11 +208,13 @@ export async function POST(request: Request) {
       {
         message: cleanedMessage,
         meters,
+        birthSign,
       },
       { status: 200 },
     );
   } catch (error) {
     console.error("[fortune]", error);
-    return NextResponse.json(buildLocalFallback(safeFallback), { status: 200 });
+    const fallbackBirthSign = getThaiBirthSign(safeFallback.birthDate);
+    return NextResponse.json(buildLocalFallback(safeFallback, fallbackBirthSign), { status: 200 });
   }
 }
