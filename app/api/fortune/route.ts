@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { readGeminiApiKey, readGeminiChatModel } from "@/lib/gemini-env";
 import { extractGeminiResponseText } from "@/lib/gemini-response-text";
 import { splitMetersFromFortuneText } from "@/lib/fortune-parse";
+import { getThaiBirthSign } from "@/lib/birth-sign";
 
 type FortuneRequestBody = {
   fullName?: string;
@@ -19,7 +20,7 @@ function hashSeed(input: string) {
   return h;
 }
 
-function buildLocalFallback(body: Required<FortuneRequestBody>) {
+function buildLocalFallback(body: Required<FortuneRequestBody>, birthSign: string) {
   const seed = hashSeed(
     `${body.fullName}|${body.gender}|${body.birthDate}|${body.birthHour}|${body.birthMinute}|${body.birthProvince}`,
   );
@@ -46,6 +47,7 @@ ${body.fullName} มีพลังการตัดสินใจที่ช
   return {
     message: text,
     meters: { career, wealth, love },
+    birthSign,
   };
 }
 
@@ -131,7 +133,7 @@ export async function POST(request: Request) {
     safeFallback = normalizedBody;
 
     if (!apiKey) {
-      return NextResponse.json(buildLocalFallback(normalizedBody), { status: 200 });
+      return NextResponse.json(buildLocalFallback(normalizedBody, birthSign), { status: 200 });
     }
 
     const birthTime = `${birthHour.trim().padStart(2, "0")}:${birthMinute.trim().padStart(2, "0")}`;
@@ -196,7 +198,7 @@ export async function POST(request: Request) {
 
     if (!text?.trim()) {
       console.error("[fortune] no text from Gemini", { lastModelTried, lastError });
-      return NextResponse.json(buildLocalFallback(normalizedBody), { status: 200 });
+      return NextResponse.json(buildLocalFallback(normalizedBody, birthSign), { status: 200 });
     }
 
     const { body: cleanedMessage, meters } = splitMetersFromFortuneText(text);
