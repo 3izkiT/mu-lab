@@ -59,7 +59,7 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
             </Link>
           </HoverConstellation>
           <HoverConstellation>
-            <Link href="/login" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
+            <Link href="/login" className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-4 py-2 text-sm font-semibold text-[#241d16] transition hover:brightness-105">
               Log in
             </Link>
           </HoverConstellation>
