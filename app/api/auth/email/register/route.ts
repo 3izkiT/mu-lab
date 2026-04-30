@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, withRetry } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
@@ -27,7 +27,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "password must be 8+ characters" }, { status: 400 });
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await withRetry(
+    () => prisma.user.findUnique({ where: { email } }),
+    3,
+    2000
+  );
   if (existing) {
     if (existing.passwordHash) {
       return NextResponse.json({ message: "email already registered" }, { status: 409 });
@@ -38,11 +42,15 @@ export async function POST(request: Request) {
   const passwordHash = await bcrypt.hash(password, 10);
   const userId = existing?.id ?? `email:${email}`;
 
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: { email, name, passwordHash },
-    create: { id: userId, email, name, passwordHash, credits: 80 },
-  });
+  await withRetry(
+    () => prisma.user.upsert({
+      where: { id: userId },
+      update: { email, name, passwordHash },
+      create: { id: userId, email, name, passwordHash, credits: 80 },
+    }),
+    3,
+    2000
+  );
 
   const response = NextResponse.json({ ok: true, redirectUrl: nextPath });
   response.cookies.set("mu_lab_uid", userId, {

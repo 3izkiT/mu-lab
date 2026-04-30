@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, withRetry } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
@@ -25,7 +25,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "password required" }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await withRetry(
+    () => prisma.user.findUnique({ where: { email } }),
+    3,
+    2000
+  );
   if (!user?.passwordHash) {
     return NextResponse.json({ message: "invalid credentials" }, { status: 401 });
   }
