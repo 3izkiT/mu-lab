@@ -1,0 +1,1 @@
+const fs=require('fs'); const path='node_modules/astronomy-engine/astronomy.d.ts'; const lines=fs.readFileSync(path,'utf8').split(/\r?\n/); for(let i=0;i<lines.length;i++){ const l=lines[i]; if(l.indexOf('export declare class Observer')>=0){ console.log('line', i+1, l); for(let j=i-5;j<=i+10;j++){ if(j>=0 && j<lines.length) console.log((j+1)+': '+lines[j]); } break; } }

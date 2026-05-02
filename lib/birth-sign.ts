@@ -106,7 +106,7 @@ function getAyanamsa(dateUtc: Date) {
 function getAscendantLongitude(dateUtc: Date, lat: number, lon: number) {
   const observer = new Observer(lat, lon, 0);
   const horToEcl = Rotation_HOR_ECL(dateUtc, observer);
-  const risingVector = VectorFromHorizon({ lat: 0, lon: 90, dist: 1 }, dateUtc, null);
+  const risingVector = VectorFromHorizon({ lat: 0, lon: 90, dist: 1 }, dateUtc, "");
   const eclVector = RotateVector(horToEcl, risingVector);
   const eclSphere = SphereFromVector(eclVector);
   const siderealLongitude = normalizeAngle(eclSphere.lon - getAyanamsa(dateUtc));

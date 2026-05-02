@@ -131,7 +131,12 @@ export async function POST(request: Request) {
       birthProvince: birthProvince.trim(),
     };
     safeFallback = normalizedBody;
-    const birthSign = getThaiBirthSign(normalizedBody.birthDate);
+    const birthSign = getThaiBirthSign(
+      normalizedBody.birthDate,
+      normalizedBody.birthHour,
+      normalizedBody.birthMinute,
+      normalizedBody.birthProvince,
+    );
 
     if (!apiKey) {
       return NextResponse.json(buildLocalFallback(normalizedBody, birthSign), { status: 200 });
@@ -214,7 +219,12 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("[fortune]", error);
-    const fallbackBirthSign = getThaiBirthSign(safeFallback.birthDate);
+    const fallbackBirthSign = getThaiBirthSign(
+      safeFallback.birthDate,
+      safeFallback.birthHour,
+      safeFallback.birthMinute,
+      safeFallback.birthProvince,
+    );
     return NextResponse.json(buildLocalFallback(safeFallback, fallbackBirthSign), { status: 200 });
   }
 }
