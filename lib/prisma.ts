@@ -13,10 +13,12 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
  * ใน schema อีก) — ฉะนั้นเราอ่าน env แล้วยัดเข้า PrismaPg
  */
 function buildPrisma(): PrismaClient {
-  const url = process.env.DATABASE_URL;
+  // Vercel + Supabase integration ตั้ง POSTGRES_PRISMA_URL (transaction pooler + pgbouncer flags)
+  // Local dev ตั้ง DATABASE_URL ใน .env.local
+  const url = process.env.POSTGRES_PRISMA_URL ?? process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      "DATABASE_URL is not set. ตั้งค่าใน .env.local (dev) หรือ Vercel env (production).",
+      "DATABASE_URL/POSTGRES_PRISMA_URL is not set. ตั้งค่าใน .env.local (dev) หรือ Vercel env (production).",
     );
   }
   const adapter = new PrismaPg({ connectionString: url });
