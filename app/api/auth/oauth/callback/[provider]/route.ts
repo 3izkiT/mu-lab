@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma, withRetry } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { getCallbackUrl, getOAuthConfig, type SocialProvider } from "@/lib/social-auth";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
 
-async function exchangeGoogleCode(code: string, request: Request) {
+function safeNextUrl(rawPath: string | null | undefined, requestUrl: string): URL {
+  const fallback = new URL("/vault", requestUrl);
+  if (!rawPath) return fallback;
+
+  // Allow only same-origin absolute path to avoid open-redirect.
+  if (!rawPath.startsWith("/")) return fallback;
+  if (rawPath.startsWith("//")) return fallback;
+  return new URL(rawPath, requestUrl);
+}
+
+async function exchangeGoogleCode(code: string) {
   const cfg = getOAuthConfig("google");
   if (!cfg.clientId || !cfg.clientSecret) throw new Error("google_not_configured");
   const token = await fetch("https://oauth2.googleapis.com/token", {
@@ -14,7 +24,7 @@ async function exchangeGoogleCode(code: string, request: Request) {
       code,
       client_id: cfg.clientId,
       client_secret: cfg.clientSecret,
-      redirect_uri: getCallbackUrl("google", request),
+      redirect_uri: getCallbackUrl("google"),
       grant_type: "authorization_code",
     }),
   }).then((r) => r.json() as Promise<{ access_token?: string }>);
@@ -27,84 +37,45 @@ async function exchangeGoogleCode(code: string, request: Request) {
 }
 
 export async function GET(request: Request, { params }: { params: Promise<{ provider: string }> }) {
-  try {
-    const { provider } = await params;
-    if (provider !== "google") {
-      return NextResponse.redirect("/login?error=provider");
-    }
-    const p = provider as SocialProvider;
-    const { searchParams } = new URL(request.url);
-    const code = searchParams.get("code");
-    const state = searchParams.get("state");
-    
-    console.log("[OAuth Callback] Starting callback for provider:", p, "with code:", code?.substring(0, 10) + "...");
-    
-    if (!code || !state) {
-      console.warn("[OAuth Callback] Missing code or state");
-      return NextResponse.redirect("/login?error=oauth");
-    }
-
-    const cookieStore = await cookies();
-    const expectedState = cookieStore.get("mu_oauth_state")?.value;
-    const nextPath = cookieStore.get("mu_oauth_next")?.value || "/vault";
-    
-    if (!expectedState || expectedState !== state) {
-      console.warn("[OAuth Callback] State mismatch - expected:", expectedState, "got:", state);
-      return NextResponse.redirect("/login?error=state");
-    }
-
-    let profile: { providerId: string; email: string | null; name: string };
-    try {
-      console.log("[OAuth Callback] Exchanging code for token...");
-      profile = await exchangeGoogleCode(code, request);
-      console.log("[OAuth Callback] Got profile:", { sub: profile.providerId, email: profile.email });
-    } catch (err) {
-      console.error("[OAuth Callback] Exchange error:", err instanceof Error ? err.message : String(err));
-      return NextResponse.redirect(`/login?error=${p}_config`);
-    }
-
-    const userId = `${p}:${profile.providerId}`;
-    try {
-      console.log("[OAuth Callback] Creating/updating user:", userId);
-      await withRetry(
-        () => prisma.user.upsert({
-          where: { id: userId },
-          update: { name: profile.name, email: profile.email ?? undefined },
-          create: { id: userId, name: profile.name, email: profile.email, credits: 80 },
-        }),
-        3,
-        2000
-      );
-      console.log("[OAuth Callback] User upsert successful");
-    } catch (err) {
-      console.error("[OAuth Callback] User upsert error after retries:", err instanceof Error ? err.message : String(err));
-      console.error("[OAuth Callback] Full error:", err);
-      return NextResponse.json(
-        { error: "database_error", details: err instanceof Error ? err.message : String(err) },
-        { status: 500 }
-      );
-    }
-
-    console.log("[OAuth Callback] Setting cookies and redirecting to:", nextPath);
-    const response = NextResponse.redirect(nextPath);
-    response.cookies.set("mu_lab_uid", userId, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: shouldUseSecureCookie(request),
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
-    response.cookies.set("mu_oauth_state", "", { path: "/", maxAge: 0 });
-    response.cookies.set("mu_oauth_next", "", { path: "/", maxAge: 0 });
-    
-    console.log("[OAuth Callback] Successfully logged in user:", userId);
-    return response;
-  } catch (err) {
-    console.error("[OAuth Callback] Unexpected error:", err instanceof Error ? err.message : String(err));
-    console.error("[OAuth Callback] Full error:", err);
-    return NextResponse.json(
-      { error: "unexpected_error", details: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
-    );
+  const { provider } = await params;
+  if (provider !== "google") {
+    return NextResponse.redirect(new URL("/login?error=provider", request.url));
   }
+  const p = provider as SocialProvider;
+  const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code");
+  const state = searchParams.get("state");
+  if (!code || !state) return NextResponse.redirect(new URL("/login?error=oauth", request.url));
+
+  const cookieStore = await cookies();
+  const expectedState = cookieStore.get("mu_oauth_state")?.value;
+  const nextPath = cookieStore.get("mu_oauth_next")?.value;
+  const nextUrl = safeNextUrl(nextPath, request.url);
+  if (!expectedState || expectedState !== state) return NextResponse.redirect(new URL("/login?error=state", request.url));
+
+  let profile: { providerId: string; email: string | null; name: string };
+  try {
+    profile = await exchangeGoogleCode(code);
+  } catch {
+    return NextResponse.redirect(new URL(`/login?error=${p}_config`, request.url));
+  }
+
+  const userId = `${p}:${profile.providerId}`;
+  await prisma.user.upsert({
+    where: { id: userId },
+    update: { name: profile.name, email: profile.email ?? undefined },
+    create: { id: userId, name: profile.name, email: profile.email, credits: 80 },
+  });
+
+  const response = NextResponse.redirect(nextUrl);
+  response.cookies.set("mu_lab_uid", userId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: shouldUseSecureCookie(request),
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+  response.cookies.set("mu_oauth_state", "", { path: "/", maxAge: 0 });
+  response.cookies.set("mu_oauth_next", "", { path: "/", maxAge: 0 });
+  return response;
 }
