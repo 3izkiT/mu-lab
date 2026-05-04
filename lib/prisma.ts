@@ -12,6 +12,23 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
  * Prisma 7 ต้องใช้ adapter ส่ง connection string เข้าไปเอง (ไม่อ่าน datasource.url
  * ใน schema อีก) — ฉะนั้นเราอ่าน env แล้วยัดเข้า PrismaPg
  */
+/**
+ * pg parses `?sslmode=` from connection URL and overrides explicit ssl config.
+ * For Supabase pooler we need ssl ON but skip cert chain verification — strip sslmode
+ * from URL and set ssl explicitly via PoolConfig.
+ */
+function buildPgConfig(rawUrl: string) {
+  const isSupabase = /supabase\.(com|co)/.test(rawUrl);
+  if (!isSupabase) {
+    return { connectionString: rawUrl };
+  }
+  const cleaned = rawUrl.replace(/([?&])sslmode=[^&]*&?/g, "$1").replace(/[?&]$/, "");
+  return {
+    connectionString: cleaned,
+    ssl: { rejectUnauthorized: false } as const,
+  };
+}
+
 function buildPrisma(): PrismaClient {
   // Vercel + Supabase integration ตั้ง POSTGRES_PRISMA_URL (transaction pooler + pgbouncer flags)
   // Local dev ตั้ง DATABASE_URL ใน .env.local
@@ -21,13 +38,7 @@ function buildPrisma(): PrismaClient {
       "DATABASE_URL/POSTGRES_PRISMA_URL is not set. ตั้งค่าใน .env.local (dev) หรือ Vercel env (production).",
     );
   }
-  // Supabase ใช้ self-signed/Let's Encrypt chain ที่ pg อาจไม่ accept โดย default บน Vercel
-  // ต้องเปิด TLS แต่ไม่ verify chain (Supabase ดูแล cert ตัวเอง ไม่ใช่ MITM risk บน private pooler)
-  const isSupabase = /supabase\.(com|co)/.test(url);
-  const adapter = new PrismaPg({
-    connectionString: url,
-    ...(isSupabase ? { ssl: { rejectUnauthorized: false } } : {}),
-  });
+  const adapter = new PrismaPg(buildPgConfig(url));
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
