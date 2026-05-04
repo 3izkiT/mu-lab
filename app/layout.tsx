@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { Pridi, Prompt } from "next/font/google";
+import { AdSenseScript } from "@/components/AdSenseScript";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -127,6 +128,7 @@ export default function RootLayout({
         />
         {children}
         <Analytics />
+        <AdSenseScript />
       </body>
     </html>
   );

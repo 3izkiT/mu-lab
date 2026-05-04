@@ -63,10 +63,39 @@ Callback URL ที่ต้องตั้งใน Google Console:
 Webhook endpoint:
 - `https://<โดเมนจริง>/api/webhook/stripe`
 
-ขั้นทดสอบแบบเร็วสุด:
-- ไป Stripe Dashboard → Developers → Webhooks → เลือก endpoint
-- กด **Send test event**: `checkout.session.completed`
-- ดู Delivery ว่าเป็น **2xx** และไม่มี error
+#### 6.1 ตั้ง webhook endpoint ใน Stripe (ครั้งแรก)
+1. https://dashboard.stripe.com → ขวาบนเปลี่ยนเป็น **Test mode** ก่อน (สวิตช์ "Test mode")
+2. **Developers** → **Webhooks** → **Add endpoint**
+3. URL: `https://mu-lab.vercel.app/api/webhook/stripe`
+4. **Events to listen to**: เลือกอย่างน้อย
+   - `checkout.session.completed`
+   - `payment_intent.succeeded`
+   - `payment_intent.payment_failed`
+   - `customer.subscription.created`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+5. กด **Add endpoint**
+6. หลังสร้าง คลิกเข้า endpoint → คัดลอกค่า **Signing secret** (`whsec_...`)
+7. ไป Vercel → Project Settings → Environment Variables → ตั้ง `STRIPE_WEBHOOK_SECRET = whsec_...` (Production + Preview + Development)
+8. Redeploy production เพื่อให้ค่ามีผล
+
+#### 6.2 ทดสอบ event จริงจาก Dashboard
+1. กลับไปที่ webhook endpoint ใน Stripe Dashboard
+2. กดปุ่ม **Send test event** ที่มุมขวาบนของ endpoint
+3. เลือก `checkout.session.completed` แล้วกด **Send test webhook**
+4. ตรวจ Delivery:
+   - ✅ Status `200 OK` = ผ่าน webhook + signature verify
+   - ❌ `400 invalid signature` = `STRIPE_WEBHOOK_SECRET` ผิด/ยังไม่ redeploy
+   - ❌ `500` = ดู logs ใน Vercel → Functions
+
+#### 6.3 ทดสอบ end-to-end ด้วย Stripe CLI (ทางเลือก)
+```bash
+# Windows (PowerShell)
+iwr -useb get.scoop.sh | iex; scoop install stripe
+stripe login
+stripe trigger checkout.session.completed --add checkout_session:client_reference_id=demo-user
+```
+ถ้าจะทดสอบกับ live mode จริงให้สลับ Test → Live ใน Dashboard และเปลี่ยน secret ใน Vercel เป็น live secret
 
 ### 7) ฐานข้อมูล + สมัครด้วยอีเมล (สำคัญถ้า “สมัครไม่ได้”)
 ถ้าใช้ **Postgres / Neon / Vercel Postgres** บน production:
@@ -77,7 +106,57 @@ Webhook endpoint:
 ถ้าใช้ **SQLite บน Vercel serverless** (ไฟล์ใน image):
 - การเขียน DB ระหว่างรันอาจไม่ถาวร — แนะนำย้ายไป **Postgres แบบ hosted** สำหรับ production จริง
 
-### 8) ⚠️ Critical ก่อน Go-Live: ย้ายจาก SQLite → Postgres
+### 8) ✅ Database (DONE — ใช้ Supabase Postgres)
+ตอนนี้โปรเจกต์ migrate ไป **Supabase Postgres (Tokyo region)** แล้ว ผ่าน:
+- `@prisma/adapter-pg` (รองรับ Vercel serverless)
+- Vercel Supabase integration → ตั้ง `POSTGRES_PRISMA_URL` / `POSTGRES_URL_NON_POOLING` ให้อัตโนมัติ
+- `vercel-build` ใน `package.json` รัน `prisma migrate deploy && next build`
+
+ข้อมูลผู้ใช้/analysis/tarot ทุกคนเก็บที่เดียวกัน — ทุก lambda instance อ่านได้ตรงกัน ✓
+
+#### Maintenance ที่ต้องรู้
+- **เพิ่มฟิลด์ใหม่**: แก้ `prisma/schema.prisma` → รัน `npx prisma migrate dev -n <name>` ในเครื่อง → push ไป Vercel จะ auto-migrate
+- **Reset DB ใน emergency**: `vercel env pull .env.production.local` แล้ว `DATABASE_URL=$POSTGRES_PRISMA_URL npx prisma migrate reset` (ระวังลบข้อมูลผู้ใช้จริง!)
+- **Monitor**: Supabase Dashboard → Database → ดู connections, query performance
+- **Backup**: Supabase Free tier มี daily backup 7 วันให้อัตโนมัติ
+
+### 9) Sentry (Error Monitoring)
+- โค้ดมี `@sentry/nextjs` ติดตั้งแล้ว — **โหลดเฉพาะเมื่อมี DSN** (ไม่มีก็ no-op)
+- ตั้งค่า:
+  1. สมัคร https://sentry.io → Create project (Next.js)
+  2. คัดลอก DSN จากหน้าโปรเจกต์
+  3. Vercel env (Production):
+     - `NEXT_PUBLIC_SENTRY_DSN=https://xxxx@oXXX.ingest.sentry.io/XXX`
+     - `SENTRY_DSN=<same>`
+     - (เลือกใส่) `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` — ถ้าจะให้ upload sourcemap อัตโนมัติ
+  4. Redeploy → ลองตั้งใจให้ error เกิดในโปรดักชัน → ดูใน Sentry dashboard
+
+### 10) Google AdSense
+- โค้ดมี `<AdSenseScript />` + `<AdSlot slot=... />` พร้อมใช้
+- โหลดเฉพาะเมื่อมี `NEXT_PUBLIC_ADSENSE_CLIENT` (รูปแบบ `ca-pub-XXXXXXXXXXXXXXXX`)
+- ตำแหน่ง slot ปัจจุบัน: ท้ายบทความ daily-horoscope (ไม่ขัด conversion)
+- ขั้นตอน Go-Live:
+  1. https://www.google.com/adsense → Approve เว็บ (ใช้เวลา 1–14 วัน)
+  2. หลัง approve → สร้าง ad unit → ได้ slot ID
+  3. ตั้ง `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX` ใน Vercel env
+  4. แก้ slot ID ใน `components/DailyHoroscopeArticleView.tsx` (ตอนนี้ placeholder `9876543210`)
+  5. Redeploy
+
+### 11) Performance / LCP
+ปรับแล้ว:
+- โลโก้ hero (260×260) `priority` + `fetchPriority="high"` → คาด LCP < 2.5s
+- โลโก้ header `priority` (ทุกหน้า)
+- `next.config.images.formats` = `[avif, webp]` → คนใหม่จะได้ภาพเล็กลง 30–60%
+
+ทดสอบ:
+```bash
+# วัดด้วย Lighthouse CLI
+npx lighthouse https://mu-lab.vercel.app/ --view --preset=desktop
+npx lighthouse https://mu-lab.vercel.app/daily-horoscope --view
+```
+หรือ Chrome DevTools → Lighthouse tab
+
+### 12) ⚠️ Legacy: ย้ายจาก SQLite → Postgres (เก็บไว้อ้างอิง)
 ระหว่างทดสอบ end-to-end บน production จริง พบว่า
 
 - POST `/api/auth/email/register` → user ถูกสร้างใน lambda instance A

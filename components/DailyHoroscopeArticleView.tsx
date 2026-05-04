@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AdSlot from "@/components/AdSlot";
 import type { DailyHoroscopeArticle } from "@/lib/daily-horoscope-article-data";
 import { getWeekdayHoroscopeStyle } from "@/lib/weekday-horoscope-styles";
 
@@ -171,6 +172,11 @@ export function DailyHoroscopeArticleView({ article, siteUrl, canonicalPath, var
               </Link>
             </div>
           </div>
+
+          <AdSlot
+            slot="9876543210"
+            className="mt-8 overflow-hidden rounded-2xl border border-white/[0.05] bg-[rgba(5,10,24,0.35)] p-3"
+          />
 
           <div className="mt-10 rounded-2xl border border-white/[0.08] bg-[rgba(5,10,24,0.35)] p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">

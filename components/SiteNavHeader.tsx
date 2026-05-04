@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { GlintWrap, HoverConstellation } from "@/components/CinematicCelestial";
-import UserMenu from "@/components/UserMenu";
+import { HoverConstellation } from "@/components/CinematicCelestial";
+import HeaderActions from "@/components/HeaderActions";
 import { getCurrentUser } from "@/lib/auth-utils";
 
 type SiteNavHeaderProps = {
@@ -10,13 +10,25 @@ type SiteNavHeaderProps = {
   logoLarge?: boolean;
 };
 
+const NAV_LINKS: { href: string; label: string }[] = [
+  { href: "/#fortune-form", label: "ดูดวงทันที" },
+  { href: "/daily-horoscope", label: "ดูดวงรายวัน" },
+  { href: "/tarot", label: "ไพ่ยิปซี" },
+  { href: "/#services", label: "บริการและแพ็กเกจ" },
+  { href: "/the-science-behind-mu-lab", label: "เกี่ยวกับ Mu-Lab" },
+];
+
 /**
- * เมนูหลักเดียวกับหน้าแรก — ใช้ลิงก์ `/#…` เพื่อกลับไปแอนเคอร์บนหน้าแรกจากหน้าย่อย
- * เมื่อล็อกอินแล้วจะแสดง UserMenu (อีเมล + Logout) แทนปุ่ม Log in
+ * Header กลางของเว็บ — โครงเดียวทุกหน้า เปลี่ยนแค่บอดี้
  *
- * Note: บน Vercel ที่ DB ของ lambda แต่ละ instance ยังไม่ sync (SQLite-on-tmp)
- * อาจมีกรณี cookie ระบุ user แต่ DB ของ instance นั้นยังไม่มี record ผู้ใช้
- * เราจึง fallback ใช้ค่าจาก cookie เพื่อแสดงเมนู Logout แทนการกลายเป็น "Log in"
+ * Layout (ทุกขนาดจอ):
+ *   [Logo]  [Desktop nav (links)]  [HeaderActions: Log in + เริ่มวิเคราะห์]  [Burger (มือถือ)]
+ *
+ * - Log in / เริ่มวิเคราะห์ อยู่นอกเมนู burger เสมอ — ผู้ใช้กดได้ทันทีโดยไม่ต้องเปิดเมนู
+ * - Log in เปิดเป็น modal (LoginDialog) ไม่ navigate ไปหน้า /login
+ * - หากล็อกอินแล้ว Log in กลายเป็น UserMenu (avatar + dropdown logout)
+ * - มี cookie fallback: ถ้า `mu_lab_uid` cookie มีอยู่แม้ DB instance ไม่เห็น user
+ *   ก็ยังถือว่า logged-in เพื่อกัน UI flicker
  */
 export async function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
   const img = logoLarge ? { w: 46, h: 46, cls: "h-[46px] w-[46px]" } : { w: 40, h: 40, cls: "h-10 w-10" };
@@ -29,117 +41,75 @@ export async function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-[rgba(6,10,22,0.72)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-8 lg:px-10">
-        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3" aria-label="หน้าแรก Mu-Lab">
+      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-8 sm:py-4 lg:px-10">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3" aria-label="หน้าแรก Mu-Lab">
           <Image
             src="/logo-brand-v2.png"
             alt="Mu Lab"
             width={img.w}
             height={img.h}
+            priority
+            sizes={`${img.w}px`}
             className={`mu-lab-logo-solid mu-lab-logo-living shrink-0 rounded-full object-cover ${img.cls}`}
           />
-          <p className="truncate font-serif text-xl tracking-tight text-[var(--gold)] sm:text-2xl">Mu-Lab</p>
+          <p className="truncate font-serif text-lg tracking-tight text-[var(--gold)] sm:text-2xl">Mu-Lab</p>
         </Link>
-        <nav className="!hidden flex-wrap items-center justify-end gap-2 lg:!flex">
-          <HoverConstellation>
-            <Link
-              href="/#fortune-form"
-              className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-            >
-              ดูดวงทันที
-            </Link>
-          </HoverConstellation>
-          <HoverConstellation>
-            <Link href="/daily-horoscope" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
-              ดูดวงรายวัน
-            </Link>
-          </HoverConstellation>
-          <HoverConstellation>
-            <Link href="/tarot" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
-              ไพ่ยิปซี
-            </Link>
-          </HoverConstellation>
-          <HoverConstellation>
-            <Link href="/#services" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
-              บริการและแพ็กเกจ
-            </Link>
-          </HoverConstellation>
-          <HoverConstellation>
-            <Link
-              href="/the-science-behind-mu-lab"
-              className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]"
-            >
-              เกี่ยวกับ Mu-Lab
-            </Link>
-          </HoverConstellation>
-          {isAuthenticated ? (
-            <UserMenu name={displayName} email={displayEmail} />
-          ) : (
-            <HoverConstellation>
-              <Link href="/login" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
-                Log in
+
+        <nav className="!hidden flex-1 items-center justify-center gap-1.5 lg:!flex xl:gap-2">
+          {NAV_LINKS.map((item) => (
+            <HoverConstellation key={item.href}>
+              <Link
+                href={item.href}
+                className="rounded-full px-3 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07] xl:px-4"
+              >
+                {item.label}
               </Link>
             </HoverConstellation>
-          )}
-          <HoverConstellation>
-            <Link
-              href="/#fortune-form"
-              className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-[#241d16] shadow-[0_0_28px_rgba(247,231,206,0.26)] transition hover:brightness-105"
-            >
-              <GlintWrap>เริ่มวิเคราะห์</GlintWrap>
-            </Link>
-          </HoverConstellation>
+          ))}
         </nav>
-        <details className="group relative !block lg:!hidden">
-          <summary className="list-none rounded-full border border-white/15 px-4 py-2 text-sm text-zinc-200">
-            เมนู
-          </summary>
-          <div className="absolute right-0 z-[60] mt-2 max-h-[min(70vh,24rem)] w-[min(100vw-2rem,16rem)] overflow-y-auto overscroll-contain rounded-2xl border border-white/12 bg-[#071024]/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl">
-            <Link href="/#fortune-form" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-              ดูดวงทันที
-            </Link>
-            <Link href="/daily-horoscope" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-              ดูดวงรายวัน
-            </Link>
-            <Link href="/tarot" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-              ไพ่ยิปซี
-            </Link>
-            <Link href="/#services" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-              บริการและแพ็กเกจ
-            </Link>
-            <Link
-              href="/the-science-behind-mu-lab"
-              className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]"
-            >
-              เกี่ยวกับ Mu-Lab
-            </Link>
-            {isAuthenticated ? (
-              <>
-                <Link href="/vault" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-                  Personal Vault ({displayName || displayEmail || "Member"})
+
+        <div className="ml-auto flex items-center gap-2 lg:ml-0">
+          <HeaderActions
+            isAuthenticated={isAuthenticated}
+            userName={displayName}
+            userEmail={displayEmail}
+          />
+
+          <details className="group relative !block lg:!hidden">
+            <summary className="list-none rounded-full border border-white/15 px-3 py-2 text-xs text-zinc-200 sm:text-sm">
+              เมนู
+            </summary>
+            <div className="absolute right-0 z-[60] mt-2 max-h-[min(70vh,24rem)] w-[min(100vw-2rem,15rem)] overflow-y-auto overscroll-contain rounded-2xl border border-white/12 bg-[#071024]/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+              {NAV_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]"
+                >
+                  {item.label}
                 </Link>
-                <form action="/api/auth/logout" method="post">
-                  <button
-                    type="submit"
-                    className="block w-full rounded-xl px-3 py-2 text-left text-sm text-zinc-100 hover:bg-white/[0.08]"
+              ))}
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    href="/vault"
+                    className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]"
                   >
-                    Logout
-                  </button>
-                </form>
-              </>
-            ) : (
-              <Link href="/login" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-                Log in
-              </Link>
-            )}
-            <Link
-              href="/#fortune-form"
-              className="mt-1 block rounded-xl bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-3 py-2 text-center text-sm font-semibold text-[#241d16]"
-            >
-              เริ่มวิเคราะห์
-            </Link>
-          </div>
-        </details>
+                    Personal Vault ({displayName || displayEmail || "Member"})
+                  </Link>
+                  <form action="/api/auth/logout" method="post">
+                    <button
+                      type="submit"
+                      className="block w-full rounded-xl px-3 py-2 text-left text-sm text-zinc-100 hover:bg-white/[0.08]"
+                    >
+                      Logout
+                    </button>
+                  </form>
+                </>
+              ) : null}
+            </div>
+          </details>
+        </div>
       </div>
     </header>
   );

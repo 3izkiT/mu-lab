@@ -44,6 +44,9 @@ export default async function Home() {
                   alt=""
                   width={260}
                   height={260}
+                  priority
+                  fetchPriority="high"
+                  sizes="(max-width: 640px) 42vw, 210px"
                   className="mu-lab-logo-solid mu-lab-logo-living mu-lab-logo-floating h-full w-full rounded-full object-cover drop-shadow-[0_16px_44px_rgba(0,0,0,0.52)]"
                 />
               </div>
