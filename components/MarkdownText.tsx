@@ -44,6 +44,7 @@ export function MarkdownText({ source }: MarkdownTextProps) {
 export function stripMarkdown(source: string): string {
   return source
     .replace(/^#+\s+/gm, "")
+    .replace(/(^|\s)#{1,6}\s+/g, "$1")
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/__([^_]+)__/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")

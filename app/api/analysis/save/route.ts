@@ -25,8 +25,10 @@ export async function POST(request: Request) {
   }
 
   const id = nanoid(10);
-  const lines = body.message.trim().split("\n").filter(Boolean);
-  const summary = lines.slice(0, 3).join(" ").slice(0, 300);
+  const trimmed = body.message.trim();
+  // Keep first ~6 logical lines (preserving headings/newlines) so markdown renders properly
+  const summaryLines = trimmed.split("\n").slice(0, 6);
+  const summary = summaryLines.join("\n").slice(0, 600);
 
   let birthSign: string | null = null;
   const d = body.birthDate?.trim();
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
       id,
       userId,
       summary,
-      deepInsight: body.message.trim(),
+      deepInsight: trimmed,
       career: body.meters?.career ?? 50,
       wealth: body.meters?.wealth ?? 50,
       love: body.meters?.love ?? 50,
