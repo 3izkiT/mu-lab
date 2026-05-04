@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import LoginForm from "@/components/LoginForm";
 
 type LoginDialogProps = {
@@ -10,6 +11,12 @@ type LoginDialogProps = {
 };
 
 export default function LoginDialog({ open, onClose, nextPath }: LoginDialogProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!open) return;
     function onKey(event: KeyboardEvent) {
@@ -24,10 +31,21 @@ export default function LoginDialog({ open, onClose, nextPath }: LoginDialogProp
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="เข้าสู่ระบบ Mu-Lab">
+  /**
+   * Portal to document.body — escapes the SiteNavHeader's `backdrop-blur-xl`
+   * which would otherwise become the containing block for `fixed` descendants
+   * (CSS spec: any `backdrop-filter` ancestor establishes new containing block).
+   * Without portal, modal would only span the 80px header instead of viewport.
+   */
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] isolate"
+      role="dialog"
+      aria-modal="true"
+      aria-label="เข้าสู่ระบบ Mu-Lab"
+    >
       {/* Blurred backdrop — fills viewport, click closes */}
       <button
         type="button"
@@ -37,8 +55,8 @@ export default function LoginDialog({ open, onClose, nextPath }: LoginDialogProp
       />
 
       {/* Scroll wrapper — flex centers; if card is taller than viewport, scroll inside this layer */}
-      <div className="absolute inset-0 overflow-y-auto px-4 py-6 sm:py-10">
-        <div className="mx-auto flex min-h-full items-center justify-center">
+      <div className="absolute inset-0 overflow-y-auto">
+        <div className="flex min-h-full w-full items-center justify-center px-4 py-6 sm:py-10">
           <div className="mu-lab-modal-card relative w-full max-w-md">
             {/* outer conic glow halo */}
             <div
@@ -76,6 +94,7 @@ export default function LoginDialog({ open, onClose, nextPath }: LoginDialogProp
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
