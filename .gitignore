@@ -40,6 +40,8 @@ yarn-error.log*
 
 # local sqlite db (do not commit)
 prisma/dev.db
+# shipped empty schema for Vercel serverless (/tmp copy at runtime)
+!prisma/baseline.sqlite
 
 # typescript
 *.tsbuildinfo

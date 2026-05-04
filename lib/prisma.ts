@@ -1,16 +1,54 @@
+import fs from "node:fs";
+import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 /**
- * Schema ใช้ SQLite — ต้องใช้ Better-SQLite3 adapter เสมอ
- * (ห้ามใช้ adapter-pg ขณะที่ `schema.prisma` ยังเป็น provider sqlite จะทำให้ build พัง)
- * ถ้าต้องการ Neon/Postgres จริง ให้เปลี่ยน provider เป็น postgresql + migration แยก
+ * SQLite บน Vercel:
+ * - ไฟล์ใน bundle อ่านอย่างเดียว และ `prisma/dev.db` ถูก .vercelignore ไม่ขึ้น production
+ * - เขียนได้จริงที่ `/tmp` — จึงคัดลอก `prisma/baseline.sqlite` (schema ครบ) ไป `/tmp/mu-lab-runtime.db`
+ *
+ * Local: ใช้ `prisma/dev.db` ตามเดิม
  */
-const dbUrl = process.env.DATABASE_URL?.trim() || "file:./prisma/dev.db";
-const effectiveFileUrl = dbUrl.startsWith("file:") ? dbUrl : "file:./prisma/dev.db";
-const sqlitePath = effectiveFileUrl.replace(/^file:/, "");
+function resolveSqliteFilePath(): string {
+  const onVercel = process.env.VERCEL === "1";
+  const fromEnv = process.env.DATABASE_URL?.trim();
+
+  if (fromEnv?.startsWith("file:")) {
+    const p = fromEnv.replace(/^file:/, "").replace(/^\.\//, "");
+    return path.isAbsolute(p) ? p : path.join(process.cwd(), p);
+  }
+
+  if (onVercel) {
+    const baseline = path.join(process.cwd(), "prisma", "baseline.sqlite");
+    const runtime = "/tmp/mu-lab-runtime.db";
+    if (!fs.existsSync(baseline)) {
+      console.error("[prisma] Missing prisma/baseline.sqlite in deployment bundle");
+      return runtime;
+    }
+    try {
+      const needCopy =
+        !fs.existsSync(runtime) || fs.statSync(baseline).mtimeMs > fs.statSync(runtime).mtimeMs;
+      if (needCopy) {
+        fs.copyFileSync(baseline, runtime);
+      }
+    } catch (e) {
+      console.error("[prisma] Failed to copy baseline SQLite to /tmp", e);
+    }
+    return runtime;
+  }
+
+  return path.join(process.cwd(), "prisma", "dev.db");
+}
+
+const sqlitePath = resolveSqliteFilePath();
+try {
+  fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
+} catch {
+  // ignore
+}
 
 const adapter = new PrismaBetterSqlite3({ url: sqlitePath });
 
