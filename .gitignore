@@ -50,4 +50,7 @@ next-env.d.ts
 # local QA artifacts
 /artifacts
 
+# scratch / temp commit message file
+.git-commit-msg.tmp
+
 .vercel
