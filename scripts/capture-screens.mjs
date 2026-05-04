@@ -30,6 +30,34 @@ async function main() {
   await shoot(page, `${BASE}/login`, "login.png");
   await shoot(page, `${BASE}/tarot`, "tarot-guest.png");
 
+  // Login modal popup (click Log in button on home, capture overlay)
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle", timeout: 30000 });
+  await page.waitForTimeout(1500);
+  const loginBtn = await page.locator('button:has-text("Log in")').first();
+  if (await loginBtn.count()) {
+    await loginBtn.click();
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: path.join(OUT, "login-modal.png"), fullPage: false });
+    console.log("captured login-modal.png");
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(400);
+  }
+
+  // Mobile (iPhone 13) — verify Log in / เริ่มวิเคราะห์ buttons stay outside burger
+  const mobileContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    locale: "th-TH",
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const mPage = await mobileContext.newPage();
+  await mPage.goto(`${BASE}/`, { waitUntil: "networkidle", timeout: 30000 });
+  await mPage.waitForTimeout(1500);
+  await mPage.screenshot({ path: path.join(OUT, "home-mobile.png"), fullPage: false });
+  console.log("captured home-mobile.png");
+  await mobileContext.close();
+
   // 2. Sign up + capture authenticated pages
   const ts = Date.now();
   const email = `qa+${ts}@mulab.test`;
