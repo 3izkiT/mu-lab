@@ -70,10 +70,56 @@ Webhook endpoint:
 
 ### 7) ฐานข้อมูล + สมัครด้วยอีเมล (สำคัญถ้า “สมัครไม่ได้”)
 ถ้าใช้ **Postgres / Neon / Vercel Postgres** บน production:
-- ต้องรัน migration ให้ครบทุกครั้งที่ deploy สคีมาใหม่ เช่น  
+- ต้องรัน migration ให้ครบทุกครั้งที่ deploy สคีมาใหม่ เช่น
   `npx prisma migrate deploy` (ใน CI หรือ post-deploy script)
 - ถ้าเจอ error จาก API ว่าไม่มีคอลัมน์ `passwordHash` / `birthSign` แปลว่า **ยังไม่ migrate**
 
 ถ้าใช้ **SQLite บน Vercel serverless** (ไฟล์ใน image):
 - การเขียน DB ระหว่างรันอาจไม่ถาวร — แนะนำย้ายไป **Postgres แบบ hosted** สำหรับ production จริง
+
+### 8) ⚠️ Critical ก่อน Go-Live: ย้ายจาก SQLite → Postgres
+ระหว่างทดสอบ end-to-end บน production จริง พบว่า
+
+- POST `/api/auth/email/register` → user ถูกสร้างใน lambda instance A
+- POST `/api/analysis/save` → บังเอิญลง instance A เลยอ้างอิง user ได้ และ /vault อ่านเห็น
+- GET `/analysis/<id>` → request ถัด ๆ มาบาง request วิ่งไป **instance B**
+  ซึ่งมีแต่ `prisma/baseline.sqlite` เปล่าๆ จึงตอบ "ไม่พบผลวิเคราะห์"
+  พร้อม `getCurrentUser()` คืน `null` (header กลายเป็น "Log in" ทั้งที่มี cookie อยู่)
+
+สาเหตุเชิงระบบ:
+- Vercel จะ scale ฟังก์ชัน serverless เป็น **หลาย instance**
+- `lib/prisma.ts` คัดลอก `prisma/baseline.sqlite` → `/tmp/mu-lab-runtime.db` ใน **แต่ละ instance แยกกัน**
+- การเขียนใน instance A จึง **ไม่ replicate** ไป instance B/C/D
+
+แปลว่าก่อนเปิดให้ผู้ใช้จริง **ต้องย้าย DB เป็น service ที่แชร์ได้** (Postgres) ตัวเลือกแนะนำ:
+
+#### A. Vercel Postgres (กดง่ายสุด)
+1. Vercel → Storage → Create Database → Postgres
+2. เลือก project `mu-lab` แล้วกด Connect — Vercel จะตั้ง `POSTGRES_PRISMA_URL` ให้อัตโนมัติ
+3. ใน repo:
+   - แก้ `prisma/schema.prisma`: `provider = "postgresql"`, `url = env("POSTGRES_PRISMA_URL")`
+   - ใน `lib/prisma.ts`: ใช้ `new PrismaClient()` ปกติ (ลบโค้ดคัดลอก /tmp/baseline ออก)
+   - รัน `npx prisma migrate dev -n init_pg` (สร้าง migration ใหม่ชุดเดียวจาก schema)
+4. Push → Vercel จะรัน `prisma generate` ใน postinstall และเรียก `prisma migrate deploy` (เพิ่มให้)
+
+#### B. Neon (free tier, ภายนอก)
+1. สมัคร https://neon.tech → New Project (region ใกล้สุด)
+2. คัดลอก connection string (รูปแบบ `postgres://...?sslmode=require`)
+3. Vercel → Project Settings → Environment Variables → เพิ่ม `DATABASE_URL`
+4. ทำ schema/migrate เหมือนข้อ A
+
+#### Migration script ที่ต้องเพิ่มใน package.json
+```json
+"scripts": {
+  "postinstall": "prisma generate",
+  "vercel-build": "prisma migrate deploy && next build"
+}
+```
+เปลี่ยน Build Command บน Vercel เป็น `npm run vercel-build`
+
+#### หลังย้ายแล้วไม่ต้องใช้
+- `prisma/baseline.sqlite` (ลบทิ้งหรือเก็บไว้สำหรับ dev เฉย ๆ)
+- โค้ดคัดลอก /tmp ใน `lib/prisma.ts`
+
+> ปล. ระหว่างที่ยังใช้ SQLite อยู่ — flow แบบ single-session demo (สมัคร → ทำนาย → ดู vault ทันที) ใช้ได้เพราะมัก hit instance เดียวกัน แต่ flow ที่หลายผู้ใช้พร้อมกันหรือเปิดลิงก์ analysis วันถัดไป **จะเชื่อถือไม่ได้**
 

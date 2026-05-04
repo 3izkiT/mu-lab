@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { GlintWrap, HoverConstellation } from "@/components/CinematicCelestial";
@@ -12,11 +13,19 @@ type SiteNavHeaderProps = {
 /**
  * เมนูหลักเดียวกับหน้าแรก — ใช้ลิงก์ `/#…` เพื่อกลับไปแอนเคอร์บนหน้าแรกจากหน้าย่อย
  * เมื่อล็อกอินแล้วจะแสดง UserMenu (อีเมล + Logout) แทนปุ่ม Log in
+ *
+ * Note: บน Vercel ที่ DB ของ lambda แต่ละ instance ยังไม่ sync (SQLite-on-tmp)
+ * อาจมีกรณี cookie ระบุ user แต่ DB ของ instance นั้นยังไม่มี record ผู้ใช้
+ * เราจึง fallback ใช้ค่าจาก cookie เพื่อแสดงเมนู Logout แทนการกลายเป็น "Log in"
  */
 export async function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
   const img = logoLarge ? { w: 46, h: 46, cls: "h-[46px] w-[46px]" } : { w: 40, h: 40, cls: "h-10 w-10" };
   const user = await getCurrentUser().catch(() => null);
-  const isAuthenticated = Boolean(user);
+  const cookieStore = await cookies();
+  const hasUidCookie = Boolean(cookieStore.get("mu_lab_uid")?.value);
+  const isAuthenticated = Boolean(user) || hasUidCookie;
+  const displayName = user?.name ?? null;
+  const displayEmail = user?.email ?? null;
 
   return (
     <header className="sticky top-0 z-50 bg-[rgba(6,10,22,0.72)] backdrop-blur-xl">
@@ -64,7 +73,7 @@ export async function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
             </Link>
           </HoverConstellation>
           {isAuthenticated ? (
-            <UserMenu name={user?.name} email={user?.email} />
+            <UserMenu name={displayName} email={displayEmail} />
           ) : (
             <HoverConstellation>
               <Link href="/login" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
@@ -107,7 +116,7 @@ export async function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
             {isAuthenticated ? (
               <>
                 <Link href="/vault" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-                  Personal Vault ({user?.name || user?.email || "Member"})
+                  Personal Vault ({displayName || displayEmail || "Member"})
                 </Link>
                 <form action="/api/auth/logout" method="post">
                   <button
