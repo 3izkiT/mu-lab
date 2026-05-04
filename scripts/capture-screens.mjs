@@ -43,6 +43,20 @@ async function main() {
     await page.waitForTimeout(400);
   }
 
+  // Tarot — click to draw, capture flipped cards
+  await page.goto(`${BASE}/tarot`, { waitUntil: "networkidle", timeout: 30000 });
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: path.join(OUT, "tarot-cards-back.png"), fullPage: false });
+  console.log("captured tarot-cards-back.png");
+  const drawBtn = await page.locator('button:has-text("สับและเปิดไพ่")').first();
+  if (await drawBtn.count()) {
+    await drawBtn.click();
+    // wait for shuffle (700ms) + API + sequential flip (3*380ms+350ms init) + buffer
+    await page.waitForTimeout(5500);
+    await page.screenshot({ path: path.join(OUT, "tarot-cards-revealed.png"), fullPage: true });
+    console.log("captured tarot-cards-revealed.png");
+  }
+
   // Mobile (iPhone 13) — verify Log in / เริ่มวิเคราะห์ buttons stay outside burger
   const mobileContext = await browser.newContext({
     viewport: { width: 390, height: 844 },
