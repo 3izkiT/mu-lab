@@ -7,7 +7,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Local: SQLite, Production (Vercel): PostgreSQL from DATABASE_URL
-    url: process.env.DATABASE_URL || "file:./prisma/dev.db",
+    // Allow build-time prisma generate on platforms without DATABASE_URL set.
+    url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
   },
 });

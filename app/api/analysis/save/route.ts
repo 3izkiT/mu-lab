@@ -13,6 +13,7 @@ export async function POST(request: Request) {
   const body = (await request.json()) as {
     message?: string;
     meters?: { career?: number; wealth?: number; love?: number };
+    fullName?: string;
     birthDate?: string;
     birthHour?: string;
     birthMinute?: string;
@@ -32,6 +33,8 @@ export async function POST(request: Request) {
   const h = body.birthHour?.trim();
   const m = body.birthMinute?.trim();
   const p = body.birthProvince?.trim();
+  const fullName = body.fullName?.trim();
+  const birthTime = h && m ? `${h.padStart(2, "0")}:${m.padStart(2, "0")}` : null;
   if (d && h && m && p) {
     birthSign = getThaiBirthSign(d, h, m, p);
   }
@@ -46,6 +49,10 @@ export async function POST(request: Request) {
       wealth: body.meters?.wealth ?? 50,
       love: body.meters?.love ?? 50,
       birthSign,
+      fullName: fullName || null,
+      birthDate: d || null,
+      birthTime,
+      birthProvince: p || null,
     },
   });
 

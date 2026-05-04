@@ -10,6 +10,7 @@ export type TarotResponse = {
   freeLimitPerDay: number;
   freeRemainingToday: number;
   deepUnlocked: boolean;
+  guestMode?: boolean;
   deepInsight?: string;
   checkout?: { purchaseType: "tarot-deep"; readingId: string; amountTHB: number };
 };
@@ -58,6 +59,11 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         }),
       });
       const c = (await checkout.json()) as { sessionId?: string; message?: string };
+      if (checkout.status === 401) {
+        const next = encodeURIComponent(`/tarot?readingId=${result.readingId}`);
+        window.location.href = `/login?next=${next}`;
+        return;
+      }
       if (!checkout.ok || !c.sessionId) throw new Error(c.message || "checkout failed");
 
       const unlock = await fetch("/api/purchases/tarot-deep/unlock", {
@@ -86,11 +92,14 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     <div className="mu-lab-glass rounded-3xl p-8">
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/80">Quantum Tarot</p>
       <h1 className="mt-3 font-serif text-3xl text-[#eef1ff]">Sacred Geometry Deck</h1>
-      <p className="mt-3 text-sm text-[#dbe1ff]/82">
-        ทดลองเปิดไพ่ฟรีได้ก่อน โดยไม่ต้องล็อกอิน แค่ลองดู 1 ครั้งก่อน แล้วถ้าอยากดูเพิ่มให้ล็อกอินหรือปลดล็อกเชิงลึก
-      </p>
+      <p className="mt-3 text-sm text-[#dbe1ff]/82">ฟรีวันละ 1 ครั้ง/คน แล้วปลดล็อกโหมดเจาะลึกได้ด้วยแพ็กเกจ 79 บาท</p>
+      {result?.guestMode ? (
+        <p className="mt-2 text-xs text-[#dbe1ff]/70">
+          โหมดทดลองใช้งานโดยไม่ต้องสมัครสมาชิก: เปิดไพ่ฟรีได้ทันที หากต้องการปลดล็อกเชิงลึกหรือเก็บประวัติข้ามอุปกรณ์ ให้เข้าสู่ระบบ
+        </p>
+      ) : null}
       <p className="mt-2 text-xs text-[#dbe1ff]/62">
-        สิทธิ์ฟรีคงเหลือวันนี้: {result?.freeRemainingToday ?? 1}/{result?.freeLimitPerDay ?? 1} — เปิดก่อนแล้วค่อยตัดสินใจล็อกอินเพื่อดูเพิ่มเติม
+        สิทธิ์ฟรีคงเหลือวันนี้: {result?.freeRemainingToday ?? 1}/{result?.freeLimitPerDay ?? 1}
       </p>
 
       <label className="mt-6 block text-sm text-[#dbe1ff]/85">

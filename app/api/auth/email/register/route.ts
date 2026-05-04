@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
-import { shouldUseSecureCookie } from "@/lib/cookie-security";
+import { setUserSessionCookie } from "@/lib/auth-session";
 
 function prismaErrorCode(err: unknown): string | undefined {
   if (typeof err === "object" && err !== null && "code" in err) {
@@ -70,13 +70,7 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({ ok: true, redirectUrl: nextPath });
-  response.cookies.set("mu_lab_uid", userId, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: shouldUseSecureCookie(request),
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
+  setUserSessionCookie(response, request, userId);
   return response;
 }
 

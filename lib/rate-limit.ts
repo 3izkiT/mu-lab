@@ -31,7 +31,8 @@ export function rateLimitOrThrow(request: Request, opts: { keyPrefix: string; li
 
   if (existing.count >= opts.limit) {
     const retryAfterSeconds = Math.max(1, Math.ceil((existing.resetAt - t) / 1000));
-    const error = new Error("rate_limited") as Error & { retryAfterSeconds: number };
+    const error = new Error("rate_limited");
+    (error as any).retryAfterSeconds = retryAfterSeconds;
     throw error;
   }
 

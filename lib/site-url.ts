@@ -1,4 +1,4 @@
-export function normalizeSiteUrl(url: string): string {
+function normalizeSiteUrl(url: string): string {
   return url.trim().replace(/\/+$/, "");
 }
 

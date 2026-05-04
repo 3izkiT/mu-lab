@@ -279,6 +279,7 @@ export default function FortuneForm() {
               body: JSON.stringify({
                 message: message.trim(),
                 meters,
+                fullName: formData.fullName.trim(),
                 birthDate: formData.birthDate.trim(),
                 birthHour: formData.birthHour.trim(),
                 birthMinute: formData.birthMinute.trim(),

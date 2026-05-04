@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { getCurrentUser, checkFeatureAccess } from "@/lib/auth-utils";
+import { SiteNavHeader } from "@/components/SiteNavHeader";
 import { prisma } from "@/lib/prisma";
-
-export const dynamic = 'force-dynamic';
 
 export default async function VaultPage() {
   const user = await getCurrentUser();
@@ -21,18 +20,26 @@ export default async function VaultPage() {
   const isPremium = await checkFeatureAccess(user.id, "premium");
 
   return (
-    <main className="mx-auto grid max-w-6xl gap-6 px-4 py-12 lg:grid-cols-[220px_minmax(0,1fr)]">
-      <aside className="mu-lab-glass rounded-2xl p-4">
-        <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/80">Personal Vault</p>
-        <nav className="mt-4 space-y-2 text-sm text-[#dbe1ff]/85">
-          <p>My Profile</p>
-          <p>History</p>
-          <p>My Stars</p>
-          <p>Credits: {user.credits}</p>
-        </nav>
-      </aside>
+    <>
+      <SiteNavHeader />
+      <main className="mx-auto grid max-w-6xl gap-6 px-4 py-10 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <aside className="mu-lab-glass rounded-2xl p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/80">Personal Vault</p>
+          <nav className="mt-4 space-y-2 text-sm text-[#dbe1ff]/85">
+            <Link href="/vault" className="block rounded-lg px-2 py-1 hover:bg-white/[0.06]">
+              My Profile
+            </Link>
+            <Link href="/vault" className="block rounded-lg px-2 py-1 hover:bg-white/[0.06]">
+              History
+            </Link>
+            <Link href="/tarot" className="block rounded-lg px-2 py-1 hover:bg-white/[0.06]">
+              My Stars
+            </Link>
+            <p className="px-2 pt-1">Credits: {user.credits}</p>
+          </nav>
+        </aside>
 
-      <section className="space-y-6">
+        <section className="space-y-6">
         <div className="mu-lab-glass rounded-2xl p-6">
           <h1 className="font-serif text-3xl text-[#eef1ff]">Daily Personal Dashboard</h1>
           <p className="mt-2 text-sm text-[#dbe1ff]/82">สรุปสถานะดวงส่วนตัวของคุณในวันนี้ พร้อมประวัติย้อนหลัง</p>
@@ -73,7 +80,8 @@ export default async function VaultPage() {
             ) : null}
           </div>
         </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </>
   );
 }

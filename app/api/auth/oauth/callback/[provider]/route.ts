@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getCallbackUrl, getOAuthConfig, type SocialProvider } from "@/lib/social-auth";
-import { shouldUseSecureCookie } from "@/lib/cookie-security";
+import { setUserSessionCookie } from "@/lib/auth-session";
 
 function safeNextUrl(rawPath: string | null | undefined, requestUrl: string): URL {
   const fallback = new URL("/vault", requestUrl);
@@ -68,13 +68,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ prov
   });
 
   const response = NextResponse.redirect(nextUrl);
-  response.cookies.set("mu_lab_uid", userId, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: shouldUseSecureCookie(request),
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
+  setUserSessionCookie(response, request, userId);
   response.cookies.set("mu_oauth_state", "", { path: "/", maxAge: 0 });
   response.cookies.set("mu_oauth_next", "", { path: "/", maxAge: 0 });
   return response;

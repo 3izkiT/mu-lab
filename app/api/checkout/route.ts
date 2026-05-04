@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   try {
     rateLimitOrThrow(request, { keyPrefix: "checkout", limit: 8, windowMs: 60_000 });
   } catch (err) {
-    const retryAfterSeconds = (err as Error & { retryAfterSeconds?: number })?.retryAfterSeconds;
+    const retryAfterSeconds = (err as any)?.retryAfterSeconds as number | undefined;
     return NextResponse.json(
       { message: "too many requests" },
       {
