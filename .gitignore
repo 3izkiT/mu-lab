@@ -38,10 +38,10 @@ yarn-error.log*
 # vercel
 .vercel
 
-# local sqlite db (do not commit)
+# local sqlite db legacy (no longer used after Postgres migration)
 prisma/dev.db
-# shipped empty schema for Vercel serverless (/tmp copy at runtime)
-!prisma/baseline.sqlite
+prisma/dev.db-journal
+prisma/baseline.sqlite
 
 # typescript
 *.tsbuildinfo

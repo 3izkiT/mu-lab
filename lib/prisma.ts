@@ -1,69 +1,37 @@
-import fs from "node:fs";
-import path from "node:path";
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 /**
- * SQLite บน Vercel:
- * - ไฟล์ใน bundle อ่านอย่างเดียว และ `prisma/dev.db` ถูก .vercelignore ไม่ขึ้น production
- * - เขียนได้จริงที่ `/tmp` — จึงคัดลอก `prisma/baseline.sqlite` (schema ครบ) ไป `/tmp/mu-lab-runtime.db`
+ * Prisma client (PostgreSQL via Supabase pooler).
  *
- * Local: ใช้ `prisma/dev.db` ตามเดิม
+ * - `DATABASE_URL` ใช้ Transaction pooler (port 6543) — เหมาะกับ Vercel serverless
+ * - `DIRECT_URL` ใช้ Session pooler (port 5432) — สำหรับ `prisma migrate deploy` ตอน build
+ *
+ * Prisma 7 ต้องใช้ adapter ส่ง connection string เข้าไปเอง (ไม่อ่าน datasource.url
+ * ใน schema อีก) — ฉะนั้นเราอ่าน env แล้วยัดเข้า PrismaPg
  */
-function resolveSqliteFilePath(): string {
-  const onVercel = process.env.VERCEL === "1";
-  const fromEnv = process.env.DATABASE_URL?.trim();
-
-  if (fromEnv?.startsWith("file:")) {
-    const p = fromEnv.replace(/^file:/, "").replace(/^\.\//, "");
-    return path.isAbsolute(p) ? p : path.join(process.cwd(), p);
+function buildPrisma(): PrismaClient {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error(
+      "DATABASE_URL is not set. ตั้งค่าใน .env.local (dev) หรือ Vercel env (production).",
+    );
   }
-
-  if (onVercel) {
-    const baseline = path.join(process.cwd(), "prisma", "baseline.sqlite");
-    const runtime = "/tmp/mu-lab-runtime.db";
-    if (!fs.existsSync(baseline)) {
-      console.error("[prisma] Missing prisma/baseline.sqlite in deployment bundle");
-      return runtime;
-    }
-    try {
-      const needCopy =
-        !fs.existsSync(runtime) || fs.statSync(baseline).mtimeMs > fs.statSync(runtime).mtimeMs;
-      if (needCopy) {
-        fs.copyFileSync(baseline, runtime);
-      }
-    } catch (e) {
-      console.error("[prisma] Failed to copy baseline SQLite to /tmp", e);
-    }
-    return runtime;
-  }
-
-  return path.join(process.cwd(), "prisma", "dev.db");
-}
-
-const sqlitePath = resolveSqliteFilePath();
-try {
-  fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
-} catch {
-  // ignore
-}
-
-const adapter = new PrismaBetterSqlite3({ url: sqlitePath });
-
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
+  const adapter = new PrismaPg({ connectionString: url });
+  return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
+}
+
+export const prisma = globalForPrisma.prisma ?? buildPrisma();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 /**
- * Retry helper for database operations on Vercel
- * Database may not be ready immediately after deployment
+ * Retry helper — มีไว้สำหรับ transient connection errors (เช่นช่วง pooler restart)
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
