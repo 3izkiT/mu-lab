@@ -48,11 +48,25 @@ async function main() {
   await page.waitForTimeout(1200);
   await page.screenshot({ path: path.join(OUT, "tarot-cards-back.png"), fullPage: false });
   console.log("captured tarot-cards-back.png");
+  // Warm up tarot endpoint first to avoid cold-start screenshotting the loading state
+  await context.request
+    .post(`${BASE}/api/tarot/read`, { data: { question: "warmup" }, timeout: 15000 })
+    .catch(() => {});
+
   const drawBtn = await page.locator('button:has-text("สับและเปิดไพ่")').first();
   if (await drawBtn.count()) {
     await drawBtn.click();
-    // wait for shuffle (700ms) + API + sequential flip (3*380ms+350ms init) + buffer
-    await page.waitForTimeout(5500);
+    // Tarot endpoint on cold pooler is ~6-7s; wait until at least one card flipped
+    await page
+      .waitForFunction(
+        () => {
+          const flipped = document.querySelector('[style*="rotateY(180deg)"]');
+          return Boolean(flipped);
+        },
+        { timeout: 15000 },
+      )
+      .catch(() => {});
+    await page.waitForTimeout(1800);
     await page.screenshot({ path: path.join(OUT, "tarot-cards-revealed.png"), fullPage: true });
     console.log("captured tarot-cards-revealed.png");
   }
