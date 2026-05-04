@@ -1,9 +1,8 @@
 import Link from "next/link";
+import { BirthSignDisplay } from "@/components/BirthSignDisplay";
 import PaywallOverlay from "@/components/ui/PaywallOverlay";
 import { checkFeatureAccess, getCurrentUser } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
-
-export const dynamic = 'force-dynamic';
 
 type AnalysisPageProps = {
   params: Promise<{ id: string }>;
@@ -66,6 +65,12 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
           </article>
           {!hasAccess ? <PaywallOverlay analysisId={id} /> : null}
         </section>
+
+        {analysis.birthSign ? (
+          <div className="mt-8">
+            <BirthSignDisplay signName={analysis.birthSign} />
+          </div>
+        ) : null}
 
         <div className="mt-8 flex flex-wrap gap-3">
           {!user ? (

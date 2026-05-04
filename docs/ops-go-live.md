@@ -68,3 +68,12 @@ Webhook endpoint:
 - กด **Send test event**: `checkout.session.completed`
 - ดู Delivery ว่าเป็น **2xx** และไม่มี error
 
+### 7) ฐานข้อมูล + สมัครด้วยอีเมล (สำคัญถ้า “สมัครไม่ได้”)
+ถ้าใช้ **Postgres / Neon / Vercel Postgres** บน production:
+- ต้องรัน migration ให้ครบทุกครั้งที่ deploy สคีมาใหม่ เช่น  
+  `npx prisma migrate deploy` (ใน CI หรือ post-deploy script)
+- ถ้าเจอ error จาก API ว่าไม่มีคอลัมน์ `passwordHash` / `birthSign` แปลว่า **ยังไม่ migrate**
+
+ถ้าใช้ **SQLite บน Vercel serverless** (ไฟล์ใน image):
+- การเขียน DB ระหว่างรันอาจไม่ถาวร — แนะนำย้ายไป **Postgres แบบ hosted** สำหรับ production จริง
+

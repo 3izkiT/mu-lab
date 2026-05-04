@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma, withRetry } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
+
+function prismaErrorCode(err: unknown): string | undefined {
+  if (typeof err === "object" && err !== null && "code" in err) {
+    return String((err as { code?: string }).code);
+  }
+  return undefined;
+}
 
 type Body = { email?: string; password?: string; nextPath?: string };
 
@@ -25,11 +32,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "password required" }, { status: 400 });
   }
 
-  const user = await withRetry(
-    () => prisma.user.findUnique({ where: { email } }),
-    3,
-    2000
-  );
+  let user: { id: string; passwordHash: string | null } | null;
+  try {
+    user = await prisma.user.findUnique({ where: { email }, select: { id: true, passwordHash: true } });
+  } catch (err) {
+    console.error("[email/login]", err);
+    if (prismaErrorCode(err) === "P2022") {
+      return NextResponse.json(
+        {
+          message:
+            "ฐานข้อมูลยังไม่อัปเดตสคีมาล่าสุด — รัน prisma migrate deploy บนเซิร์ฟเวอร์ หรือตรวจ DATABASE_URL",
+        },
+        { status: 503 },
+      );
+    }
+    return NextResponse.json({ message: "login failed" }, { status: 500 });
+  }
+
   if (!user?.passwordHash) {
     return NextResponse.json({ message: "invalid credentials" }, { status: 401 });
   }

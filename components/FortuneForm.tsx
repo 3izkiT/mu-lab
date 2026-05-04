@@ -26,7 +26,6 @@ import LuckMeters from "@/components/LuckMeters";
 import ProvinceCommand from "@/components/ProvinceCommand";
 import { CELESTIAL_STROKE } from "@/lib/celestial-icon-tokens";
 import { defaultLuckMeters, type LuckMetersData } from "@/lib/fortune-parse";
-import { getThaiBirthSign } from "@/lib/birth-sign";
 import {
   POLICY_LAST_UPDATED,
   PRIVACY_INTRO,
@@ -164,8 +163,8 @@ export default function FortuneForm() {
   );
 
   const isStepOneValid = formData.fullName.trim() !== "" && formData.gender !== "";
-  const isValidDateFormat = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value.trim());
-  const isStepTwoValid = isValidDateFormat(formData.birthDate);
+  const isThaiDateFormat = (value: string) => /^\d{2}\/\d{2}\/\d{4}$/.test(value.trim());
+  const isStepTwoValid = isThaiDateFormat(formData.birthDate);
   const isStepThreeValid =
     formData.birthHour !== "" &&
     formData.birthMinute !== "" &&
@@ -242,7 +241,7 @@ export default function FortuneForm() {
         return;
       }
 
-      let payload: { message?: string; meters?: LuckMetersData } = {};
+      let payload: { message?: string; meters?: LuckMetersData; birthSign?: string } = {};
       try {
         payload = (await response.json()) as typeof payload;
       } catch {
@@ -280,16 +279,10 @@ export default function FortuneForm() {
               body: JSON.stringify({
                 message: message.trim(),
                 meters,
-                birthDate: formData.birthDate,
-                birthHour: formData.birthHour,
-                birthMinute: formData.birthMinute,
-                birthProvince: formData.birthProvince,
-                birthSign: getThaiBirthSign(
-                  formData.birthDate,
-                  formData.birthHour,
-                  formData.birthMinute,
-                  formData.birthProvince,
-                ),
+                birthDate: formData.birthDate.trim(),
+                birthHour: formData.birthHour.trim(),
+                birthMinute: formData.birthMinute.trim(),
+                birthProvince: formData.birthProvince.trim(),
               }),
             },
             SAVE_REQUEST_TIMEOUT_MS,
@@ -305,7 +298,7 @@ export default function FortuneForm() {
           saved = null;
         }
         if (saved?.id) {
-          router.push(`/my-fortune/${saved.id}`);
+          router.push(`/analysis/${saved.id}`);
           return;
         }
         setFortuneResult(message.trim());
@@ -711,11 +704,13 @@ export default function FortuneForm() {
                   วันเกิด
                 </span>
                 <input
-                  type="date"
+                  type="text"
+                  inputMode="numeric"
                   value={formData.birthDate}
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, birthDate: event.target.value }))
                   }
+                  placeholder="DD/MM/YYYY"
                   className="mu-lab-input w-full min-w-0 px-4 py-3.5 text-base scheme-dark"
                 />
               </label>

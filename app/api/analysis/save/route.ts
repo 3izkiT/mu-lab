@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
+import { getThaiBirthSign } from "@/lib/birth-sign";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers, GUEST_USER_ID } from "@/lib/auth-mvp";
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+
 export async function POST(request: Request) {
   await ensureMvpUsers();
   const cookieStore = await cookies();
@@ -14,8 +14,9 @@ export async function POST(request: Request) {
     message?: string;
     meters?: { career?: number; wealth?: number; love?: number };
     birthDate?: string;
-    birthSign?: string;
     birthHour?: string;
+    birthMinute?: string;
+    birthProvince?: string;
   };
 
   if (!body.message?.trim()) {
@@ -26,6 +27,15 @@ export async function POST(request: Request) {
   const lines = body.message.trim().split("\n").filter(Boolean);
   const summary = lines.slice(0, 3).join(" ").slice(0, 300);
 
+  let birthSign: string | null = null;
+  const d = body.birthDate?.trim();
+  const h = body.birthHour?.trim();
+  const m = body.birthMinute?.trim();
+  const p = body.birthProvince?.trim();
+  if (d && h && m && p) {
+    birthSign = getThaiBirthSign(d, h, m, p);
+  }
+
   await prisma.analysis.create({
     data: {
       id,
@@ -35,9 +45,7 @@ export async function POST(request: Request) {
       career: body.meters?.career ?? 50,
       wealth: body.meters?.wealth ?? 50,
       love: body.meters?.love ?? 50,
-      birthDate: body.birthDate || null,
-      birthHour: body.birthHour || null,
-      birthSign: body.birthSign || null,
+      birthSign,
     },
   });
 

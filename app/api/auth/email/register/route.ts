@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma, withRetry } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { shouldUseSecureCookie } from "@/lib/cookie-security";
+
+function prismaErrorCode(err: unknown): string | undefined {
+  if (typeof err === "object" && err !== null && "code" in err) {
+    return String((err as { code?: string }).code);
+  }
+  return undefined;
+}
 
 type Body = { email?: string; password?: string; name?: string; nextPath?: string };
 
@@ -27,11 +34,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "password must be 8+ characters" }, { status: 400 });
   }
 
-  const existing = await withRetry(
-    () => prisma.user.findUnique({ where: { email } }),
-    3,
-    2000
-  );
+  const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     if (existing.passwordHash) {
       return NextResponse.json({ message: "email already registered" }, { status: 409 });
@@ -42,15 +45,29 @@ export async function POST(request: Request) {
   const passwordHash = await bcrypt.hash(password, 10);
   const userId = existing?.id ?? `email:${email}`;
 
-  await withRetry(
-    () => prisma.user.upsert({
+  try {
+    await prisma.user.upsert({
       where: { id: userId },
       update: { email, name, passwordHash },
       create: { id: userId, email, name, passwordHash, credits: 80 },
-    }),
-    3,
-    2000
-  );
+    });
+  } catch (err) {
+    console.error("[email/register]", err);
+    const code = prismaErrorCode(err);
+    if (code === "P2022") {
+      return NextResponse.json(
+        {
+          message:
+            "ฐานข้อมูลยังไม่อัปเดตสคีมาล่าสุด (เช่น ยังไม่มีคอลัมน์ passwordHash) — รัน prisma migrate deploy บนเซิร์ฟเวอร์ หรือตรวจ DATABASE_URL",
+        },
+        { status: 503 },
+      );
+    }
+    return NextResponse.json(
+      { message: "ไม่สามารถสมัครได้ชั่วคราว กรุณาลองใหม่ภายหลัง" },
+      { status: 500 },
+    );
+  }
 
   const response = NextResponse.json({ ok: true, redirectUrl: nextPath });
   response.cookies.set("mu_lab_uid", userId, {
