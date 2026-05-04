@@ -1,13 +1,12 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-async function loadFont(file: string): Promise<ArrayBuffer> {
-  const url = new URL(`./_fonts/${file}`, import.meta.url);
-  const res = await fetch(url);
-  return res.arrayBuffer();
+async function loadFont(file: string): Promise<Buffer> {
+  return readFile(path.join(process.cwd(), "app", "_fonts", file));
 }
 
 export default async function TwitterImage() {

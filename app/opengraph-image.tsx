@@ -1,17 +1,17 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /**
- * OG image — ใช้ฟอนต์ Prompt subset ไทยจากไฟล์ใน repo
- * (next/og default ไม่มี glyph ไทย ทำให้ภาพออกมา 0 bytes/ขาวเปล่า — ต้องส่ง fonts เอง)
+ * OG image — ใช้ Node.js runtime + อ่านฟอนต์ Prompt subset ไทยจาก app/_fonts/
+ * (next/og edge runtime + `fetch(new URL(...))` ไม่ wired bundle ไฟล์บน Vercel ทำให้ image ออกมา 0 bytes
+ *  จึงสลับเป็น Node.js runtime + readFile ตรงๆ — เสถียรกว่ามากสำหรับฟอนต์ไทย)
  */
-async function loadFont(file: string): Promise<ArrayBuffer> {
-  const url = new URL(`./_fonts/${file}`, import.meta.url);
-  const res = await fetch(url);
-  return res.arrayBuffer();
+async function loadFont(file: string): Promise<Buffer> {
+  return readFile(path.join(process.cwd(), "app", "_fonts", file));
 }
 
 export default async function OpenGraphImage() {
