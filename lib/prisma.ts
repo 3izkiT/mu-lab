@@ -21,7 +21,13 @@ function buildPrisma(): PrismaClient {
       "DATABASE_URL/POSTGRES_PRISMA_URL is not set. ตั้งค่าใน .env.local (dev) หรือ Vercel env (production).",
     );
   }
-  const adapter = new PrismaPg({ connectionString: url });
+  // Supabase ใช้ self-signed/Let's Encrypt chain ที่ pg อาจไม่ accept โดย default บน Vercel
+  // ต้องเปิด TLS แต่ไม่ verify chain (Supabase ดูแล cert ตัวเอง ไม่ใช่ MITM risk บน private pooler)
+  const isSupabase = /supabase\.(com|co)/.test(url);
+  const adapter = new PrismaPg({
+    connectionString: url,
+    ...(isSupabase ? { ssl: { rejectUnauthorized: false } } : {}),
+  });
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
