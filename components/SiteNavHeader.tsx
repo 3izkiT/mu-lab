@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { GlintWrap, HoverConstellation } from "@/components/CinematicCelestial";
+import UserMenu from "@/components/UserMenu";
+import { getCurrentUser } from "@/lib/auth-utils";
 
 type SiteNavHeaderProps = {
   /** true = โลโก้ 46px เหมือนหน้าแรก, false = 40px สำหรับหน้าย่อย */
@@ -9,9 +11,12 @@ type SiteNavHeaderProps = {
 
 /**
  * เมนูหลักเดียวกับหน้าแรก — ใช้ลิงก์ `/#…` เพื่อกลับไปแอนเคอร์บนหน้าแรกจากหน้าย่อย
+ * เมื่อล็อกอินแล้วจะแสดง UserMenu (อีเมล + Logout) แทนปุ่ม Log in
  */
-export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
+export async function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
   const img = logoLarge ? { w: 46, h: 46, cls: "h-[46px] w-[46px]" } : { w: 40, h: 40, cls: "h-10 w-10" };
+  const user = await getCurrentUser().catch(() => null);
+  const isAuthenticated = Boolean(user);
 
   return (
     <header className="sticky top-0 z-50 bg-[rgba(6,10,22,0.72)] backdrop-blur-xl">
@@ -58,11 +63,15 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
               เกี่ยวกับ Mu-Lab
             </Link>
           </HoverConstellation>
-          <HoverConstellation>
-            <Link href="/login" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
-              Log in
-            </Link>
-          </HoverConstellation>
+          {isAuthenticated ? (
+            <UserMenu name={user?.name} email={user?.email} />
+          ) : (
+            <HoverConstellation>
+              <Link href="/login" className="rounded-full px-4 py-2 text-sm text-zinc-200 transition hover:bg-white/[0.07]">
+                Log in
+              </Link>
+            </HoverConstellation>
+          )}
           <HoverConstellation>
             <Link
               href="/#fortune-form"
@@ -95,9 +104,25 @@ export function SiteNavHeader({ logoLarge = false }: SiteNavHeaderProps) {
             >
               เกี่ยวกับ Mu-Lab
             </Link>
-            <Link href="/login" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
-              Log in
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link href="/vault" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
+                  Personal Vault ({user?.name || user?.email || "Member"})
+                </Link>
+                <form action="/api/auth/logout" method="post">
+                  <button
+                    type="submit"
+                    className="block w-full rounded-xl px-3 py-2 text-left text-sm text-zinc-100 hover:bg-white/[0.08]"
+                  >
+                    Logout
+                  </button>
+                </form>
+              </>
+            ) : (
+              <Link href="/login" className="block rounded-xl px-3 py-2 text-sm text-zinc-100 hover:bg-white/[0.08]">
+                Log in
+              </Link>
+            )}
             <Link
               href="/#fortune-form"
               className="mt-1 block rounded-xl bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-3 py-2 text-center text-sm font-semibold text-[#241d16]"

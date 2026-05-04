@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentUser, checkFeatureAccess } from "@/lib/auth-utils";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
+import { stripMarkdown } from "@/components/MarkdownText";
 import { prisma } from "@/lib/prisma";
 
 export default async function VaultPage() {
@@ -51,10 +52,17 @@ export default async function VaultPage() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {history.map((item: { id: string; createdAt: Date; summary: string }) => (
+          {history.map((item: { id: string; createdAt: Date; summary: string; fullName: string | null; birthSign: string | null }) => (
             <Link key={item.id} href={`/analysis/${item.id}`} className="mu-lab-glass rounded-2xl p-4">
               <p className="text-xs text-[var(--gold)]/80">{new Date(item.createdAt).toLocaleString("th-TH")}</p>
-              <p className="mt-2 line-clamp-3 text-sm text-[#e8eeff]/88">{item.summary}</p>
+              {item.fullName || item.birthSign ? (
+                <p className="mt-1 text-xs text-[#dbe1ff]/72">
+                  {item.fullName ? <span>{item.fullName}</span> : null}
+                  {item.fullName && item.birthSign ? " · " : null}
+                  {item.birthSign ? <span>ลักขณา {item.birthSign}</span> : null}
+                </p>
+              ) : null}
+              <p className="mt-2 line-clamp-3 text-sm text-[#e8eeff]/88">{stripMarkdown(item.summary)}</p>
             </Link>
           ))}
           {history.length === 0 ? (

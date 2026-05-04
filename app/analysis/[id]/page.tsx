@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
 import { BirthSignDisplay } from "@/components/BirthSignDisplay";
+import { MarkdownText } from "@/components/MarkdownText";
 import PaywallOverlay from "@/components/ui/PaywallOverlay";
 import { checkFeatureAccess, getCurrentUser } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
@@ -78,7 +79,9 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
 
           <section className="mt-8 rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(247,231,206,0.05)] p-5">
             <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">ส่วนฟรี · ภาพรวมเบื้องต้น</p>
-            <p className="mt-3 text-sm leading-relaxed text-[#e8eeff]/88">{analysis.summary}</p>
+            <div className="mt-3 max-w-none">
+              <MarkdownText source={analysis.summary} />
+            </div>
             <div className="mt-5 grid grid-cols-3 gap-3">
               <div className="mu-lab-glass rounded-xl p-4 text-center">
                 <p className="text-xs text-[var(--gold)]/80">Career</p>
@@ -103,9 +106,9 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
             >
               <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">ส่วนชำระเงิน · คำทำนายเชิงลึก</p>
               <h2 className="mt-2 font-serif text-2xl text-[#eef1ff]">Deep Insight</h2>
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-[#dbe1ff]/84">
-                {analysis.deepInsight}
-              </p>
+              <div className="mt-3 max-w-none">
+                <MarkdownText source={analysis.deepInsight} />
+              </div>
             </article>
             {!hasAccess ? <PaywallOverlay analysisId={id} /> : null}
           </section>
