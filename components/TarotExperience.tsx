@@ -10,6 +10,8 @@ type GlobalPassPurchaseType = "vip-daily" | "vip-weekly" | "premium-monthly";
 export type TarotResponse = {
   readingId: string;
   dateKey: string;
+  spreadCount: 3 | 5 | 10;
+  spreadPositions: string[];
   cards: string[];
   preview: string;
   freeLimitPerDay: number;
@@ -57,7 +59,7 @@ function CardFace({ name }: { name: string }) {
   const art = getTarotCardArt(name);
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[18px] bg-[#0a1024]">
-      {art ? (
+      {art?.hasArtwork ? (
         <Image
           src={`/tarot/${art.slug}.webp`}
           alt={art.nameTh ?? art.name}
@@ -66,6 +68,11 @@ function CardFace({ name }: { name: string }) {
           className="object-cover"
           priority={false}
         />
+      ) : art ? (
+        <div className="grid h-full w-full place-content-center bg-[linear-gradient(135deg,#171033_0%,#0b1228_100%)] p-2 text-center">
+          <p className="font-serif text-base text-[var(--gold)]">{art.nameTh}</p>
+          <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[#dbe1ff]/72">{art.name}</p>
+        </div>
       ) : (
         <div className="grid h-full w-full place-items-center text-sm text-[var(--gold)]">{name}</div>
       )}
@@ -132,7 +139,6 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
 
   const totalRemaining = result?.freeRemainingToday ?? 1;
   const totalLimit = result?.freeLimitPerDay ?? 1;
-  const canChangeSpread = totalRemaining > 0;
   const cardArts = useMemo(
     () => slots.map((slot) => (slot.name ? getTarotCardArt(slot.name) : null)),
     [slots],
@@ -140,10 +146,11 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
   const slotLabels = useMemo(
     () =>
       slots.map((_, i) => {
+        if (result?.spreadPositions?.[i]) return result.spreadPositions[i];
         if (i < BASE_SLOT_LABELS.length) return BASE_SLOT_LABELS[i];
         return `ตำแหน่ง ${i + 1}`;
       }),
-    [slots],
+    [slots, result?.spreadPositions],
   );
 
   async function onDraw() {
@@ -228,7 +235,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
           <button
             key={n}
             type="button"
-            disabled={loading || !canChangeSpread}
+            disabled={loading}
             onClick={() => setSpreadCount(n)}
             className={`rounded-full px-3 py-1 text-xs transition ${
               spreadCount === n
@@ -241,17 +248,16 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         ))}
       </div>
 
-      {result && !canChangeSpread ? (
-        <p className="mt-2 text-xs text-[#dbe1ff]/65">
-          วันนี้คุณเปิดไพ่แล้ว (ชุดล่าสุด {result.cards.length} ใบ) — ตัวเลือก 3/5/10 จะมีผลกับการเปิดครั้งถัดไป
-        </p>
-      ) : null}
-
       <div className="relative mt-7 flex justify-center [perspective:1400px]">
         <div
           className={`grid w-full max-w-5xl gap-3 sm:gap-5 ${shuffling ? "tarot-shuffle" : ""}`}
           style={{
-            gridTemplateColumns: `repeat(${slots.length <= 3 ? 3 : slots.length <= 5 ? slots.length : 5}, minmax(0, 1fr))`,
+            gridTemplateColumns:
+              spreadCount === 10
+                ? "repeat(6, minmax(0, 1fr))"
+                : spreadCount === 5
+                  ? "repeat(3, minmax(0, 1fr))"
+                  : "repeat(3, minmax(0, 1fr))",
           }}
         >
           {slots.map((slot, i) => {
@@ -259,7 +265,27 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
             const interactive = !loading;
             const isFlipped = slot.flipped && Boolean(slot.name);
             return (
-              <div key={slot.key} className="flex flex-col items-center gap-3">
+              <div
+                key={slot.key}
+                className={`flex flex-col items-center gap-3 ${
+                  spreadCount === 5
+                    ? ["col-start-2 row-start-2", "col-start-1 row-start-2", "col-start-3 row-start-2", "col-start-2 row-start-1", "col-start-2 row-start-3"][i] ?? ""
+                    : spreadCount === 10
+                      ? [
+                          "col-start-3 row-start-2",
+                          "col-start-3 row-start-3",
+                          "col-start-2 row-start-2",
+                          "col-start-4 row-start-2",
+                          "col-start-3 row-start-1",
+                          "col-start-3 row-start-4",
+                          "col-start-5 row-start-1",
+                          "col-start-5 row-start-2",
+                          "col-start-5 row-start-3",
+                          "col-start-5 row-start-4",
+                        ][i] ?? ""
+                      : ""
+                }`}
+              >
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/70">
                   {slotLabels[i]}
                 </div>
@@ -335,7 +361,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                 result.cards.length <= 3
                   ? "sm:grid-cols-3"
                   : result.cards.length <= 5
-                    ? "sm:grid-cols-2 md:grid-cols-5"
+                    ? "sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
                     : "grid-cols-2 sm:grid-cols-3 md:grid-cols-5"
               }`}
             >

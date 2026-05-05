@@ -2,35 +2,32 @@ import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { oneOffCutoffDate } from "@/lib/billing-config";
 import { getBangkokDateKey } from "@/lib/daily-forecast-data";
+import { TAROT_CARD_NAMES } from "@/lib/tarot-cards";
 
-const DECK = [
-  "The Fool",
-  "The Magician",
-  "The High Priestess",
-  "The Empress",
-  "The Emperor",
-  "The Hierophant",
-  "The Lovers",
-  "The Chariot",
-  "Strength",
-  "The Hermit",
-  "Wheel of Fortune",
-  "Justice",
-  "The Hanged Man",
-  "Death",
-  "Temperance",
-  "The Devil",
-  "The Tower",
-  "The Star",
-  "The Moon",
-  "The Sun",
-  "Judgement",
-  "The World",
-] as const;
+const DECK = TAROT_CARD_NAMES;
+
+const SPREAD_POSITIONS: Record<3 | 5 | 10, string[]> = {
+  3: ["อดีต", "ปัจจุบัน", "อนาคต"],
+  5: ["แกนปัจจุบัน", "อุปสรรค", "รากเหตุ", "แนวโน้มใกล้", "คำแนะนำ"],
+  10: [
+    "สถานการณ์ปัจจุบัน",
+    "แรงท้าทาย/สิ่งต้าน",
+    "รากเหตุใต้จิต",
+    "อดีตใกล้ที่ส่งผล",
+    "เป้าหมายที่อยากไป",
+    "อนาคตใกล้",
+    "ตัวคุณในบทนี้",
+    "สภาพแวดล้อมรอบตัว",
+    "ความหวังและความกลัว",
+    "แนวโน้มผลลัพธ์",
+  ],
+};
 
 export type TarotDrawResult = {
   readingId: string;
   dateKey: string;
+  spreadCount: 3 | 5 | 10;
+  spreadPositions: string[];
   cards: string[];
   preview: string;
   freeLimitPerDay: number;
@@ -65,12 +62,25 @@ function pickCards(seedKey: string, count = 3): string[] {
   return picked;
 }
 
-function buildPreview(cards: string[], question: string): string {
-  return `ไพ่ขึ้น ${cards.join(", ")} — วันนี้จังหวะเด่นคือการตั้งสติและเลือกสิ่งที่ควบคุมได้ก่อน คำถาม “${question}” มีแนวโน้มบวกแบบค่อยเป็นค่อยไป`;
+function buildPreview(cards: string[], question: string, positions: string[]): string {
+  const mapped = cards
+    .map((card, idx) => `${positions[idx] ?? `ตำแหน่ง ${idx + 1}`}: ${card}`)
+    .slice(0, 5)
+    .join(" | ");
+  return `สเปรด: ${mapped} — คำถาม “${question}” กำลังบอกให้ค่อยๆ วางแผนจากภาพรวมก่อนลงมือแบบเร่งรีบ`;
 }
 
-function buildDeepInsight(cards: string[], question: string): string {
-  return `Deep Tarot Insight\n\nคำถาม: ${question}\n\nแกนพลังจากไพ่ ${cards.join(" / ")} สะท้อนว่าคุณกำลังอยู่ช่วงเปลี่ยนผ่านที่ต้องตัดสินใจด้วยข้อมูลมากกว่าความกลัว\n\nแผน 3 ขั้น:\n1) ภายใน 48 ชม. ระบุทางเลือกหลัก 2 ทางพร้อมผลลัพธ์ที่ยอมรับได้\n2) ภายใน 7 วัน ลงมือทดสอบทางเลือกที่เสี่ยงต่ำก่อน\n3) ภายใน 30 วัน ประเมินผลและปรับแผนโดยยึดเป้าหมายระยะยาว\n\nสัญญาณดี: ได้รับคำตอบชัดจากคนสำคัญ / โอกาสใหม่แบบไม่คาดคิด\nข้อควรเลี่ยง: ตัดสินใจจากอารมณ์ฉับพลันหรือตามแรงกดดันภายนอก`;
+function buildDeepInsight(cards: string[], question: string, positions: string[]): string {
+  const positionLines = cards
+    .map((card, idx) => `- ${positions[idx] ?? `ตำแหน่ง ${idx + 1}`}: ${card}`)
+    .join("\n");
+  return `Deep Tarot Insight\n\nคำถาม: ${question}\n\nอ่านตามตำแหน่งสเปรด:\n${positionLines}\n\nแผน 3 ขั้น:\n1) ภายใน 48 ชม. แปลงไพ่ตำแหน่ง “อุปสรรค/แรงต้าน” เป็น task ที่จัดการได้จริง\n2) ภายใน 7 วัน ลงมือทางเลือกที่เสี่ยงต่ำก่อน และเช็กผลตามตำแหน่ง “แนวโน้มใกล้/อนาคตใกล้”\n3) ภายใน 30 วัน ประเมินผลด้วยตำแหน่ง “ผลลัพธ์” เทียบเป้าหมายที่ตั้งไว้\n\nสัญญาณดี: เกิดความชัดเจนจากคนรอบตัว + มีทางเลือกใหม่เข้ามา\nข้อควรเลี่ยง: ตัดสินใจจากอารมณ์ชั่ววูบโดยไม่เทียบข้อมูลในตำแหน่งหลัก`;
+}
+
+function normalizeSpreadCount(value: number): 3 | 5 | 10 {
+  if (value === 5) return 5;
+  if (value === 10) return 10;
+  return 3;
 }
 
 async function hasTarotDeepPurchase(userId: string, readingId: string): Promise<boolean> {
@@ -95,10 +105,11 @@ export async function createOrGetTarotReading(userId: string, question: string, 
   });
   const hasUsedFreeQuotaToday = Boolean(existingUsage);
 
-  const count = spreadCount === 5 || spreadCount === 10 ? spreadCount : 3;
+  const count = normalizeSpreadCount(spreadCount);
+  const positions = SPREAD_POSITIONS[count];
   const cards = pickCards(`${userId}:${dateKey}:${normalizedQuestion}:${count}`, count);
-  const preview = buildPreview(cards, normalizedQuestion);
-  const deepInsight = buildDeepInsight(cards, normalizedQuestion);
+  const preview = buildPreview(cards, normalizedQuestion, positions);
+  const deepInsight = buildDeepInsight(cards, normalizedQuestion, positions);
   const readingId = nanoid(12);
 
   await prisma.$transaction(async (tx) => {
@@ -127,6 +138,8 @@ export async function createOrGetTarotReading(userId: string, question: string, 
   return {
     readingId,
     dateKey,
+    spreadCount: count,
+    spreadPositions: positions,
     cards,
     preview,
     freeLimitPerDay: FREE_LIMIT_PER_DAY,
@@ -140,10 +153,14 @@ export async function getTarotReadingForUser(userId: string, readingId: string):
   const reading = await prisma.tarotReading.findUnique({ where: { id: readingId } });
   if (!reading || reading.userId !== userId) return null;
   const cards = JSON.parse(reading.cardsJson) as string[];
+  const spreadCount = normalizeSpreadCount(cards.length);
+  const spreadPositions = SPREAD_POSITIONS[spreadCount];
   const deepUnlocked = await hasTarotDeepPurchase(userId, readingId);
   return {
     readingId,
     dateKey: reading.dateKey,
+    spreadCount,
+    spreadPositions,
     cards,
     preview: reading.preview,
     freeLimitPerDay: FREE_LIMIT_PER_DAY,
