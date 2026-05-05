@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ONE_OFF_ACCESS_DAYS, PRICING_THB } from "@/lib/billing-config";
 import { getTarotCardArt } from "@/lib/tarot-cards";
 
+type TarotCheckoutPurchaseType = "tarot-deep" | "vip-weekly" | "premium-monthly";
+
 export type TarotResponse = {
   readingId: string;
   dateKey: string;
@@ -15,7 +17,7 @@ export type TarotResponse = {
   deepUnlocked: boolean;
   guestMode?: boolean;
   deepInsight?: string;
-  checkout?: { purchaseType: "tarot-deep"; readingId: string; amountTHB: number };
+  checkout?: { purchaseType: TarotCheckoutPurchaseType; readingId: string; amountTHB: number };
 };
 
 type TarotExperienceProps = {
@@ -163,18 +165,19 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     }
   }
 
-  async function onUnlockDeep() {
+  async function startCheckout(purchaseType: TarotCheckoutPurchaseType) {
     if (!result?.checkout) return;
     setUnlocking(true);
     setError(null);
     try {
+      const targetType = purchaseType === "tarot-deep" ? "tarot" : "dashboard";
       const checkout = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          purchaseType: "tarot-deep",
+          purchaseType,
           targetId: result.checkout.readingId,
-          targetType: "tarot",
+          targetType,
         }),
       });
       const c = (await checkout.json()) as { sessionId?: string; redirectUrl?: string; message?: string };
@@ -318,14 +321,32 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                 <p className="mt-3 text-sm leading-relaxed text-[#dbe1ff]/72">
                   ปลดล็อกเพื่ออ่านบทเจาะลึกเฉพาะคำถามนี้ (สิทธิ์ย้อนหลัง {ONE_OFF_ACCESS_DAYS} วัน): แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
                 </p>
-                <button
-                  type="button"
-                  onClick={onUnlockDeep}
-                  disabled={unlocking}
-                  className="mt-4 rounded-full border border-[rgba(247,231,206,0.5)] bg-[rgba(247,231,206,0.06)] px-5 py-2 text-sm font-semibold text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.12)] disabled:opacity-60"
-                >
-                  {unlocking ? "กำลังปลดล็อก..." : `ปลดล็อกบทอ่านลึก ${PRICING_THB["tarot-deep"]} บาท`}
-                </button>
+                <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={() => startCheckout("tarot-deep")}
+                    disabled={unlocking}
+                    className="rounded-full border border-[rgba(247,231,206,0.5)] bg-[rgba(247,231,206,0.06)] px-4 py-2 text-xs font-semibold text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.12)] disabled:opacity-60"
+                  >
+                    {unlocking ? "กำลังพาไปจ่าย..." : `เฉพาะบทนี้ ฿${PRICING_THB["tarot-deep"]}`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startCheckout("vip-weekly")}
+                    disabled={unlocking}
+                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
+                  >
+                    {unlocking ? "กำลังพาไปจ่าย..." : `ทั้งระบบ 7 วัน ฿${PRICING_THB["vip-weekly"]}`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startCheckout("premium-monthly")}
+                    disabled={unlocking}
+                    className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-4 py-2 text-xs font-semibold text-[#241d16] transition hover:brightness-105 disabled:opacity-60"
+                  >
+                    {unlocking ? "กำลังพาไปจ่าย..." : `พรีเมียมรายเดือน ฿${PRICING_THB["premium-monthly"]}`}
+                  </button>
+                </div>
               </div>
             )}
           </div>
