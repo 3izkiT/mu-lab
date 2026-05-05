@@ -29,53 +29,11 @@ const SPREAD_OPTIONS = [3, 5, 10] as const;
 
 function CardBack() {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[18px] bg-[radial-gradient(circle_at_30%_25%,rgba(247,231,206,0.18)_0%,transparent_55%),linear-gradient(140deg,#1a1235_0%,#0a0a22_55%,#020314_100%)]">
-      <div className="pointer-events-none absolute inset-[6px] rounded-[14px] border border-[rgba(247,231,206,0.32)] shadow-[inset_0_0_24px_rgba(247,231,206,0.12)]" />
-      <div className="pointer-events-none absolute inset-[14px] rounded-[10px] border border-[rgba(247,231,206,0.16)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-20">
-        <Image src="/logo-brand-v2.png" alt="Mu-Lab logo" fill sizes="220px" className="object-contain p-6" priority={false} />
-      </div>
-      <div className="absolute inset-0 grid place-items-center">
-        <svg viewBox="0 0 100 140" className="h-3/5 w-auto text-[var(--gold)] opacity-80" aria-hidden>
-          <defs>
-            <radialGradient id="cb-glow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="rgba(247,231,206,0.55)" />
-              <stop offset="100%" stopColor="rgba(247,231,206,0)" />
-            </radialGradient>
-          </defs>
-          <circle cx="50" cy="70" r="36" fill="url(#cb-glow)" />
-          <circle cx="50" cy="70" r="22" fill="none" stroke="currentColor" strokeWidth="0.6" />
-          <circle cx="50" cy="70" r="14" fill="none" stroke="currentColor" strokeWidth="0.4" />
-          <g stroke="currentColor" strokeWidth="0.5" fill="none" opacity="0.85">
-            {Array.from({ length: 12 }).map((_, i) => {
-              const a = (i * Math.PI) / 6;
-              const x1 = 50 + Math.cos(a) * 14;
-              const y1 = 70 + Math.sin(a) * 14;
-              const x2 = 50 + Math.cos(a) * 26;
-              const y2 = 70 + Math.sin(a) * 26;
-              return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />;
-            })}
-          </g>
-          <text
-            x="50"
-            y="74"
-            textAnchor="middle"
-            fontSize="6"
-            fill="currentColor"
-            style={{ letterSpacing: "0.2em" }}
-            opacity="0.95"
-          >
-            μ-Lab
-          </text>
-          <text x="50" y="22" textAnchor="middle" fontSize="4.5" fill="currentColor" opacity="0.7">
-            ✦ TAROT ✦
-          </text>
-          <text x="50" y="124" textAnchor="middle" fontSize="4.5" fill="currentColor" opacity="0.7">
-            ✦ ✦ ✦
-          </text>
-        </svg>
-      </div>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_85%,rgba(163,175,255,0.18)_0%,transparent_60%)]" />
+    <div className="relative h-full w-full overflow-hidden rounded-[18px] bg-[#060a1a]">
+      <Image src="/logo-brand-v2.png" alt="Mu-Lab logo card back" fill sizes="220px" className="object-cover" priority={false} />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(2,4,12,0.18)_0%,rgba(2,4,12,0.45)_100%)]" />
+      <div className="pointer-events-none absolute inset-[6px] rounded-[14px] border border-[rgba(247,231,206,0.36)] shadow-[inset_0_0_20px_rgba(247,231,206,0.14)]" />
+      <div className="pointer-events-none absolute inset-[14px] rounded-[10px] border border-[rgba(247,231,206,0.2)]" />
     </div>
   );
 }
