@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
+import { getPriceTHB } from "@/lib/billing-config";
 
 export async function POST(request: Request) {
   await ensureMvpUsers();
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
       userId,
       featureType: "deep-insight",
       targetId: body.analysisId,
-      amountTHB: 19,
+      amountTHB: getPriceTHB("deep-insight"),
       status: "completed",
     },
   });

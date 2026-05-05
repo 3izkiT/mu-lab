@@ -328,7 +328,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
             ) : (
               <div>
                 <p className="mt-3 text-sm leading-relaxed text-[#dbe1ff]/72">
-                  ปลดล็อกเพื่ออ่านบทเจาะลึกเฉพาะคำถามนี้: แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
+                  ปลดล็อกเพื่ออ่านบทเจาะลึกเฉพาะคำถามนี้ (สิทธิ์ย้อนหลัง 7 วัน): แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
                 </p>
                 <button
                   type="button"

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
+import { getPriceTHB } from "@/lib/billing-config";
 
 export async function POST(request: Request) {
   await ensureMvpUsers();
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
         userId,
         featureType: "tarot-deep",
         targetId: body.readingId,
-        amountTHB: 39,
+        amountTHB: getPriceTHB("tarot-deep"),
         status: "completed",
       },
     });

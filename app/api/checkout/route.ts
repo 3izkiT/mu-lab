@@ -3,10 +3,11 @@ import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
+import { getPriceTHB, type PurchaseType } from "@/lib/billing-config";
 import { rateLimitOrThrow } from "@/lib/rate-limit";
 
 type CheckoutBody = {
-  purchaseType?: "deep-insight" | "premium-monthly" | "tarot-deep";
+  purchaseType?: PurchaseType;
   analysisId?: string;
 };
 
@@ -37,12 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "purchaseType is required" }, { status: 400 });
   }
 
-  const amountTHB =
-    body.purchaseType === "deep-insight"
-      ? 19
-      : body.purchaseType === "tarot-deep"
-        ? 39
-        : 159;
+  const amountTHB = getPriceTHB(body.purchaseType);
   const sessionId = nanoid(12);
   await prisma.checkoutSession.create({
     data: {

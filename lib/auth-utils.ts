@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
+import { ONE_OFF_ACCESS_DAYS, oneOffCutoffDate } from "@/lib/billing-config";
 
 export type FeatureType = "deep-insight" | "premium" | "tarot-draw" | "tarot-deep";
 
@@ -35,8 +36,15 @@ export async function checkFeatureAccess(userId: string, featureType: FeatureTyp
 
   if (featureType === "deep-insight") {
     if (!targetId) return false;
+    const cutoff = oneOffCutoffDate(new Date());
     const count = await prisma.purchase.count({
-      where: { userId, featureType: "deep-insight", targetId, status: "completed" },
+      where: {
+        userId,
+        featureType: "deep-insight",
+        targetId,
+        status: "completed",
+        createdAt: { gte: cutoff },
+      },
     });
     return count > 0;
   }
@@ -48,11 +56,22 @@ export async function checkFeatureAccess(userId: string, featureType: FeatureTyp
 
   if (featureType === "tarot-deep") {
     if (!targetId) return false;
+    const cutoff = oneOffCutoffDate(new Date());
     const count = await prisma.purchase.count({
-      where: { userId, featureType: "tarot-deep", targetId, status: "completed" },
+      where: {
+        userId,
+        featureType: "tarot-deep",
+        targetId,
+        status: "completed",
+        createdAt: { gte: cutoff },
+      },
     });
     return count > 0;
   }
 
   return false;
+}
+
+export function getOneOffAccessDays() {
+  return ONE_OFF_ACCESS_DAYS;
 }

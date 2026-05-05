@@ -34,7 +34,7 @@ export default function PaywallOverlay({ analysisId }: PaywallOverlayProps) {
               ปลดล็อกเฉพาะรายงานนี้ 19 บาท
             </button>
             <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">
-              ใช้ได้กับรายงานนี้ครั้งเดียว เหมาะกับคนที่อยากตัดสินใจเรื่องเร่งด่วนแบบทันที
+              ใช้ได้กับรายงานนี้นาน 7 วัน เหมาะกับคนที่อยากตัดสินใจเรื่องเร่งด่วนแบบทันที
             </p>
           </div>
 
@@ -49,6 +49,7 @@ export default function PaywallOverlay({ analysisId }: PaywallOverlayProps) {
             <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">
               ใช้งานได้ไม่จำกัดตลอด 30 วัน สำหรับทุกรายงานใหม่และรายงานเดิมในบัญชีเดียวกัน
             </p>
+            <p className="mt-1 text-[11px] text-[var(--gold)]/85">คุ้มกว่าเมื่อดูเกิน 8 เคส/เดือน</p>
           </div>
         </div>
       </div>
