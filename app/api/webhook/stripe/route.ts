@@ -1,26 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { nanoid } from "nanoid";
-import { prisma } from "@/lib/prisma";
-
-type WebhookTx = Pick<typeof prisma, "checkoutSession" | "purchase" | "subscription">;
-
-type StripeEventLike = {
-  id?: string;
-  type?: string;
-  eventType?: string;
-  sessionId?: string;
-  status?: "completed" | "failed";
-  providerRef?: string;
-  data?: {
-    object?: {
-      id?: string;
-      payment_intent?: string;
-      client_reference_id?: string;
-      metadata?: Record<string, string | undefined>;
-    };
-  };
-};
+import { processStripeWebhookEvent, type StripeEventLike } from "@/lib/stripe-webhook";
 
 function timingSafeHexCompare(a: string, b: string): boolean {
   try {
@@ -42,26 +22,6 @@ function verifyStripeSignature(rawBody: string, signatureHeader: string, secret:
   const payload = `${t}.${rawBody}`;
   const expected = crypto.createHmac("sha256", secret).update(payload).digest("hex");
   return v1s.some((sig) => timingSafeHexCompare(expected, sig));
-}
-
-function resolveSessionId(body: StripeEventLike): string | null {
-  const fromMock = body.sessionId;
-  if (fromMock) return fromMock;
-  const fromMetadata = body.data?.object?.metadata?.sessionId;
-  if (fromMetadata) return fromMetadata;
-  const fromClientRef = body.data?.object?.client_reference_id;
-  if (fromClientRef) return fromClientRef;
-  return null;
-}
-
-function resolveStatus(body: StripeEventLike): "completed" | "failed" {
-  if (body.status === "completed" || body.type === "checkout.session.completed") return "completed";
-  if (body.status === "failed" || body.type === "checkout.session.expired") return "failed";
-  return "failed";
-}
-
-function resolveEventType(body: StripeEventLike): string {
-  return body.type || body.eventType || "unknown";
 }
 
 export async function POST(request: Request) {
@@ -86,108 +46,9 @@ export async function POST(request: Request) {
     }
   }
 
-  const eventType = resolveEventType(body);
-  const sessionId = resolveSessionId(body);
-  const status = resolveStatus(body);
-  const providerRef = body.providerRef || body.data?.object?.payment_intent || body.data?.object?.id || null;
-  const eventId = body.id || `manual:${sessionId ?? "none"}:${status}`;
-
-  const alreadyHandled = await prisma.webhookEvent.findUnique({ where: { id: eventId } });
-  if (alreadyHandled) {
-    return NextResponse.json({ ok: true, duplicate: true });
+  const result = await processStripeWebhookEvent({ raw, body });
+  if (!result.ok) {
+    return NextResponse.json({ message: result.message }, { status: result.status });
   }
-
-  await prisma.webhookEvent.create({
-    data: {
-      id: eventId,
-      provider: "stripe",
-      eventType,
-      payload: raw || "{}",
-      status: sessionId ? "received" : "rejected",
-    },
-  });
-
-  if (!sessionId) {
-    return NextResponse.json({ message: "missing sessionId" }, { status: 400 });
-  }
-
-  const session = await prisma.checkoutSession.findUnique({ where: { id: sessionId } });
-  if (!session) {
-    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "failed" } });
-    return NextResponse.json({ message: "session not found" }, { status: 404 });
-  }
-
-  if (status !== "completed") {
-    await prisma.checkoutSession.update({
-      where: { id: sessionId },
-      data: { status: "failed", providerRef },
-    });
-    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "processed" } });
-    return NextResponse.json({ ok: true, unlocked: false });
-  }
-
-  try {
-    await prisma.$transaction(async (tx: WebhookTx) => {
-      await tx.checkoutSession.update({
-        where: { id: sessionId },
-        data: { status: "completed", providerRef },
-      });
-
-      if (session.purchaseType === "deep-insight" || session.purchaseType === "tarot-deep") {
-        const exists = await tx.purchase.findFirst({
-          where: {
-            userId: session.userId,
-            featureType: session.purchaseType,
-            targetId: session.analysisId ?? undefined,
-            status: "completed",
-          },
-        });
-        if (!exists) {
-          await tx.purchase.create({
-            data: {
-              id: nanoid(12),
-              userId: session.userId,
-              featureType: session.purchaseType,
-              targetId: session.analysisId,
-              amountTHB: session.amountTHB,
-              status: "completed",
-            },
-          });
-        }
-        return;
-      }
-
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + 30);
-      await tx.subscription.upsert({
-        where: { id: `premium-${session.userId}` },
-        create: {
-          id: `premium-${session.userId}`,
-          userId: session.userId,
-          planType: "premium",
-          status: "active",
-          expiryDate,
-        },
-        update: {
-          status: "active",
-          expiryDate,
-        },
-      });
-      await tx.purchase.create({
-        data: {
-          id: nanoid(12),
-          userId: session.userId,
-          featureType: "premium-monthly",
-          amountTHB: session.amountTHB,
-          status: "completed",
-        },
-      });
-    });
-
-    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "processed" } });
-    return NextResponse.json({ ok: true, unlocked: true });
-  } catch {
-    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "failed" } });
-    return NextResponse.json({ message: "webhook processing failed" }, { status: 500 });
-  }
+  return NextResponse.json({ ok: true, duplicate: result.duplicate, unlocked: result.unlocked });
 }

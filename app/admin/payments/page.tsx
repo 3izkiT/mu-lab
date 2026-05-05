@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import WebhookReplayButton from "@/components/admin/WebhookReplayButton";
 import { getCurrentUser, isAdminUserId } from "@/lib/auth-utils";
 import { ENTITLEMENT_MATRIX } from "@/lib/entitlement-matrix";
 import { prisma } from "@/lib/prisma";
@@ -101,16 +102,21 @@ export default async function AdminPaymentsPage() {
             {recentWebhookEvents.map((event) => (
               <div
                 key={event.id}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-xs"
+                className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-xs"
               >
-                <p className="truncate text-[#dbe1ff]/86">{event.eventType}</p>
-                <p
-                  className={
-                    event.status === "processed" ? "text-emerald-300" : event.status === "failed" ? "text-rose-300" : "text-amber-300"
-                  }
-                >
-                  {event.status}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate text-[#dbe1ff]/86">{event.eventType}</p>
+                  <p
+                    className={
+                      event.status === "processed" ? "text-emerald-300" : event.status === "failed" ? "text-rose-300" : "text-amber-300"
+                    }
+                  >
+                    {event.status}
+                  </p>
+                </div>
+                {event.status === "failed" ? (
+                  <WebhookReplayButton eventId={event.id} />
+                ) : null}
               </div>
             ))}
           </div>

@@ -6,6 +6,9 @@ import { ensureMvpUsers } from "@/lib/auth-mvp";
 import { getPriceTHB } from "@/lib/billing-config";
 
 export async function POST(request: Request) {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ message: "manual unlock disabled in production" }, { status: 410 });
+  }
   await ensureMvpUsers();
   const cookieStore = await cookies();
   const userId = cookieStore.get("mu_lab_uid")?.value;
