@@ -1,10 +1,4 @@
-﻿import {
-  Observer,
-  RotateVector,
-  Rotation_HOR_ECL,
-  SphereFromVector,
-  VectorFromHorizon,
-} from "astronomy-engine";
+﻿import { generateThaiAstrologyChart, type PlanetPositions } from "thai-astrology";
 
 const THAI_BIRTH_SIGNS = [
   "เมษ", // 0° - 30°  (Aries)
@@ -111,21 +105,39 @@ const PROVINCE_ALIAS: Record<string, string> = {
   กทม: "กรุงเทพมหานคร",
   นครศรีฯ: "นครศรีธรรมราช",
   นครศรี: "นครศรีธรรมราช",
+  /** ผู้ใช้มักเขียนย่อ / ผิดพลิก */
+  "นครษฏร์": "นครศรีธรรมราช",
+  "นครศรีธรรมราช์": "นครศรีธรรมราช",
+  "นครราช": "นครราชสีมา",
+  "ศรีสเกษ": "ศรีสะเกษ",
   ศรีสระเกษ: "ศรีสะเกษ",
   ศรีษะเกษ: "ศรีสะเกษ",
+  ขอนแกนพ: "ขอนแก่น",
   ธนบุรี: "กรุงเทพมหานคร",
   พระนคร: "กรุงเทพมหานคร",
+  เชียงไหม่: "เชียงใหม่",
+  ชลบุรี้: "ชลบุรี",
+  พิษณูโลก: "พิษณุโลก",
+  ประจบ: "ประจวบคีรีขันธ์",
 };
 
-function normalizeProvince(raw: string): string {
-  const cleaned = raw
+function sanitizeProvinceCharacters(raw: string): string {
+  return raw
     .trim()
     .replace(/\s+/g, "")
     .replace(/\u00A0/g, "")
     .replace(/\./g, "")
     .replace(/จังหวัด/g, "")
     .replace(/อำเภอ.+$/g, "");
-  return PROVINCE_ALIAS[cleaned] ?? cleaned;
+}
+
+/** ให้เป็นรูปที่ใช้ match ฟัซซี่ (ยังไม่บังคับ alias) */
+function normalizeProvince(raw: string): string {
+  return sanitizeProvinceCharacters(raw);
+}
+
+function canonicalProvinceByAlias(sanitized: string): string {
+  return PROVINCE_ALIAS[sanitized] ?? sanitized;
 }
 
 function parseBirthDate(dateString: string): { year: number; month: number; day: number } | null {
@@ -168,43 +180,98 @@ function parseBirthTime(hour?: string, minute?: string) {
   return { hour: h, minute: m };
 }
 
-function getProvinceCoordinates(province?: string) {
-  const fallback = { lat: 13.7563, lon: 100.5018 }; // กรุงเทพ default
-  if (!province) return fallback;
-  const key = normalizeProvince(province);
-  return PROVINCE_COORDINATES[key] ?? fallback;
+/** ความเป็นไปได้ว่าจังหวัดจากผู้ใช้ถูกแปลงพิกัดอย่างไร */
+export type ProvinceMatchKind = "exact" | "alias" | "fuzzy-short" | "levenshtein" | "fallback-unknown";
+
+export type ResolvedProvinceCoordinates = {
+  lat: number;
+  lon: number;
+  canonicalName: string;
+  matchedBy: ProvinceMatchKind;
+};
+
+const BANGKOK_FALLBACK_COORDS = PROVINCE_COORDINATES["กรุงเทพมหานคร"];
+
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  const m = a.length;
+  const n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  const row = new Array<number>(n + 1);
+  for (let j = 0; j <= n; j += 1) row[j] = j;
+  for (let i = 1; i <= m; i += 1) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= n; j += 1) {
+      const temp = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = temp;
+    }
+  }
+  return row[n];
 }
 
-function normalizeAngle(value: number) {
-  return ((value % 360) + 360) % 360;
+const PROVINCE_KEYS_SORTED_BY_LEN = Object.keys(PROVINCE_COORDINATES).sort((a, b) => b.length - a.length);
+
+/** ผู้อ่านอยากได้ลักขณาที่ผูกพิกัดจังหวัดอย่างน่าเชื่อถือ — เลี่ยงบังคับกรุงเทพเงียบๆ */
+export function resolveProvinceCoordinates(raw?: string | null): ResolvedProvinceCoordinates {
+  if (!raw?.trim()) {
+    return {
+      ...BANGKOK_FALLBACK_COORDS,
+      canonicalName: "กรุงเทพมหานคร",
+      matchedBy: "fallback-unknown",
+    };
+  }
+
+  const sanitized = normalizeProvince(raw.trim());
+  const aliasedCanon = canonicalProvinceByAlias(sanitized);
+
+  if (PROVINCE_COORDINATES[aliasedCanon]) {
+    const matchedBy: ProvinceMatchKind = sanitized === aliasedCanon ? "exact" : "alias";
+    return { ...PROVINCE_COORDINATES[aliasedCanon], canonicalName: aliasedCanon, matchedBy };
+  }
+
+  /** เก็บ prefix / substring เทียบกับชื่อจังหวัดเต็ม (ยาวสุดก่อน) — ใช้ sanitized เดิมเพื่อรองรับย่อ/ typo เล็ก */
+  const minLen = 3;
+  for (const k of PROVINCE_KEYS_SORTED_BY_LEN) {
+    if (k.length < minLen) continue;
+    if (sanitized === k || (sanitized.includes(k) && k.length >= 4)) {
+      return { ...PROVINCE_COORDINATES[k], canonicalName: k, matchedBy: "fuzzy-short" };
+    }
+    if (k.includes(sanitized) && sanitized.length >= minLen) {
+      return { ...PROVINCE_COORDINATES[k], canonicalName: k, matchedBy: "fuzzy-short" };
+    }
+  }
+
+  let bestKey = "";
+  let bestDist = Infinity;
+  for (const k of PROVINCE_KEYS_SORTED_BY_LEN) {
+    const flatK = sanitizeProvinceCharacters(k);
+    const dist = Math.min(levenshtein(sanitized, flatK), levenshtein(sanitized, k.replace(/^จังหวัด/, "")));
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestKey = k;
+    }
+  }
+  if (bestDist <= Math.max(2, Math.floor(sanitized.length * 0.22)) && bestKey) {
+    return {
+      ...PROVINCE_COORDINATES[bestKey],
+      canonicalName: bestKey,
+      matchedBy: "levenshtein",
+    };
+  }
+
+  return {
+    ...BANGKOK_FALLBACK_COORDS,
+    canonicalName: "กรุงเทพมหานคร (สำรอง)",
+    matchedBy: "fallback-unknown",
+  };
 }
 
-/**
- * Lahiri (Chitrapaksha) ayanamsa — รัฐบาลอินเดียประกาศใช้ และโหรไทยส่วนใหญ่ใช้
- * Reference: ที่ J2000.0 (1 ม.ค. 2000 12:00 UTC) ayanamsa = 23°51'10.79" = 23.852997°
- * อัตราเลื่อน (precession) ~50.288 arcsec/yr ≈ 0.013969°/yr
- */
-function getAyanamsa(dateUtc: Date) {
-  const J2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
-  const days = (dateUtc.getTime() - J2000) / 86400000;
-  const years = days / 365.25;
-  return 23.852997 + (years * 50.288) / 3600;
-}
-
-/**
- * คำนวณตำแหน่งราศีขึ้น (Ascendant) แบบ Sidereal/Lahiri
- *
- * วิธี: หาจุดที่ "เส้นขอบฟ้าทิศตะวันออก (alt=0, az=90)" ตัดกับ "วงระนาบสุริยวิถี"
- * แล้วแปลงพิกัดจากระบบ horizon → ecliptic → ลด ayanamsa ออกเพื่อได้ longitude แบบ sidereal
- */
-function getAscendantLongitude(dateUtc: Date, lat: number, lon: number) {
-  const observer = new Observer(lat, lon, 0);
-  const horToEcl = Rotation_HOR_ECL(dateUtc, observer);
-  const eastHorizonVector = VectorFromHorizon({ lat: 0, lon: 90, dist: 1 }, dateUtc, "");
-  const eclVector = RotateVector(horToEcl, eastHorizonVector);
-  const eclSphere = SphereFromVector(eclVector);
-  const tropicalLongitude = normalizeAngle(eclSphere.lon);
-  return normalizeAngle(tropicalLongitude - getAyanamsa(dateUtc));
+/** ชื่อจังหวัดที่ส่งเข้า `thai-astrology` (ตารางอาทิตย์อุทัยต่อจังหวัด) */
+function provinceKeyForThaiAstrologyLibrary(canonicalName: string): string {
+  return canonicalName.replace(/\s*\(สำรอง\)\s*$/, "").trim();
 }
 
 export type ThaiBirthSignDetail = {
@@ -212,12 +279,21 @@ export type ThaiBirthSignDetail = {
   signName: string;
   /** index 0–11 (เมษ=0 .. มีน=11) */
   signIndex: number;
-  /** องศาภายในราศี 0–30 */
-  degInSign: number;
-  /** Sidereal longitude 0–360° */
-  siderealLongitude: number;
+  /** องศาภายในราศี — มีเฉพาะบางวิธีคำนวณ (ไม่มีเมื่อใช้สุริยยาตร์ไทยแบบช่อง 12 ราศี) */
+  degInSign?: number;
+  /** ลองจิจูดเชิงมุมรวม (เช่น sidereal) — ไม่ใช้ในสุริยยาตร์ไทยคลาสสิก */
+  siderealLongitude?: number;
   /** true = คำนวณจากเวลา/พิกัด, false = ใช้ราศีพระอาทิตย์เป็น fallback */
   hasTimeAndPlace: boolean;
+  /** ว่าด้วยพื้นที่เกิด — เพื่อแสดงใต้ผลลัพธ์ & ความโปร่งใส */
+  provinceResolved?: Omit<ResolvedProvinceCoordinates, "lat" | "lon"> & { userInputRaw?: string };
+  /** ข้อมูลดิบจากแพ็กเกจ `thai-astrology` — ส่งต่อ AI เป็นข้อเท็จจริงคำนวณแล้ว */
+  thaiChart?: {
+    tanuseth: number;
+    channelOutputs: string[];
+    sunPosition: [number, number];
+    planets: PlanetPositions;
+  };
 };
 
 /**
@@ -235,20 +311,41 @@ export function getBirthSignDetail(
 
   const time = parseBirthTime(birthHour, birthMinute);
   if (time) {
-    const coords = getProvinceCoordinates(birthProvince);
-    // เวลาท้องถิ่นไทย UTC+7 — แปลงเป็น UTC ก่อนยัดเข้า Date.UTC()
-    const birthUtc = new Date(
-      Date.UTC(parsedDate.year, parsedDate.month - 1, parsedDate.day, time.hour - 7, time.minute),
-    );
-    const sidereal = getAscendantLongitude(birthUtc, coords.lat, coords.lon);
-    const signIndex = Math.floor(sidereal / 30) % 12;
-    return {
-      signName: THAI_BIRTH_SIGNS[signIndex],
-      signIndex,
-      degInSign: sidereal - signIndex * 30,
-      siderealLongitude: sidereal,
-      hasTimeAndPlace: true,
-    };
+    const coords = resolveProvinceCoordinates(birthProvince);
+    const provinceKey = provinceKeyForThaiAstrologyLibrary(coords.canonicalName);
+    const yearBe = parsedDate.year + 543;
+
+    try {
+      const chart = generateThaiAstrologyChart({
+        day: parsedDate.day,
+        monthTh: parsedDate.month,
+        yearBe,
+        hour: time.hour,
+        minute: time.minute,
+        province: provinceKey,
+      });
+
+      const signIndex = ((chart.positions.ascendant % 12) + 12) % 12;
+
+      return {
+        signName: THAI_BIRTH_SIGNS[signIndex],
+        signIndex,
+        hasTimeAndPlace: true,
+        provinceResolved: {
+          canonicalName: coords.canonicalName,
+          matchedBy: coords.matchedBy,
+          userInputRaw: birthProvince?.trim(),
+        },
+        thaiChart: {
+          tanuseth: chart.tanuseth,
+          channelOutputs: [...chart.channelOutputs],
+          sunPosition: [...chart.sunPosition] as [number, number],
+          planets: { ...chart.positions },
+        },
+      };
+    } catch {
+      return null;
+    }
   }
 
   const month = parsedDate.month;
@@ -291,6 +388,18 @@ export function getBirthSignDetail(
     }
   }
   return null;
+}
+
+/** แยกจาก field `birthTime` ใน DB รูปแบบ HH:MM — ใช้คำนวณลักขณาใหม่บนหน้า analysis */
+export function parseStoredBirthClock(birthTime?: string | null): { hour: string; minute: string } | null {
+  const raw = birthTime?.trim();
+  if (!raw) return null;
+  const hit = raw.match(/^(\d{1,2}):(\d{2})$/);
+  if (!hit) return null;
+  const h = Number(hit[1]);
+  const m = Number(hit[2]);
+  if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+  return { hour: String(h).padStart(2, "0"), minute: String(m).padStart(2, "0") };
 }
 
 /**

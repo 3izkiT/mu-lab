@@ -4,6 +4,7 @@ import Ascendant3D from "@/components/Ascendant3D";
 import { MarkdownText } from "@/components/MarkdownText";
 import PaywallOverlay from "@/components/ui/PaywallOverlay";
 import { checkFeatureAccess, getCurrentUser } from "@/lib/auth-utils";
+import { getBirthSignDetail, parseStoredBirthClock, type ThaiBirthSignDetail } from "@/lib/birth-sign";
 import { getZodiacMeta } from "@/lib/zodiac-meta";
 import { prisma } from "@/lib/prisma";
 
@@ -33,7 +34,24 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
     );
   }
 
-  const meta = getZodiacMeta(analysis.birthSign);
+  const clock = parseStoredBirthClock(analysis.birthTime);
+  const lagnaFresh =
+    analysis.birthDate != null && analysis.birthDate !== ""
+      ? getBirthSignDetail(
+          analysis.birthDate,
+          clock?.hour,
+          clock?.minute,
+          analysis.birthProvince ?? undefined,
+        )
+      : null;
+
+  const ascName = lagnaFresh?.signName ?? analysis.birthSign ?? "";
+  const degInSignOnlyIfTimed =
+    lagnaFresh?.hasTimeAndPlace === true && typeof lagnaFresh.degInSign === "number"
+      ? lagnaFresh.degInSign
+      : undefined;
+  const meta = ascName ? getZodiacMeta(ascName) : null;
+  const provinceFootnote = provinceMatchFootnote(lagnaFresh?.provinceResolved);
 
   return (
     <>
@@ -47,13 +65,13 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
               ลักขณาและดวงชะตาของ {analysis.fullName ?? "คุณ"}
             </h1>
             <p className="mt-1 text-xs text-[#dbe1ff]/60">
-              คำนวณตามเวลา/พิกัดเกิด ระบบ Lahiri sidereal · เก็บไว้ใน Personal Vault ของคุณ
+              ลัคนาคำนวณแบบสุริยยาตร์ไทย (อันตรนาที + อาทิตย์อุทัยต่อจังหวัด) ผ่านเอนจินมาตรฐานเปิดโค้ด · เก็บไว้ใน Personal Vault
             </p>
           </div>
 
           {/* Hero — 3D ascendant + birth profile */}
-          {analysis.birthSign ? (
-            <Ascendant3D signName={analysis.birthSign} />
+          {ascName ? (
+            <Ascendant3D mode="signature" signName={ascName} degInSign={degInSignOnlyIfTimed} footnote={provinceFootnote} />
           ) : (
             <div className="rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(7,16,36,0.55)] p-6 text-center">
               <p className="text-sm text-[#e8eeff]/80">ยังไม่มีข้อมูลเวลา-สถานที่เกิดสำหรับคำนวณลักขณา</p>
@@ -122,11 +140,11 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
                 <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/85">Deep Insight</p>
               </div>
               <h2 className="mt-2 font-serif text-2xl text-[#eef1ff] sm:text-3xl">
-                แผนชีวิต 12 เรือนชะตา · เจาะลึกตามลักขณา{analysis.birthSign ?? "ของคุณ"}
+                แผนชีวิต 12 เรือนชะตา · เจาะลึกตามลักขณา{ascName || "ของคุณ"}
               </h2>
               <p className="mt-2 text-sm text-[#dbe1ff]/80">
-                ผลแบบเต็ม ครอบคลุมการงาน-การเงิน-ความรัก-สุขภาพ-โอกาสรายเดือน + ช่วงเวลาทองเดิน
-                ใหญ่ ๆ ของปี และคำแนะนำเฉพาะองศาลักขณาของคุณ
+                ฟรีด้านบนคุณได้กรอบความเข้าใจจากลักขณาและมิเตอร์แล้ว — Deep Insight เติมมุมมองเป็นรายเรือนชะตาและจังหวะเดือนต่อเดือน
+                พร้อมคำถามที่ควรให้ความชัด และหัวข้อที่ปกติต้องนั่งกับโหรเป็นเท่า เพื่อคุณเอากลับไปตัดสินใจเองอย่างมั่นใจขึ้น
               </p>
               <div className="mt-4 max-w-none">
                 <MarkdownText source={analysis.deepInsight} />
@@ -134,6 +152,14 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
             </article>
             {!hasAccess ? <PaywallOverlay analysisId={id} /> : null}
           </section>
+
+          {/* เมื่อฟิลด์ birthSign ใน DB (ตอนบันทึกครั้งเก่า) ไม่ตรงผลจากสูตร+จังหวัดใน Vault ปัจจุบัน */}
+          {analysis.birthSign && ascName && analysis.birthSign !== ascName ? (
+            <p className="rounded-xl border border-amber-500/25 bg-amber-500/6 px-4 py-3 text-[11px] leading-relaxed text-[#fde8bf]/92">
+              ใน Vault เคยเก็บลักขณาเป็น 「{analysis.birthSign}」 — จากวันเกิดเวลาเกิดและจังหวัดในโปรไฟล์ตอนนี้ Mu-Lab คำนวณใหม่ได้ 「{ascName}」หลังปรับระบบจัดการจังหวัดและสูตร
+              ผลในหน้านี้เลยใช้ค่าชุดล่าสุดจากบรรทัดโปรไฟล์ด้านบน (ไม่ใช่ข้อความที่บันทึกไว้ในครั้งเก่า)
+            </p>
+          ) : null}
 
           <div className="flex flex-wrap gap-3">
             {!user ? (
@@ -211,4 +237,30 @@ function Meter({ label, value }: { label: string; value: number }) {
       </div>
     </div>
   );
+}
+
+function provinceMatchFootnote(
+  provinceResolved?: ThaiBirthSignDetail["provinceResolved"],
+): string | undefined {
+  if (!provinceResolved) return undefined;
+
+  const { matchedBy, canonicalName, userInputRaw } = provinceResolved;
+
+  if (matchedBy === "fallback-unknown") {
+    if (!(userInputRaw?.trim()?.length ?? 0)) {
+      return "ยังไม่ได้ระบุจังหวัดเกิด — Mu-Lab ใช้พิกัดกลางเป็นมาตรฐาน หากคุณใส่จังหวัดจริงได้ ผลของลักขณาจะสัมพันธ์กับพื้นที่เกิดได้มากขึ้น";
+    }
+    return `จังหวัดจากข้อความที่คุณพิมพ์ยังจับเข้ากับรายการมาตรฐานไม่ได้ชัดเจน — ระบบใช้พิกัดสำรอง (กทม.) อยู่ ตรวจคำว่า 「${userInputRaw}」 และลองเลือกจังหวัดจากเมนูเมื่อประมวลผลครั้งใหม่`;
+  }
+
+  if (matchedBy === "levenshtein") {
+    return `จัดจังหวัดโดยค้นชื่อที่ใกล้เคียงกับ「${userInputRaw ?? "?"}» เป็น「${canonicalName}» — แนะนำเลือกจังหวัดจากเมนูเพื่อลดความเพี้ยนเล็กจากการเดาสะกด`;
+  }
+
+  if (matchedBy === "fuzzy-short") {
+    const rawBit = userInputRaw?.trim() ? `จากคำว่า 「${userInputRaw.trim()}」 ` : "";
+    return `${rawBit}จับเข้ากับ「${canonicalName}» เพื่อคำนวณ — เลือกจังหวัดมาตรฐานในรายการจะเป็นผลที่สมบูรณ์ที่สุด`;
+  }
+
+  return undefined;
 }
