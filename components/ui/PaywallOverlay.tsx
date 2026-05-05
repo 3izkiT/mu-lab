@@ -7,11 +7,11 @@ type PaywallOverlayProps = {
 };
 
 export default function PaywallOverlay({ analysisId }: PaywallOverlayProps) {
-  const startCheckout = async (purchaseType: "deep-insight" | "premium-monthly") => {
+  const startCheckout = async (purchaseType: "deep-insight" | "vip-weekly" | "premium-monthly") => {
     const response = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ purchaseType, analysisId }),
+      body: JSON.stringify({ purchaseType, targetId: analysisId, targetType: "analysis" }),
     });
 
     const payload = (await response.json()) as { redirectUrl?: string };
@@ -38,6 +38,17 @@ export default function PaywallOverlay({ analysisId }: PaywallOverlayProps) {
             <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">
               ใช้ได้กับรายงานนี้นาน {ONE_OFF_ACCESS_DAYS} วัน เหมาะกับคนที่อยากตัดสินใจเรื่องเร่งด่วนแบบทันที
             </p>
+          </div>
+
+          <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.05)] p-3 text-left">
+            <button
+              type="button"
+              onClick={() => startCheckout("vip-weekly")}
+              className="w-full rounded-full border border-[rgba(247,231,206,0.4)] bg-[rgba(247,231,206,0.08)] px-5 py-2.5 text-sm font-semibold text-[var(--gold)]"
+            >
+              ปลดล็อกทั้งระบบ {PRICING_THB["vip-weekly"]} บาท / 7 วัน
+            </button>
+            <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">เหมาะกับคนที่ต้องการเช็กหลายเคสต่อเนื่องทั้งสัปดาห์</p>
           </div>
 
           <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.04)] p-3 text-left">

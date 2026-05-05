@@ -101,7 +101,12 @@ export async function processStripeWebhookEvent(args: {
         data: { status: "completed", providerRef },
       });
 
-      if (session.purchaseType === "deep-insight" || session.purchaseType === "tarot-deep") {
+      if (
+        session.purchaseType === "deep-insight" ||
+        session.purchaseType === "tarot-deep" ||
+        session.purchaseType === "vip-daily" ||
+        session.purchaseType === "vip-weekly"
+      ) {
         const exists = await tx.purchase.findFirst({
           where: {
             userId: session.userId,

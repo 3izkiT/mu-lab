@@ -172,8 +172,9 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          purchaseType: result.checkout.purchaseType,
-          analysisId: result.checkout.readingId,
+          purchaseType: "tarot-deep",
+          targetId: result.checkout.readingId,
+          targetType: "tarot",
         }),
       });
       const c = (await checkout.json()) as { sessionId?: string; redirectUrl?: string; message?: string };

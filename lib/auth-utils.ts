@@ -1,7 +1,12 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { ensureMvpUsers } from "@/lib/auth-mvp";
-import { ONE_OFF_ACCESS_DAYS, oneOffCutoffDate } from "@/lib/billing-config";
+import {
+  ONE_OFF_ACCESS_DAYS,
+  vipDailyCutoffDate,
+  vipWeeklyCutoffDate,
+  oneOffCutoffDate,
+} from "@/lib/billing-config";
 
 export type FeatureType = "deep-insight" | "premium" | "tarot-draw" | "tarot-deep";
 
@@ -33,28 +38,47 @@ export async function checkFeatureAccess(userId: string, featureType: FeatureTyp
   await ensureMvpUsers();
   const now = Date.now();
 
+  const premiumCount = await prisma.subscription.count({
+    where: {
+      userId,
+      status: "active",
+      planType: "premium",
+      expiryDate: { gt: new Date(now) },
+    },
+  });
+  const vipDailyCount = await prisma.purchase.count({
+    where: {
+      userId,
+      featureType: "vip-daily",
+      status: "completed",
+      createdAt: { gte: vipDailyCutoffDate(new Date()) },
+    },
+  });
+  const vipWeeklyCount = await prisma.purchase.count({
+    where: {
+      userId,
+      featureType: "vip-weekly",
+      status: "completed",
+      createdAt: { gte: vipWeeklyCutoffDate(new Date()) },
+    },
+  });
+  const hasGlobalPremium = premiumCount > 0 || vipDailyCount > 0 || vipWeeklyCount > 0;
+
   if (featureType === "premium") {
-    const count = await prisma.subscription.count({
-      where: {
-        userId,
-        status: "active",
-        planType: "premium",
-        expiryDate: { gt: new Date(now) },
-      },
-    });
-    return count > 0;
+    return hasGlobalPremium;
   }
 
   if (featureType === "deep-insight") {
+    if (hasGlobalPremium) return true;
     if (!targetId) return false;
-    const cutoff = oneOffCutoffDate(new Date());
+    const dailyCutoff = vipDailyCutoffDate(new Date());
     const count = await prisma.purchase.count({
       where: {
         userId,
         featureType: "deep-insight",
         targetId,
         status: "completed",
-        createdAt: { gte: cutoff },
+        createdAt: { gte: dailyCutoff },
       },
     });
     return count > 0;
@@ -66,6 +90,7 @@ export async function checkFeatureAccess(userId: string, featureType: FeatureTyp
   }
 
   if (featureType === "tarot-deep") {
+    if (hasGlobalPremium) return true;
     if (!targetId) return false;
     const cutoff = oneOffCutoffDate(new Date());
     const count = await prisma.purchase.count({

@@ -8,7 +8,8 @@ import { rateLimitOrThrow } from "@/lib/rate-limit";
 
 type CheckoutBody = {
   purchaseType?: PurchaseType;
-  analysisId?: string;
+  targetId?: string;
+  targetType?: "analysis" | "tarot" | "dashboard";
 };
 
 export async function POST(request: Request) {
@@ -45,18 +46,24 @@ export async function POST(request: Request) {
       id: sessionId,
       userId,
       purchaseType: body.purchaseType,
-      analysisId: body.analysisId,
+      analysisId: body.targetId,
       amountTHB,
       status: "pending",
       provider: "stripe",
     },
   });
 
-  const successUrl = body.analysisId
-    ? `/checkout/success?analysisId=${encodeURIComponent(body.analysisId)}&sessionId=${encodeURIComponent(sessionId)}`
-    : "/checkout/success";
+  const targetType = body.targetType ?? "analysis";
+  const targetId = body.targetId ?? "";
+  const successUrl = `/checkout/success?sessionId=${encodeURIComponent(sessionId)}&purchaseType=${encodeURIComponent(body.purchaseType)}&targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`;
+  const cancelUrl = `/checkout/cancel?sessionId=${encodeURIComponent(sessionId)}`;
+  const providerBaseUrl = process.env.PAYMENT_PROVIDER_CHECKOUT_URL?.trim();
+  const redirectUrl = providerBaseUrl
+    ? `${providerBaseUrl}?sessionId=${encodeURIComponent(sessionId)}&successUrl=${encodeURIComponent(successUrl)}&cancelUrl=${encodeURIComponent(cancelUrl)}`
+    : `/checkout/provider?sessionId=${encodeURIComponent(sessionId)}&successUrl=${encodeURIComponent(successUrl)}`;
+
   return NextResponse.json({
-    redirectUrl: successUrl,
+    redirectUrl,
     sessionId,
   });
 }

@@ -1,12 +1,47 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
 type SuccessPageProps = {
-  searchParams: Promise<{ analysisId?: string }>;
+  searchParams: Promise<{
+    sessionId?: string;
+    purchaseType?: string;
+    targetType?: "analysis" | "tarot" | "dashboard";
+    targetId?: string;
+  }>;
 };
 
 export default async function CheckoutSuccessPage({ searchParams }: SuccessPageProps) {
-  const { analysisId } = await searchParams;
-  const analysisLink = analysisId ? `/analysis/${analysisId}` : "/vault";
+  const { sessionId, purchaseType, targetType, targetId } = await searchParams;
+
+  let resolvedPurchaseType = purchaseType ?? "";
+  let resolvedTargetType = targetType ?? "dashboard";
+  let resolvedTargetId = targetId ?? "";
+
+  if (sessionId) {
+    const session = await prisma.checkoutSession.findUnique({
+      where: { id: sessionId },
+      select: { purchaseType: true, analysisId: true },
+    });
+    if (session) {
+      resolvedPurchaseType = resolvedPurchaseType || session.purchaseType;
+      resolvedTargetId = resolvedTargetId || session.analysisId || "";
+      if (!targetType) {
+        resolvedTargetType =
+          session.purchaseType === "tarot-deep"
+            ? "tarot"
+            : session.purchaseType === "premium-monthly" || session.purchaseType === "vip-daily" || session.purchaseType === "vip-weekly"
+              ? "dashboard"
+              : "analysis";
+      }
+    }
+  }
+
+  const redirectHref =
+    resolvedTargetType === "tarot"
+      ? `/tarot${resolvedTargetId ? `?readingId=${encodeURIComponent(resolvedTargetId)}` : ""}`
+      : resolvedTargetType === "analysis" && resolvedTargetId
+        ? `/analysis/${encodeURIComponent(resolvedTargetId)}`
+        : "/vault";
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-20">
@@ -14,8 +49,11 @@ export default async function CheckoutSuccessPage({ searchParams }: SuccessPageP
         <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/80">Payment Success</p>
         <h1 className="mt-3 font-serif text-3xl text-[#eef1ff]">Divine Connection Established</h1>
         <p className="mt-3 text-sm text-[#dbe1ff]/82">สิทธิ์ของคุณถูกอัปเดตแล้ว พร้อมใช้งานทันที</p>
+        {resolvedPurchaseType ? (
+          <p className="mt-1 text-xs text-[#dbe1ff]/62">แพ็กที่ปลดล็อก: {resolvedPurchaseType}</p>
+        ) : null}
         <Link
-          href={analysisLink}
+          href={redirectHref}
           className="mt-6 inline-block rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16]"
         >
           ไปที่ผลลัพธ์ของคุณ

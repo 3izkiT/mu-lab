@@ -6,8 +6,9 @@ This document is the implementation contract for entitlement, checkout, webhook,
 
 | Product | Price (THB) | Tier | Access Scope | Duration |
 |---|---:|---|---|---|
-| Starter Daily | 19 | PAY_PER_VIEW | Deep analysis for one target report | 7 days |
-| Tarot Insight | 39 | PAY_PER_VIEW | Deep tarot for one reading + follow-up context | 7 days |
+| Starter Daily | 19 | PAY_PER_VIEW | Full unlock (daily) | 1 day |
+| Weekly Pass | 79 | PAY_PER_VIEW | Full unlock (weekly) | 7 days |
+| Tarot Insight | 79 | PAY_PER_VIEW | Deep tarot for one reading + follow-up context | 7 days |
 | Premium Monthly | 159 | SUBSCRIBER | Soul Dashboard + unlimited deep content | 30 days rolling |
 
 Source of truth:
@@ -18,8 +19,9 @@ Source of truth:
 
 ### `POST /api/checkout`
 - body:
-  - `purchaseType`: `"deep-insight" | "tarot-deep" | "premium-monthly"`
-  - `analysisId`: optional target id
+  - `purchaseType`: `"deep-insight" | "vip-weekly" | "tarot-deep" | "premium-monthly"`
+  - `targetId`: optional target id
+  - `targetType`: `"analysis" | "tarot" | "dashboard"`
 - returns:
   - `redirectUrl`
   - `sessionId`
@@ -42,8 +44,9 @@ Source of truth:
 
 `lib/auth-utils.ts`:
 - `premium`: active subscription + non-expired
-- `deep-insight`: completed purchase with same targetId and `createdAt >= now - 7d`
+- `deep-insight`: completed purchase with same targetId and `createdAt >= now - 1d`
 - `tarot-deep`: completed purchase with same targetId and `createdAt >= now - 7d`
+- `vip-weekly`: enables premium-level access for 7 days
 
 ## 4) Dashboard Rules
 
@@ -69,8 +72,8 @@ Admin page:
 
 ## 6) Recommended Next Steps
 
-1. Add payment provider adapter abstraction (`stripe`, `xendit`, `2c2p`) behind one interface.
-2. Add webhook retry endpoint to replay failed events by event id.
+1. Replace mock provider page with a real payment provider checkout URL.
+2. Expand webhook replay into bulk retry queue for ops teams.
 3. Add events table for analytics funnel (`paywall_view`, `checkout_start`, `checkout_paid`, `unlock_success`).
 4. Add line OA push scheduler from Soul Dashboard daily highlights.
 
