@@ -71,7 +71,7 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
 
           {/* Hero — 3D ascendant + birth profile */}
           {ascName ? (
-            <Ascendant3D mode="signature" signName={ascName} degInSign={degInSignOnlyIfTimed} footnote={provinceFootnote} />
+            <Ascendant3D mode="full" signName={ascName} degInSign={degInSignOnlyIfTimed} footnote={provinceFootnote} />
           ) : (
             <div className="rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(7,16,36,0.55)] p-6 text-center">
               <p className="text-sm text-[#e8eeff]/80">ยังไม่มีข้อมูลเวลา-สถานที่เกิดสำหรับคำนวณลักขณา</p>

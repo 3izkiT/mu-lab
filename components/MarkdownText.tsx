@@ -1,6 +1,6 @@
 import ReactMarkdown from "react-markdown";
 
-const baseTextClasses = "text-sm leading-relaxed text-[#e8eeff]/88";
+const baseTextClasses = "text-base leading-relaxed text-[#e8eeff]/88 sm:text-lg";
 
 const components = {
   h1: ({ children }: { children?: React.ReactNode }) => (
@@ -16,10 +16,10 @@ const components = {
     <p className={`mb-3 last:mb-0 ${baseTextClasses}`}>{children}</p>
   ),
   ul: ({ children }: { children?: React.ReactNode }) => (
-    <ul className="mb-3 list-disc space-y-1 pl-4 text-sm text-[#e8eeff]/88">{children}</ul>
+    <ul className="mb-3 list-disc space-y-1 pl-4 text-base text-[#e8eeff]/88 sm:text-lg">{children}</ul>
   ),
   ol: ({ children }: { children?: React.ReactNode }) => (
-    <ol className="mb-3 list-decimal space-y-1 pl-4 text-sm text-[#e8eeff]/88">{children}</ol>
+    <ol className="mb-3 list-decimal space-y-1 pl-4 text-base text-[#e8eeff]/88 sm:text-lg">{children}</ol>
   ),
   li: ({ children }: { children?: React.ReactNode }) => (
     <li className="marker:text-[var(--gold)]/70">{children}</li>
