@@ -67,9 +67,9 @@ export function FortuneResultView({
         animate="show"
         custom={1}
         variants={fadeUp}
-        className="relative mx-auto mt-10 grid max-w-3xl gap-8 sm:grid-cols-[minmax(0,260px)_minmax(0,1fr)] sm:items-center"
+        className="relative mx-auto mt-10 grid max-w-3xl gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,260px)] sm:items-center"
       >
-        <div className="order-2 text-center sm:order-2 sm:text-left">
+        <div className="order-2 text-center sm:order-1 sm:text-left">
           <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--gold)]/70">ลัคนา · สุริยยาตร์ไทย</p>
           <p className="mt-2 font-serif text-3xl text-[#f7e7ce] sm:text-4xl">{ascendantSignName}</p>
           <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/68">
@@ -81,7 +81,7 @@ export function FortuneResultView({
           variants={fadeUp}
           initial="hidden"
           animate="show"
-          className="order-1 flex justify-center sm:order-1"
+          className="order-1 flex justify-center sm:order-2"
         >
           <motion.div
             animate={{ rotate: [0, 1.2, -1.2, 0] }}

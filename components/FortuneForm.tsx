@@ -124,15 +124,15 @@ const ILLUSION_PATHS = [
 
 const markdownComponents = {
   p: ({ children }: { children?: React.ReactNode }) => (
-    <p className="mb-3 break-words text-lg font-light leading-relaxed tracking-wide text-zinc-300 last:mb-0 sm:text-xl sm:leading-[1.72] [overflow-wrap:anywhere]">
+    <p className="mb-3 break-words text-[14px] font-light leading-[1.8] tracking-wide text-zinc-300 last:mb-0 sm:text-base sm:leading-8 [overflow-wrap:anywhere]">
       {children}
     </p>
   ),
   ul: ({ children }: { children?: React.ReactNode }) => (
-    <ul className="mb-3 list-disc space-y-2 pl-4 text-lg font-light leading-relaxed text-zinc-300 sm:text-xl sm:leading-[1.72]">{children}</ul>
+    <ul className="mb-3 list-disc space-y-2 pl-4 text-[14px] font-light text-zinc-300 sm:text-base">{children}</ul>
   ),
   ol: ({ children }: { children?: React.ReactNode }) => (
-    <ol className="mb-3 list-decimal space-y-2 pl-4 text-lg font-light leading-relaxed text-zinc-300 sm:text-xl sm:leading-[1.72]">{children}</ol>
+    <ol className="mb-3 list-decimal space-y-2 pl-4 text-[14px] font-light text-zinc-300 sm:text-base">{children}</ol>
   ),
   li: ({ children }: { children?: React.ReactNode }) => (
     <li className="marker:text-[var(--gold)]/70">{children}</li>
@@ -505,7 +505,7 @@ export default function FortuneForm() {
                 <span className="max-w-[min(100%,20rem)] break-words sm:max-w-none">คำทำนายของคุณ</span>
               </span>
             </h2>
-            <p className="mt-2 max-w-md text-sm font-light leading-relaxed text-zinc-500">
+            <p className="mt-2 max-w-md text-xs font-light leading-relaxed text-zinc-500">
               แกะกล่องทีละชั้น — อ่านช้า ๆ ได้ตามจังหวะของคุณ
             </p>
           </div>
