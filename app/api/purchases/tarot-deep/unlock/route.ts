@@ -11,8 +11,20 @@ export async function POST(request: Request) {
   const userId = cookieStore.get("mu_lab_uid")?.value;
   if (!userId) return NextResponse.json({ message: "login required" }, { status: 401 });
 
-  const body = (await request.json().catch(() => ({}))) as { readingId?: string };
+  const body = (await request.json().catch(() => ({}))) as { readingId?: string; sessionId?: string };
   if (!body.readingId) return NextResponse.json({ message: "readingId is required" }, { status: 400 });
+  if (!body.sessionId) return NextResponse.json({ message: "sessionId is required" }, { status: 400 });
+
+  const session = await prisma.checkoutSession.findUnique({ where: { id: body.sessionId } });
+  const validSession =
+    session &&
+    session.userId === userId &&
+    session.purchaseType === "tarot-deep" &&
+    session.analysisId === body.readingId &&
+    session.status === "completed";
+  if (!validSession) {
+    return NextResponse.json({ message: "payment not verified" }, { status: 403 });
+  }
 
   const exists = await prisma.purchase.findFirst({
     where: { userId, featureType: "tarot-deep", targetId: body.readingId, status: "completed" },

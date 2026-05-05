@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ParallaxNebula } from "@/components/CinematicCelestial";
+import { PRICING_THB } from "@/lib/billing-config";
 
 export const metadata = {
   title: "ติดต่อ & ชำระเงิน",
@@ -69,9 +70,21 @@ export default function ContactPaymentPage() {
             <h2 className="font-serif text-2xl text-[#eef1ff]">แพ็กเกจบริการ</h2>
             <div className="mt-8 grid gap-6 sm:grid-cols-3">
               {[
-                { title: "ดูดวงทันที", price: "199", features: ["วิเคราะห์ส่วนตัว", "ลักขณา", "คำแนะนำวันนี้"] },
-                { title: "ไพ่ยิปซี", price: "149", features: ["อ่านไพ่", "คำตอบเชิงลึก", "วิธีใช้"] },
-                { title: "Premium Pass", price: "499", features: ["บริการทั้งหมด", "อัพเดต 1 เดือน", "สนับสนุนลำดับความสำคัญ"] },
+                {
+                  title: "Starter Daily",
+                  price: String(PRICING_THB["deep-insight"]),
+                  features: ["รายงานเจาะลึกเฉพาะเคส", "ใช้สิทธิ์ย้อนหลัง 7 วัน", "เหมาะสำหรับตัดสินใจเร่งด่วน"],
+                },
+                {
+                  title: "Tarot Insight",
+                  price: String(PRICING_THB["tarot-deep"]),
+                  features: ["บทอ่านลึกผสานลัคนา", "ถาม AI ต่อได้ 2 คำถาม", "สิทธิ์ย้อนหลัง 7 วัน"],
+                },
+                {
+                  title: "Premium Monthly",
+                  price: String(PRICING_THB["premium-monthly"]),
+                  features: ["Soul Dashboard เต็ม 30 วัน", "ปลดล็อกเนื้อหาลึกไม่จำกัด", "เหมาะกับใช้งานทุกวัน"],
+                },
               ].map((pkg) => (
                 <div key={pkg.title} className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-[rgba(5,10,24,0.3)] p-6">
                   <h3 className="font-serif text-xl text-[#eef1ff]">{pkg.title}</h3>

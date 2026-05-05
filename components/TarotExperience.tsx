@@ -176,29 +176,15 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
           analysisId: result.checkout.readingId,
         }),
       });
-      const c = (await checkout.json()) as { sessionId?: string; message?: string };
+      const c = (await checkout.json()) as { sessionId?: string; redirectUrl?: string; message?: string };
       if (checkout.status === 401) {
         const next = encodeURIComponent(`/tarot?readingId=${result.readingId}`);
         window.location.href = `/login?next=${next}`;
         return;
       }
-      if (!checkout.ok || !c.sessionId) throw new Error(c.message || "checkout failed");
-
-      const unlock = await fetch("/api/purchases/tarot-deep/unlock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ readingId: result.readingId }),
-      });
-      if (!unlock.ok) throw new Error("unlock failed");
-
-      const refreshed = await fetch("/api/tarot/read", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ readingId: result.readingId }),
-      });
-      const payload = (await refreshed.json()) as TarotResponse & { message?: string };
-      if (!refreshed.ok) throw new Error(payload.message || "refresh failed");
-      setResult(payload);
+      if (!checkout.ok || !c.sessionId || !c.redirectUrl) throw new Error(c.message || "checkout failed");
+      window.location.href = c.redirectUrl;
+      return;
     } catch (e) {
       setError(e instanceof Error ? e.message : "ปลดล็อกไม่สำเร็จ");
     } finally {

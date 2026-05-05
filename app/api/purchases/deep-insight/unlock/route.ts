@@ -11,9 +11,23 @@ export async function POST(request: Request) {
   const userId = cookieStore.get("mu_lab_uid")?.value;
   if (!userId) return NextResponse.json({ message: "login required" }, { status: 401 });
 
-  const body = (await request.json()) as { analysisId?: string };
+  const body = (await request.json()) as { analysisId?: string; sessionId?: string };
   if (!body.analysisId) {
     return NextResponse.json({ message: "analysisId is required" }, { status: 400 });
+  }
+  if (!body.sessionId) {
+    return NextResponse.json({ message: "sessionId is required" }, { status: 400 });
+  }
+
+  const session = await prisma.checkoutSession.findUnique({ where: { id: body.sessionId } });
+  const validSession =
+    session &&
+    session.userId === userId &&
+    session.purchaseType === "deep-insight" &&
+    session.analysisId === body.analysisId &&
+    session.status === "completed";
+  if (!validSession) {
+    return NextResponse.json({ message: "payment not verified" }, { status: 403 });
   }
 
   await prisma.purchase.create({

@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth-utils";
+import { getCurrentUser, isAdminUserId } from "@/lib/auth-utils";
 import { ENTITLEMENT_MATRIX } from "@/lib/entitlement-matrix";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminPaymentsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/admin/payments");
+  if (!isAdminUserId(user.id)) redirect("/vault");
 
   const now = Date.now();
   const dayAgo = new Date(now - 24 * 60 * 60 * 1000);

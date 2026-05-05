@@ -13,6 +13,17 @@ export async function getCurrentUser() {
   return prisma.user.findUnique({ where: { id: userId } });
 }
 
+export function isAdminUserId(userId: string | null | undefined): boolean {
+  if (!userId) return false;
+  const raw = process.env.ADMIN_USER_IDS?.trim();
+  if (!raw) return false;
+  const allowed = raw
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean);
+  return allowed.includes(userId);
+}
+
 export async function getUserCredits(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   return user?.credits ?? 0;
