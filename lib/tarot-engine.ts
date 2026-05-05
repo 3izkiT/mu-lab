@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
-import { getPriceTHB } from "@/lib/billing-config";
+import { getPriceTHB, oneOffCutoffDate } from "@/lib/billing-config";
 import { getBangkokDateKey } from "@/lib/daily-forecast-data";
 
 const DECK = [
@@ -75,7 +75,13 @@ function buildDeepInsight(cards: string[], question: string): string {
 
 async function hasTarotDeepPurchase(userId: string, readingId: string): Promise<boolean> {
   const c = await prisma.purchase.count({
-    where: { userId, featureType: "tarot-deep", targetId: readingId, status: "completed" },
+    where: {
+      userId,
+      featureType: "tarot-deep",
+      targetId: readingId,
+      status: "completed",
+      createdAt: { gte: oneOffCutoffDate(new Date()) },
+    },
   });
   return c > 0;
 }
