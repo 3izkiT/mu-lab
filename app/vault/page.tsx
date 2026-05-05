@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getCurrentUser, checkFeatureAccess } from "@/lib/auth-utils";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
-import { VaultHistorySprite } from "@/components/VaultHistorySprite";
 import { stripMarkdown } from "@/components/MarkdownText";
 import { getBirthSignDetail, parseStoredBirthClock } from "@/lib/birth-sign";
 import { prisma } from "@/lib/prisma";
@@ -71,20 +70,16 @@ export default async function VaultPage() {
           {history.map((item: { id: string; createdAt: Date; summary: string; fullName: string | null; birthSign: string | null; birthDate: string | null; birthTime: string | null; birthProvince: string | null }) => {
             const lagnaLabel = displayLagnaSignName(item);
             return (
-              <Link key={item.id} href={`/analysis/${item.id}`} className="mu-lab-glass rounded-2xl p-4 transition hover:border-[rgba(247,231,206,0.12)]">
+              <Link key={item.id} href={`/analysis/${item.id}`} className="mu-lab-glass rounded-2xl p-4">
                 <p className="text-xs text-[var(--gold)]/80">{new Date(item.createdAt).toLocaleString("th-TH")}</p>
-                {lagnaLabel ? (
-                  <div className="mt-2 flex items-start gap-3">
-                    <VaultHistorySprite signName={lagnaLabel} />
-                    <div className="min-w-0 flex-1">
-                      {item.fullName ? <p className="text-sm font-medium text-[#eef1ff]/95">{item.fullName}</p> : null}
-                      <p className={`text-xs text-[#dbe1ff]/72 ${item.fullName ? "mt-0.5" : ""}`}>ลักขณา {lagnaLabel}</p>
-                    </div>
-                  </div>
-                ) : item.fullName ? (
-                  <p className="mt-1 text-sm text-[#eef1ff]/95">{item.fullName}</p>
+                {item.fullName || lagnaLabel ? (
+                  <p className="mt-1 text-xs text-[#dbe1ff]/72">
+                    {item.fullName ? <span>{item.fullName}</span> : null}
+                    {item.fullName && lagnaLabel ? " · " : null}
+                    {lagnaLabel ? <span>ลักขณา {lagnaLabel}</span> : null}
+                  </p>
                 ) : null}
-                <p className="mt-3 line-clamp-3 text-sm text-[#e8eeff]/88">{stripMarkdown(item.summary)}</p>
+                <p className="mt-2 line-clamp-3 text-sm text-[#e8eeff]/88">{stripMarkdown(item.summary)}</p>
               </Link>
             );
           })}

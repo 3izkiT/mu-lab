@@ -1,7 +1,5 @@
 "use client";
 
-import { ZodiacAnimalSprite } from "@/components/ZodiacAnimalSprite";
-
 const LABELS = ["เมษ", "พฤษภ", "เมถุน", "กรกฎ", "สิงห์", "กันย์", "ตุลย์", "พิจิก", "ธนู", "มังกร", "กุมภ์", "มีน"] as const;
 
 type ThaiZodiacWheelProps = {
@@ -20,12 +18,10 @@ export function ThaiZodiacWheel({ ascendantIndex, className = "" }: ThaiZodiacWh
   const rInner = 18;
   const safeIdx = ((ascendantIndex % 12) + 12) % 12;
 
-  const activeName = LABELS[safeIdx];
-
   return (
     <div
       className={`relative mx-auto aspect-square w-full max-w-[min(100%,420px)] ${className}`}
-      aria-label={`วงจักร 12 ราศี ลัคนาอยู่ราศี${activeName}`}
+      aria-label={`วงจักร 12 ราศี ลัคนาอยู่ราศี${LABELS[safeIdx]}`}
     >
       <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-[0_20px_48px_rgba(0,0,0,0.45)]">
         <defs>
@@ -42,14 +38,7 @@ export function ThaiZodiacWheel({ ascendantIndex, className = "" }: ThaiZodiacWh
         </defs>
 
         <circle cx={cx} cy={cy} r={rOuter + 2} fill="url(#tzw-glow)" />
-        <circle
-          cx={cx}
-          cy={cy}
-          r={rOuter}
-          fill="rgba(7,14,32,0.92)"
-          stroke="url(#tzw-ring)"
-          strokeWidth={0.55}
-        />
+        <circle cx={cx} cy={cy} r={rOuter} fill="rgba(7,14,32,0.92)" stroke="url(#tzw-ring)" strokeWidth={0.55} />
 
         {LABELS.map((label, i) => {
           const deg0 = -90 + i * 30;
@@ -62,8 +51,8 @@ export function ThaiZodiacWheel({ ascendantIndex, className = "" }: ThaiZodiacWh
           const y1 = cy + rOuter * Math.sin(a1);
           const active = i === safeIdx;
           const mid = (a0 + a1) / 2;
-          const tx = cx + (rOuter * 0.72) * Math.cos(mid);
-          const ty = cy + (rOuter * 0.72) * Math.sin(mid);
+          const tx = cx + rOuter * 0.72 * Math.cos(mid);
+          const ty = cy + rOuter * 0.72 * Math.sin(mid);
 
           return (
             <g key={label}>
@@ -91,16 +80,31 @@ export function ThaiZodiacWheel({ ascendantIndex, className = "" }: ThaiZodiacWh
           );
         })}
 
-        <circle cx={cx} cy={cy} r={rInner} fill="rgba(4,8,20,0.92)" stroke="rgba(247,231,206,0.35)" strokeWidth={0.35} />
+        <circle cx={cx} cy={cy} r={rInner} fill="rgba(4,8,20,0.88)" stroke="rgba(247,231,206,0.35)" strokeWidth={0.35} />
+        <text
+          x={cx}
+          y={cy - 1.2}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#f7e7ce"
+          fontSize={4.2}
+          className="font-serif"
+          style={{ textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
+        >
+          ลัคนา
+        </text>
+        <text
+          x={cx}
+          y={cy + 4.5}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#dbe1ff"
+          fontSize={3.5}
+          className="font-serif"
+        >
+          {LABELS[safeIdx]}
+        </text>
       </svg>
-
-      <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 flex w-[min(32%,150px)] -translate-x-1/2 -translate-y-[52%] flex-col items-center gap-1">
-        <p className="font-serif text-[clamp(10px,2.6vw,13px)] font-medium tracking-[0.12em] text-[#f7e7ce]/95">ลัคนา</p>
-        <div className="aspect-square w-[78%] min-w-[72px] max-w-[120px]">
-          <ZodiacAnimalSprite signName={activeName} fill rounded="full" blendScreen className="ring-2 ring-black/70" />
-        </div>
-        <p className="font-serif text-[clamp(11px,2.8vw,14px)] text-[#dbe1ff]/90">{activeName}</p>
-      </div>
     </div>
   );
 }

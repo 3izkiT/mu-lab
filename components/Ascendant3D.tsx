@@ -1,7 +1,6 @@
 "use client";
 
 import { useId } from "react";
-import { ZodiacAnimalSprite } from "@/components/ZodiacAnimalSprite";
 import { getZodiacMeta } from "@/lib/zodiac-meta";
 
 type Ascendant3DProps = {
@@ -25,6 +24,7 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
   const meta = getZodiacMeta(signName);
   const accentColor = meta?.color ?? "#f7e7ce";
   const accent2 = meta?.accent ?? "#ffe6b3";
+  const symbol = meta?.symbol ?? "✦";
   const nameEn = meta?.nameEn ?? "Ascendant";
 
   const showDetailGrid = mode === "full" && meta;
@@ -103,15 +103,14 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
               }}
             >
               <div
-                className="relative flex h-full w-full items-center justify-center rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.14)_0%,transparent_42%)] p-[10%]"
+                className="relative grid h-full w-full place-items-center rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.18)_0%,transparent_42%)]"
                 style={{
                   transform: "translateZ(12px) rotateX(18deg)",
                   transformStyle: "preserve-3d",
+                  textShadow: `0 -2px 1px rgba(255,255,255,0.35), 0 8px 16px rgba(0,0,0,0.55)`,
                 }}
               >
-                <div className="h-[82%] w-[82%] min-h-[5rem] min-w-[5rem] max-h-[11rem] max-w-[11rem] sm:max-h-[13rem] sm:max-w-[13rem]">
-                  <ZodiacAnimalSprite signName={signName} fill rounded="full" blendScreen className="shadow-[inset_0_0_20px_rgba(0,0,0,0.6)] ring-2 ring-black/60" />
-                </div>
+                <span className="font-serif text-[clamp(4.75rem,19vw,6.85rem)] leading-none text-[#0c0e26]">{symbol}</span>
               </div>
             </div>
           </div>
