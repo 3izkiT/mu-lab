@@ -31,10 +31,10 @@ export default function PaywallOverlay({ analysisId }: PaywallOverlayProps) {
               onClick={() => startCheckout("deep-insight")}
               className="w-full rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2.5 text-sm font-semibold text-[#241d16]"
             >
-              ปลดล็อกเฉพาะรายงานนี้ 99 บาท
+              ปลดล็อกเฉพาะรายงานนี้ 19 บาท
             </button>
             <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">
-              ใช้ได้กับรายงานนี้ครั้งเดียว ปลดล็อก Deep Insight อ่านได้เต็มทันที
+              ใช้ได้กับรายงานนี้ครั้งเดียว เหมาะกับคนที่อยากตัดสินใจเรื่องเร่งด่วนแบบทันที
             </p>
           </div>
 
@@ -44,7 +44,7 @@ export default function PaywallOverlay({ analysisId }: PaywallOverlayProps) {
               onClick={() => startCheckout("premium-monthly")}
               className="w-full rounded-full border border-[rgba(247,231,206,0.4)] bg-[rgba(247,231,206,0.08)] px-5 py-2.5 text-sm font-semibold text-[var(--gold)]"
             >
-              อัปเกรด Premium 199 บาท/เดือน
+              อัปเกรด Premium 159 บาท/เดือน
             </button>
             <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">
               ใช้งานได้ไม่จำกัดตลอด 30 วัน สำหรับทุกรายงานใหม่และรายงานเดิมในบัญชีเดียวกัน

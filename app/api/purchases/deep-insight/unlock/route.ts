@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       userId,
       featureType: "deep-insight",
       targetId: body.analysisId,
-      amountTHB: 99,
+      amountTHB: 19,
       status: "completed",
     },
   });

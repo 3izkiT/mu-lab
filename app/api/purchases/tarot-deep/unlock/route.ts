@@ -23,7 +23,7 @@ export async function POST(request: Request) {
         userId,
         featureType: "tarot-deep",
         targetId: body.readingId,
-        amountTHB: 79,
+        amountTHB: 39,
         status: "completed",
       },
     });

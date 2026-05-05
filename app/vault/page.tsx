@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { getCurrentUser, checkFeatureAccess } from "@/lib/auth-utils";
+import SoulDashboard from "@/components/SoulDashboard";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
 import { stripMarkdown } from "@/components/MarkdownText";
 import { getBirthSignDetail, parseStoredBirthClock } from "@/lib/birth-sign";
 import { prisma } from "@/lib/prisma";
+import { buildSevenDayPreview, buildSoulDashboardData } from "@/lib/soul-dashboard";
 
 function displayLagnaSignName(item: {
   birthDate: string | null;
@@ -34,6 +36,20 @@ export default async function VaultPage() {
     take: 12,
   });
   const isPremium = await checkFeatureAccess(user.id, "premium");
+  const latest = history[0];
+  const dashboardData = isPremium
+    ? buildSoulDashboardData({
+        birthDate: latest?.birthDate,
+        birthTime: latest?.birthTime,
+        birthProvince: latest?.birthProvince,
+        fallbackSign: latest?.birthSign,
+      })
+    : buildSevenDayPreview({
+        birthDate: latest?.birthDate,
+        birthTime: latest?.birthTime,
+        birthProvince: latest?.birthProvince,
+        fallbackSign: latest?.birthSign,
+      });
 
   return (
     <>
@@ -56,6 +72,7 @@ export default async function VaultPage() {
         </aside>
 
         <section className="space-y-6">
+        <SoulDashboard data={dashboardData} hasPremium={isPremium} />
         <div className="mu-lab-glass rounded-2xl p-6">
           <h1 className="font-serif text-3xl text-[#eef1ff]">Daily Personal Dashboard</h1>
           <p className="mt-2 text-sm text-[#dbe1ff]/82">สรุปสถานะดวงส่วนตัวของคุณในวันนี้ พร้อมประวัติย้อนหลัง</p>

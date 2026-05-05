@@ -39,10 +39,10 @@ export async function POST(request: Request) {
 
   const amountTHB =
     body.purchaseType === "deep-insight"
-      ? 99
+      ? 19
       : body.purchaseType === "tarot-deep"
-        ? 79
-        : 199;
+        ? 39
+        : 159;
   const sessionId = nanoid(12);
   await prisma.checkoutSession.create({
     data: {

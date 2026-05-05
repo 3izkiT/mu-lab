@@ -336,7 +336,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                   disabled={unlocking}
                   className="mt-4 rounded-full border border-[rgba(247,231,206,0.5)] bg-[rgba(247,231,206,0.06)] px-5 py-2 text-sm font-semibold text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.12)] disabled:opacity-60"
                 >
-                  {unlocking ? "กำลังปลดล็อก..." : "ปลดล็อกบทอ่านลึก 79 บาท"}
+                  {unlocking ? "กำลังปลดล็อก..." : "ปลดล็อกบทอ่านลึก 39 บาท"}
                 </button>
               </div>
             )}
