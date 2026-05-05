@@ -22,8 +22,9 @@ type Ascendant3DProps = {
 export default function Ascendant3D({ signName, degInSign, mode = "signature", footnote }: Ascendant3DProps) {
   const ringGradId = useId().replace(/:/g, "");
   const meta = getZodiacMeta(signName);
-  const accentColor = meta?.color ?? "#f7e7ce";
-  const accent2 = meta?.accent ?? "#ffe6b3";
+  const palette = getElementPalette(meta?.element);
+  const accentColor = palette.primary;
+  const accent2 = palette.secondary;
   const symbol = meta?.symbol ?? "✦";
   const nameEn = meta?.nameEn ?? "Ascendant";
   const zodiacSpritePosition = getZodiacSpritePosition(signName);
@@ -111,11 +112,12 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
                   <span
                     role="img"
                     aria-label={`${signName} icon`}
-                    className="h-[56%] w-[56%] rounded-md bg-no-repeat drop-shadow-[0_8px_10px_rgba(0,0,0,0.35)]"
+                    className="h-[56%] w-[56%] rounded-md bg-no-repeat [mix-blend-mode:screen] drop-shadow-[0_8px_12px_rgba(0,0,0,0.35)]"
                     style={{
                       backgroundImage: "url('/zodiac-animal-sprites.png')",
                       backgroundSize: "400% 300%",
                       backgroundPosition: zodiacSpritePosition,
+                      filter: "brightness(1.08) contrast(1.08) saturate(1.02)",
                     }}
                   />
                 ) : (
@@ -205,6 +207,22 @@ function getZodiacSpritePosition(signName: string): string | null {
   const x = (col / 3) * 100;
   const y = (row / 2) * 100;
   return `${x}% ${y}%`;
+}
+
+function getElementPalette(element?: string) {
+  if (element === "ไฟ") {
+    return { primary: "#ff8c5a", secondary: "#ffc187" };
+  }
+  if (element === "ดิน") {
+    return { primary: "#d9ba8a", secondary: "#f2ddba" };
+  }
+  if (element === "ลม") {
+    return { primary: "#7fc7ff", secondary: "#bbe1ff" };
+  }
+  if (element === "น้ำ") {
+    return { primary: "#7be2d4", secondary: "#b1f1e7" };
+  }
+  return { primary: "#f7e7ce", secondary: "#ffe6b3" };
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
