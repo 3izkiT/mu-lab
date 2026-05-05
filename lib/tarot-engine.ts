@@ -93,29 +93,7 @@ export async function createOrGetTarotReading(userId: string, question: string, 
   const existingUsage = await prisma.tarotDailyUsage.findUnique({
     where: { userId_dateKey: { userId, dateKey } },
   });
-
-  // Free quota already used today -> return latest reading and offer deep unlock.
-  if (existingUsage) {
-    const latest = await prisma.tarotReading.findFirst({
-      where: { userId, dateKey },
-      orderBy: { createdAt: "desc" },
-    });
-    if (latest) {
-      const cards = JSON.parse(latest.cardsJson) as string[];
-      const deepUnlocked = await hasTarotDeepPurchase(userId, latest.id);
-      return {
-        readingId: latest.id,
-        dateKey,
-        cards,
-        preview: latest.preview,
-        freeLimitPerDay: FREE_LIMIT_PER_DAY,
-        freeRemainingToday: 0,
-        deepUnlocked,
-        deepInsight: deepUnlocked ? latest.deepInsight : undefined,
-        checkout: deepUnlocked ? undefined : { readingId: latest.id },
-      };
-    }
-  }
+  const hasUsedFreeQuotaToday = Boolean(existingUsage);
 
   const count = spreadCount === 5 || spreadCount === 10 ? spreadCount : 3;
   const cards = pickCards(`${userId}:${dateKey}:${normalizedQuestion}:${count}`, count);
@@ -135,11 +113,15 @@ export async function createOrGetTarotReading(userId: string, question: string, 
         deepInsight,
       },
     });
-    await tx.tarotDailyUsage.upsert({
-      where: { userId_dateKey: { userId, dateKey } },
-      create: { id: nanoid(12), userId, dateKey },
-      update: {},
-    });
+    // Only mark free quota consumption the first time user draws today.
+    // Subsequent draws are still allowed for preview, but "Deep Insight" remains locked.
+    if (!hasUsedFreeQuotaToday) {
+      await tx.tarotDailyUsage.upsert({
+        where: { userId_dateKey: { userId, dateKey } },
+        create: { id: nanoid(12), userId, dateKey },
+        update: {},
+      });
+    }
   });
 
   return {
