@@ -26,9 +26,9 @@ export async function POST(request: Request) {
 
   const id = nanoid(10);
   const trimmed = body.message.trim();
-  // Keep first ~6 logical lines (preserving headings/newlines) so markdown renders properly
-  const summaryLines = trimmed.split("\n").slice(0, 6);
-  const summary = summaryLines.join("\n").slice(0, 600);
+  // Keep enough lines for 4 sections of free content (was 6 — too short)
+  const summaryLines = trimmed.split("\n").slice(0, 28);
+  const summary = summaryLines.join("\n").slice(0, 1800);
 
   let birthSign: string | null = null;
   const d = body.birthDate?.trim();

@@ -1,28 +1,14 @@
 import Link from "next/link";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
-import { BirthSignDisplay } from "@/components/BirthSignDisplay";
+import Ascendant3D from "@/components/Ascendant3D";
 import { MarkdownText } from "@/components/MarkdownText";
 import PaywallOverlay from "@/components/ui/PaywallOverlay";
 import { checkFeatureAccess, getCurrentUser } from "@/lib/auth-utils";
+import { getZodiacMeta } from "@/lib/zodiac-meta";
 import { prisma } from "@/lib/prisma";
 
 type AnalysisPageProps = {
   params: Promise<{ id: string }>;
-};
-
-const SIGN_SYMBOL: Record<string, string> = {
-  เมษ: "♈︎",
-  พฤษภ: "♉︎",
-  เมถุน: "♊︎",
-  กรกฎ: "♋︎",
-  สิงห์: "♌︎",
-  กันย์: "♍︎",
-  ตุลย์: "♎︎",
-  พิจิก: "♏︎",
-  ธนู: "♐︎",
-  มังกร: "♑︎",
-  กุมภ์: "♒︎",
-  มีน: "♓︎",
 };
 
 export default async function AnalysisPage({ params }: AnalysisPageProps) {
@@ -47,84 +33,182 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
     );
   }
 
+  const meta = getZodiacMeta(analysis.birthSign);
+
   return (
     <>
       <SiteNavHeader />
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-        <div className="mu-lab-glass rounded-3xl p-6 sm:p-10">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/80">ผลทำนายส่วนตัว</p>
-          <h1 className="mt-3 font-serif text-3xl text-[#eef1ff] sm:text-4xl">ลักขณาและดวงชะตาของคุณ</h1>
+        <div className="space-y-6">
+          {/* Header strip */}
+          <div className="rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(7,16,36,0.55)] px-5 py-4 sm:px-6">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--gold)]/75">ผลทำนายส่วนตัว · Mu-Lab</p>
+            <h1 className="mt-1.5 font-serif text-2xl text-[#eef1ff] sm:text-3xl">
+              ลักขณาและดวงชะตาของ {analysis.fullName ?? "คุณ"}
+            </h1>
+            <p className="mt-1 text-xs text-[#dbe1ff]/60">
+              คำนวณตามเวลา/พิกัดเกิด ระบบ Lahiri sidereal · เก็บไว้ใน Personal Vault ของคุณ
+            </p>
+          </div>
 
-          <section className="mt-6 grid gap-4 rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(247,231,206,0.05)] p-4 sm:grid-cols-2">
-            <div>
-              <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">ข้อมูลกำเนิด</p>
-              <p className="mt-3 text-sm text-[#e8eeff]/88">ชื่อ: {analysis.fullName ?? "ไม่ได้ระบุ"}</p>
-              <p className="mt-1 text-sm text-[#e8eeff]/88">วันเกิด: {analysis.birthDate ?? "ไม่ได้ระบุ"}</p>
-              <p className="mt-1 text-sm text-[#e8eeff]/88">เวลาเกิด: {analysis.birthTime ?? "ไม่ได้ระบุ"}</p>
-              <p className="mt-1 text-sm text-[#e8eeff]/88">จังหวัดเกิด: {analysis.birthProvince ?? "ไม่ได้ระบุ"}</p>
+          {/* Hero — 3D ascendant + birth profile */}
+          {analysis.birthSign ? (
+            <Ascendant3D signName={analysis.birthSign} />
+          ) : (
+            <div className="rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(7,16,36,0.55)] p-6 text-center">
+              <p className="text-sm text-[#e8eeff]/80">ยังไม่มีข้อมูลเวลา-สถานที่เกิดสำหรับคำนวณลักขณา</p>
             </div>
-            <div className="rounded-xl border border-[rgba(247,231,206,0.2)] bg-[rgba(7,16,36,0.55)] p-4 text-center">
-              <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">ลักขณา (ราศีขึ้น)</p>
-              <p className="mt-3 font-serif text-3xl text-[#f5dfb6]">{analysis.birthSign ?? "ไม่พบข้อมูล"}</p>
-              <p className="mt-3 text-4xl text-[#f5dfb6]">{analysis.birthSign ? SIGN_SYMBOL[analysis.birthSign] ?? "✦" : "✦"}</p>
-              <p className="mt-2 text-xs text-[#dbe1ff]/66">โครงวางผลลักขณาแบบเรือนชะตา (สไตล์วงล้อ) สามารถขยายเพิ่มได้ในรอบถัดไป</p>
-            </div>
+          )}
+
+          {/* Birth profile compact */}
+          <section className="grid gap-4 rounded-2xl border border-[rgba(247,231,206,0.12)] bg-[rgba(247,231,206,0.04)] p-5 text-sm sm:grid-cols-4 sm:p-6">
+            <ProfileItem label="ชื่อ" value={analysis.fullName ?? "ไม่ได้ระบุ"} />
+            <ProfileItem label="วันเกิด" value={analysis.birthDate ?? "ไม่ได้ระบุ"} />
+            <ProfileItem label="เวลาเกิด" value={analysis.birthTime ?? "ไม่ได้ระบุ"} />
+            <ProfileItem label="จังหวัดเกิด" value={analysis.birthProvince ?? "ไม่ได้ระบุ"} />
           </section>
 
-          {analysis.birthSign ? (
-            <div className="mt-8">
-              <BirthSignDisplay signName={analysis.birthSign} />
-            </div>
+          {/* Zodiac value cards (from static meta) — gives free reader something tangible */}
+          {meta ? (
+            <section className="grid gap-4 sm:grid-cols-3">
+              <ValueCard
+                title="จุดเด่นที่จะพาคุณไปไกล"
+                accent={meta.color}
+                items={meta.strengths}
+              />
+              <ValueCard
+                title="ข้อควรระวังที่คนรอบตัวสังเกตได้"
+                accent={meta.accent}
+                items={meta.challenges}
+              />
+              <ValueCard
+                title="เส้นทางอาชีพที่ลักขณานี้รุ่ง"
+                accent={meta.color}
+                items={meta.careerThemes}
+              />
+            </section>
           ) : null}
 
-          <section className="mt-8 rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(247,231,206,0.05)] p-5">
-            <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">ส่วนฟรี · ภาพรวมเบื้องต้น</p>
+          {/* Free analysis (markdown) */}
+          <section className="rounded-2xl border border-[rgba(247,231,206,0.16)] bg-[rgba(247,231,206,0.05)] p-5 sm:p-6">
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-[rgba(247,231,206,0.12)] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--gold)]/85">
+                ฟรี
+              </span>
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/75">ภาพรวมจากระบบ Mu-Lab</p>
+            </div>
             <div className="mt-3 max-w-none">
               <MarkdownText source={analysis.summary} />
             </div>
-            <div className="mt-5 grid grid-cols-3 gap-3">
-              <div className="mu-lab-glass rounded-xl p-4 text-center">
-                <p className="text-xs text-[var(--gold)]/80">Career</p>
-                <p className="mt-2 text-2xl text-[#eef1ff]">{analysis.career}</p>
-              </div>
-              <div className="mu-lab-glass rounded-xl p-4 text-center">
-                <p className="text-xs text-[var(--gold)]/80">Wealth</p>
-                <p className="mt-2 text-2xl text-[#eef1ff]">{analysis.wealth}</p>
-              </div>
-              <div className="mu-lab-glass rounded-xl p-4 text-center">
-                <p className="text-xs text-[var(--gold)]/80">Love</p>
-                <p className="mt-2 text-2xl text-[#eef1ff]">{analysis.love}</p>
-              </div>
+
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              <Meter label="การงาน" value={analysis.career} />
+              <Meter label="การเงิน" value={analysis.wealth} />
+              <Meter label="ความรัก" value={analysis.love} />
             </div>
           </section>
 
-          <section className="relative mt-8">
+          {/* Premium / Deep insight teaser */}
+          <section className="relative">
             <article
-              className={`mu-lab-glass rounded-2xl border border-[rgba(247,231,206,0.12)] p-5 transition ${
-                hasAccess ? "" : "select-none blur-xl"
+              className={`rounded-2xl border border-[rgba(247,231,206,0.18)] bg-[radial-gradient(circle_at_18%_0%,rgba(247,231,206,0.16)_0%,transparent_55%),radial-gradient(circle_at_82%_100%,rgba(99,118,228,0.22)_0%,transparent_60%),linear-gradient(160deg,#0d1638_0%,#070b22_55%,#03050f_100%)] p-5 sm:p-7 ${
+                hasAccess ? "" : "select-none blur-[10px]"
               }`}
             >
-              <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">ส่วนชำระเงิน · คำทำนายเชิงลึก</p>
-              <h2 className="mt-2 font-serif text-2xl text-[#eef1ff]">Deep Insight</h2>
-              <div className="mt-3 max-w-none">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-[rgba(247,231,206,0.18)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--gold)]">
+                  Premium
+                </span>
+                <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/85">Deep Insight</p>
+              </div>
+              <h2 className="mt-2 font-serif text-2xl text-[#eef1ff] sm:text-3xl">
+                แผนชีวิต 12 เรือนชะตา · เจาะลึกตามลักขณา{analysis.birthSign ?? "ของคุณ"}
+              </h2>
+              <p className="mt-2 text-sm text-[#dbe1ff]/80">
+                ผลแบบเต็ม ครอบคลุมการงาน-การเงิน-ความรัก-สุขภาพ-โอกาสรายเดือน + ช่วงเวลาทองเดิน
+                ใหญ่ ๆ ของปี และคำแนะนำเฉพาะองศาลักขณาของคุณ
+              </p>
+              <div className="mt-4 max-w-none">
                 <MarkdownText source={analysis.deepInsight} />
               </div>
             </article>
             {!hasAccess ? <PaywallOverlay analysisId={id} /> : null}
           </section>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3">
             {!user ? (
-              <Link href="/login?next=/vault" className="rounded-full border border-[rgba(247,231,206,0.4)] px-4 py-2 text-sm text-[var(--gold)]">
-                Login to Save & Read Full
+              <Link
+                href="/login?next=/vault"
+                className="rounded-full border border-[rgba(247,231,206,0.4)] bg-[rgba(247,231,206,0.06)] px-4 py-2 text-sm text-[var(--gold)]"
+              >
+                เข้าสู่ระบบเพื่อบันทึกผล
               </Link>
             ) : null}
-            <Link href="/vault" className="rounded-full border border-[rgba(247,231,206,0.24)] px-4 py-2 text-sm text-[#e8eeff]/88">
+            <Link
+              href="/vault"
+              className="rounded-full border border-[rgba(247,231,206,0.24)] bg-[rgba(247,231,206,0.04)] px-4 py-2 text-sm text-[#e8eeff]/88"
+            >
               ไปยัง Personal Vault
+            </Link>
+            <Link
+              href="/#fortune-form"
+              className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-4 py-2 text-sm font-semibold text-[#241d16]"
+            >
+              วิเคราะห์ดวงคนใหม่
             </Link>
           </div>
         </div>
       </main>
     </>
+  );
+}
+
+function ProfileItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/65">{label}</p>
+      <p className="mt-1.5 text-sm text-[#eef1ff]/95">{value}</p>
+    </div>
+  );
+}
+
+function ValueCard({ title, accent, items }: { title: string; accent: string; items: string[] }) {
+  return (
+    <article className="relative overflow-hidden rounded-2xl border border-[rgba(247,231,206,0.14)] bg-[rgba(7,16,36,0.55)] p-5">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-30"
+        style={{
+          background: `radial-gradient(circle at 0% 0%, ${accent}55 0%, transparent 55%)`,
+        }}
+      />
+      <div className="relative">
+        <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/70">{title}</p>
+        <ul className="mt-3 space-y-2 text-sm text-[#eef1ff]/92">
+          {items.map((item) => (
+            <li key={item} className="flex gap-2">
+              <span className="mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: accent }} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  );
+}
+
+function Meter({ label, value }: { label: string; value: number }) {
+  const v = Math.max(0, Math.min(100, value));
+  return (
+    <div className="rounded-xl border border-[rgba(247,231,206,0.14)] bg-[rgba(7,16,36,0.55)] p-3.5 text-center">
+      <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/70">{label}</p>
+      <p className="mt-1 text-2xl font-light text-[#eef1ff]">{v}</p>
+      <div className="mx-auto mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+        <div
+          className="h-full rounded-full bg-[linear-gradient(90deg,#f7e7ce,#ead2a6,#d9bb85)]"
+          style={{ width: `${v}%` }}
+        />
+      </div>
+    </div>
   );
 }
