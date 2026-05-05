@@ -112,12 +112,12 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
                   <span
                     role="img"
                     aria-label={`${signName} icon`}
-                    className="h-[56%] w-[56%] rounded-md bg-no-repeat [mix-blend-mode:screen] drop-shadow-[0_8px_12px_rgba(0,0,0,0.35)]"
+                    className="h-[60%] w-[60%] rounded-md bg-no-repeat [mix-blend-mode:screen] drop-shadow-[0_10px_14px_rgba(0,0,0,0.38)]"
                     style={{
                       backgroundImage: "url('/zodiac-animal-sprites.png')",
                       backgroundSize: "400% 300%",
                       backgroundPosition: zodiacSpritePosition,
-                      filter: "brightness(1.08) contrast(1.08) saturate(1.02)",
+                      filter: "brightness(1.18) contrast(1.38) saturate(1.08) drop-shadow(0 0 6px rgba(255,235,194,0.3))",
                     }}
                   />
                 ) : (
