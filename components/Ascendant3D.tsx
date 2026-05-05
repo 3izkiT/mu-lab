@@ -26,6 +26,7 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
   const accent2 = meta?.accent ?? "#ffe6b3";
   const symbol = meta?.symbol ?? "✦";
   const nameEn = meta?.nameEn ?? "Ascendant";
+  const zodiacIconUrl = getZodiacIconUrl(signName);
 
   const showDetailGrid = mode === "full" && meta;
 
@@ -106,7 +107,16 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
                   textShadow: `0 -2px 1px rgba(255,255,255,0.35), 0 8px 16px rgba(0,0,0,0.55)`,
                 }}
               >
-                <span className="font-serif text-[clamp(4.35rem,17vw,6rem)] leading-[1.05] text-[#0c0e26]">{symbol}</span>
+                {zodiacIconUrl ? (
+                  <img
+                    src={zodiacIconUrl}
+                    alt={`${signName} icon`}
+                    className="h-[56%] w-[56%] object-contain drop-shadow-[0_8px_10px_rgba(0,0,0,0.35)]"
+                    draggable={false}
+                  />
+                ) : (
+                  <span className="font-serif text-[clamp(4.15rem,16vw,5.7rem)] leading-[1.12] text-[#0c0e26]">{symbol}</span>
+                )}
               </div>
             </div>
           </div>
@@ -114,7 +124,7 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
 
         <div className={`min-w-0 ${showDetailGrid ? "sm:text-left" : "text-center"}`}>
           <p className="text-[10px] uppercase tracking-[0.24em] text-[var(--gold)]/72">Ascending sign · ลักขณา</p>
-          <h2 className="mt-1.5 bg-[linear-gradient(110deg,#f7e7ce_0%,#ffecb5_52%,#d9bb85_100%)] bg-clip-text font-serif text-4xl tracking-tight text-transparent sm:text-5xl">
+          <h2 className="mt-1.5 bg-[linear-gradient(110deg,#f7e7ce_0%,#ffecb5_52%,#d9bb85_100%)] bg-clip-text pb-1 font-serif text-4xl font-semibold leading-[1.2] tracking-tight text-transparent sm:text-5xl">
             {signName}
           </h2>
           <p className="mt-2 text-[11px] uppercase tracking-[0.24em] text-[#dbe1ff]/60">{nameEn}</p>
@@ -167,6 +177,26 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
       </div>
     </section>
   );
+}
+
+function getZodiacIconUrl(signName: string): string | null {
+  const twemojiBySign: Record<string, string> = {
+    เมษ: "2648",
+    พฤษภ: "2649",
+    เมถุน: "264a",
+    กรกฎ: "264b",
+    สิงห์: "264c",
+    กันย์: "264d",
+    ตุลย์: "264e",
+    พิจิก: "264f",
+    ธนู: "2650",
+    มังกร: "2651",
+    กุมภ์: "2652",
+    มีน: "2653",
+  };
+  const code = twemojiBySign[signName];
+  if (!code) return null;
+  return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${code}.svg`;
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
