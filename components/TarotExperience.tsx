@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ONE_OFF_ACCESS_DAYS, PRICING_THB } from "@/lib/billing-config";
 import { getTarotCardArt } from "@/lib/tarot-cards";
 
-type TarotCheckoutPurchaseType = "tarot-deep" | "vip-weekly" | "premium-monthly";
+type TarotCheckoutPurchaseType = "vip-daily" | "tarot-deep" | "vip-weekly" | "premium-monthly";
 
 export type TarotResponse = {
   readingId: string;
@@ -24,7 +24,8 @@ type TarotExperienceProps = {
   initialResult?: TarotResponse | null;
 };
 
-const SLOT_LABELS = ["อดีต", "ปัจจุบัน", "อนาคต"] as const;
+const BASE_SLOT_LABELS = ["อดีต", "ปัจจุบัน", "อนาคต"] as const;
+const SPREAD_OPTIONS = [3, 5, 10] as const;
 
 function CardBack() {
   return (
@@ -114,12 +115,13 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<TarotResponse | null>(initialResult);
   const [error, setError] = useState<string | null>(null);
+  const [spreadCount, setSpreadCount] = useState<3 | 5 | 10>(3);
   const [unlocking, setUnlocking] = useState(false);
   const [slots, setSlots] = useState<Slot[]>(() => {
     if (initialResult?.cards?.length) {
-      return initialResult.cards.slice(0, 3).map((name, i) => ({ key: `init-${i}`, name, flipped: true }));
+      return initialResult.cards.map((name, i) => ({ key: `init-${i}`, name, flipped: true }));
     }
-    return EMPTY_SLOTS;
+    return EMPTY_SLOTS.slice(0, 3);
   });
   const [shuffling, setShuffling] = useState(false);
 
@@ -140,6 +142,14 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     () => slots.map((slot) => (slot.name ? getTarotCardArt(slot.name) : null)),
     [slots],
   );
+  const slotLabels = useMemo(
+    () =>
+      slots.map((_, i) => {
+        if (i < BASE_SLOT_LABELS.length) return BASE_SLOT_LABELS[i];
+        return `ตำแหน่ง ${i + 1}`;
+      }),
+    [slots],
+  );
 
   async function onDraw() {
     if (loading) return;
@@ -152,7 +162,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
       const response = await fetch("/api/tarot/read", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, spreadCount }),
       });
       const payload = (await response.json()) as TarotResponse & { message?: string };
       if (!response.ok) throw new Error(payload.message || "tarot unavailable");
@@ -209,7 +219,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
       </div>
       <p className="mt-3 text-sm text-[#dbe1ff]/82">
         ตั้งคำถามในใจ แล้วกด <span className="text-[var(--gold)]">"สับและเปิดไพ่"</span>{" "}
-        หรือคลิกที่ไพ่ด้านหลังเพื่อเปิด ไพ่ที่ขึ้นมาคือ <em className="not-italic text-[var(--gold)]/85">อดีต · ปัจจุบัน · อนาคต</em> ของคำถามนั้น
+        หรือคลิกที่ไพ่ด้านหลังเพื่อเปิด เลือกได้ 3 / 5 / 10 ใบตามความลึกที่ต้องการ
       </p>
       {result?.guestMode ? (
         <p className="mt-2 text-xs text-[#dbe1ff]/65">
@@ -217,9 +227,29 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         </p>
       ) : null}
 
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <p className="text-xs text-[#dbe1ff]/72">รูปแบบการเปิดไพ่:</p>
+        {SPREAD_OPTIONS.map((n) => (
+          <button
+            key={n}
+            type="button"
+            disabled={loading}
+            onClick={() => setSpreadCount(n)}
+            className={`rounded-full px-3 py-1 text-xs transition ${
+              spreadCount === n
+                ? "border border-[rgba(247,231,206,0.5)] bg-[rgba(247,231,206,0.08)] text-[var(--gold)]"
+                : "border border-white/15 bg-white/[0.03] text-[#dbe1ff]/82"
+            }`}
+          >
+            {n} ใบ
+          </button>
+        ))}
+      </div>
+
       <div className="relative mt-7 flex justify-center [perspective:1400px]">
         <div
-          className={`grid w-full max-w-2xl grid-cols-3 gap-3 sm:gap-5 ${shuffling ? "tarot-shuffle" : ""}`}
+          className={`grid w-full max-w-4xl gap-3 sm:gap-5 ${shuffling ? "tarot-shuffle" : ""}`}
+          style={{ gridTemplateColumns: `repeat(${Math.min(slots.length, 5)}, minmax(0, 1fr))` }}
         >
           {slots.map((slot, i) => {
             const art = cardArts[i];
@@ -228,13 +258,13 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
             return (
               <div key={slot.key} className="flex flex-col items-center gap-3">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/70">
-                  {SLOT_LABELS[i]}
+                  {slotLabels[i]}
                 </div>
                 <button
                   type="button"
                   onClick={onDraw}
                   disabled={!interactive}
-                  aria-label={`เปิดไพ่ ${SLOT_LABELS[i]}`}
+                  aria-label={`เปิดไพ่ ${slotLabels[i]}`}
                   className={`group relative aspect-[2/3.4] w-full max-w-[200px] cursor-pointer rounded-[20px] outline-none transition will-change-transform [transform-style:preserve-3d] ${
                     isFlipped ? "[transform:rotateY(180deg)]" : ""
                   } ${interactive ? "hover:-translate-y-1.5 focus-visible:-translate-y-1.5" : "cursor-default"}`}
@@ -301,7 +331,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
               {cardArts.map((art, i) =>
                 art ? (
                   <div key={`m-${art.slug}`} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--gold)]/60">{SLOT_LABELS[i]}</p>
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--gold)]/60">{slotLabels[i]}</p>
                     <p className="mt-1 font-serif text-sm text-[var(--gold)]">{art.nameTh}</p>
                     <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/76">{art.meaningTh}</p>
                   </div>
@@ -322,6 +352,14 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                   ปลดล็อกเพื่ออ่านบทเจาะลึกเฉพาะคำถามนี้ (สิทธิ์ย้อนหลัง {ONE_OFF_ACCESS_DAYS} วัน): แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
                 </p>
                 <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={() => startCheckout("vip-daily")}
+                    disabled={unlocking}
+                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
+                  >
+                    {unlocking ? "กำลังพาไปจ่าย..." : `ทั้งระบบ 1 วัน ฿${PRICING_THB["vip-daily"]}`}
+                  </button>
                   <button
                     type="button"
                     onClick={() => startCheckout("tarot-deep")}

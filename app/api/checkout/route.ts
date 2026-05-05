@@ -58,15 +58,12 @@ export async function POST(request: Request) {
   const successUrl = `/checkout/success?sessionId=${encodeURIComponent(sessionId)}&purchaseType=${encodeURIComponent(body.purchaseType)}&targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`;
   const cancelUrl = `/checkout/cancel?sessionId=${encodeURIComponent(sessionId)}`;
   const providerBaseUrl = process.env.PAYMENT_PROVIDER_CHECKOUT_URL?.trim();
-  if (!providerBaseUrl && process.env.NODE_ENV === "production") {
-    return NextResponse.json(
-      { message: "payment provider is not configured in production" },
-      { status: 503 },
-    );
-  }
+  const slipFallbackUrl = `/checkout/slip?sessionId=${encodeURIComponent(sessionId)}&amount=${amountTHB}`;
   const redirectUrl = providerBaseUrl
     ? `${providerBaseUrl}?sessionId=${encodeURIComponent(sessionId)}&successUrl=${encodeURIComponent(successUrl)}&cancelUrl=${encodeURIComponent(cancelUrl)}`
-    : `/checkout/provider?sessionId=${encodeURIComponent(sessionId)}&successUrl=${encodeURIComponent(successUrl)}`;
+    : process.env.NODE_ENV === "production"
+      ? slipFallbackUrl
+      : `/checkout/provider?sessionId=${encodeURIComponent(sessionId)}&successUrl=${encodeURIComponent(successUrl)}`;
 
   return NextResponse.json({
     redirectUrl,

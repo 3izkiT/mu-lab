@@ -86,7 +86,7 @@ async function hasTarotDeepPurchase(userId: string, readingId: string): Promise<
   return c > 0;
 }
 
-export async function createOrGetTarotReading(userId: string, question: string): Promise<TarotDrawResult> {
+export async function createOrGetTarotReading(userId: string, question: string, spreadCount = 3): Promise<TarotDrawResult> {
   const dateKey = getBangkokDateKey();
   const normalizedQuestion = question.trim().slice(0, 240) || "ภาพรวมวันนี้";
 
@@ -119,7 +119,8 @@ export async function createOrGetTarotReading(userId: string, question: string):
     }
   }
 
-  const cards = pickCards(`${userId}:${dateKey}:${normalizedQuestion}`, 3);
+  const count = spreadCount === 5 || spreadCount === 10 ? spreadCount : 3;
+  const cards = pickCards(`${userId}:${dateKey}:${normalizedQuestion}:${count}`, count);
   const preview = buildPreview(cards, normalizedQuestion);
   const deepInsight = buildDeepInsight(cards, normalizedQuestion);
   const readingId = nanoid(12);

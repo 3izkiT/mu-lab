@@ -7,7 +7,7 @@ import { shouldUseSecureCookie } from "@/lib/cookie-security";
 import { prisma } from "@/lib/prisma";
 import { rateLimitOrThrow } from "@/lib/rate-limit";
 
-type ReadBody = { question?: string; readingId?: string };
+type ReadBody = { question?: string; readingId?: string; spreadCount?: number };
 type MaybeRetry = { retryAfterSeconds?: number };
 
 export async function POST(request: Request) {
@@ -61,7 +61,8 @@ export async function POST(request: Request) {
     return response;
   }
 
-  const reading = await createOrGetTarotReading(userId, body.question ?? "ภาพรวมวันนี้");
+  const spreadCount = body.spreadCount === 5 || body.spreadCount === 10 ? body.spreadCount : 3;
+  const reading = await createOrGetTarotReading(userId, body.question ?? "ภาพรวมวันนี้", spreadCount);
   const response = NextResponse.json({ ...reading, guestMode });
   if (createdGuestId) {
     response.cookies.set("mu_guest_uid", createdGuestId, {
