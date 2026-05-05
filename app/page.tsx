@@ -36,7 +36,8 @@ export default async function Home() {
               />
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,19,0.55)_0%,rgba(5,8,19,0.38)_48%,rgba(5,8,19,0.28)_100%)]" />
               <div
-                className="pointer-events-none absolute left-1/2 top-2 z-[70] grid h-[min(42vw,160px)] w-[min(42vw,160px)] -translate-x-1/2 place-items-center opacity-95 sm:top-3 sm:h-[210px] sm:w-[210px]"
+                id="hero-fortune-logo"
+                className="pointer-events-none absolute left-1/2 top-2 z-30 grid h-[min(42vw,160px)] w-[min(42vw,160px)] -translate-x-1/2 place-items-center opacity-95 sm:top-3 sm:h-[210px] sm:w-[210px]"
                 aria-hidden
               >
                 <Image
