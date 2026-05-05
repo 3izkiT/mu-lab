@@ -27,7 +27,7 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
   const accent2 = palette.secondary;
   const symbol = meta?.symbol ?? "✦";
   const nameEn = meta?.nameEn ?? "Ascendant";
-  const zodiacSpritePosition = getZodiacSpritePosition(signName);
+  const zodiacSpriteStyle = getZodiacSpriteStyle(signName);
 
   const showDetailGrid = mode === "full" && meta;
 
@@ -108,17 +108,17 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
                   textShadow: `0 -2px 1px rgba(255,255,255,0.35), 0 8px 16px rgba(0,0,0,0.55)`,
                 }}
               >
-                {zodiacSpritePosition ? (
+                {zodiacSpriteStyle ? (
                   <span
                     role="img"
                     aria-label={`${signName} icon`}
-                    className="h-[78%] w-[78%] bg-no-repeat drop-shadow-[0_10px_14px_rgba(0,0,0,0.34)]"
+                    className="h-[72%] w-[72%] rounded-full bg-no-repeat"
                     style={{
                       backgroundImage: "url('/zodiac-animal-sprites.png')",
-                      backgroundSize: "400% 300%",
-                      backgroundPosition: zodiacSpritePosition,
+                      backgroundSize: zodiacSpriteStyle.size,
+                      backgroundPosition: zodiacSpriteStyle.position,
                       filter:
-                        "brightness(1.14) contrast(1.52) saturate(1.05) drop-shadow(0 0 1px rgba(0,0,0,0.95)) drop-shadow(0 0 2px rgba(0,0,0,0.9)) drop-shadow(0 0 4px rgba(255,255,255,0.22))",
+                        "brightness(1.13) contrast(1.2) saturate(1.06) drop-shadow(0 2px 4px rgba(11,18,44,0.36)) drop-shadow(0 0 6px rgba(255,242,214,0.28))",
                     }}
                   />
                 ) : (
@@ -186,7 +186,7 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
   );
 }
 
-function getZodiacSpritePosition(signName: string): string | null {
+function getZodiacSpriteStyle(signName: string): { position: string; size: string } | null {
   const signIndex: Record<string, number> = {
     เมษ: 0,
     พฤษภ: 1,
@@ -205,9 +205,10 @@ function getZodiacSpritePosition(signName: string): string | null {
   if (typeof index !== "number") return null;
   const col = index % 4;
   const row = Math.floor(index / 4);
-  const x = (col / 3) * 100;
-  const y = (row / 2) * 100;
-  return `${x}% ${y}%`;
+  // The source sprite has labels under each icon, so we zoom slightly and nudge Y to keep icon centered.
+  const x = [0, 33.33, 66.66, 100][col] ?? 0;
+  const y = [8, 50, 92][row] ?? 50;
+  return { position: `${x}% ${y}%`, size: "400% 360%" };
 }
 
 function getElementPalette(element?: string) {
