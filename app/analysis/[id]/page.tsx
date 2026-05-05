@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BriefcaseBusiness, Heart, Wallet } from "lucide-react";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
 import Ascendant3D from "@/components/Ascendant3D";
 import { MarkdownText } from "@/components/MarkdownText";
@@ -225,11 +226,23 @@ function ValueCard({ title, accent, items }: { title: string; accent: string; it
 
 function Meter({ label, value }: { label: string; value: number }) {
   const v = Math.max(0, Math.min(100, value));
+  const meterMeta: Record<string, { Icon: typeof BriefcaseBusiness; iconColor: string }> = {
+    การงาน: { Icon: BriefcaseBusiness, iconColor: "text-[#9ecbff]" },
+    การเงิน: { Icon: Wallet, iconColor: "text-[var(--gold)]" },
+    ความรัก: { Icon: Heart, iconColor: "text-[#ff9cb5]" },
+  };
+  const { Icon, iconColor } = meterMeta[label] ?? { Icon: BriefcaseBusiness, iconColor: "text-[#9ecbff]" };
+
   return (
-    <div className="rounded-xl border border-[rgba(247,231,206,0.14)] bg-[rgba(7,16,36,0.55)] p-3.5 text-center">
-      <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/70">{label}</p>
-      <p className="mt-1 text-2xl font-light text-[#eef1ff]">{v}</p>
-      <div className="mx-auto mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+    <div className="rounded-xl border border-[rgba(247,231,206,0.14)] bg-[rgba(7,16,36,0.55)] p-3.5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <Icon className={`h-5 w-5 ${iconColor}`} aria-hidden />
+          <p className="text-xl font-semibold text-[var(--gold)] sm:text-2xl">{label}</p>
+        </div>
+        <p className="text-xl font-semibold text-[#eef1ff] sm:text-2xl">{v}</p>
+      </div>
+      <div className="mx-auto mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
         <div
           className="h-full rounded-full bg-[linear-gradient(90deg,#f7e7ce,#ead2a6,#d9bb85)]"
           style={{ width: `${v}%` }}

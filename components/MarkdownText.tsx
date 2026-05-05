@@ -4,13 +4,13 @@ const baseTextClasses = "text-base leading-relaxed text-[#e8eeff]/88 sm:text-lg"
 
 const components = {
   h1: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="mt-3 font-serif text-xl text-[#eef1ff]">{children}</h2>
+    <h2 className="mt-4 font-serif text-2xl font-bold text-[var(--gold)]">{children}</h2>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="mt-3 font-serif text-lg text-[#eef1ff]">{children}</h3>
+    <h3 className="mt-4 font-serif text-xl font-bold text-[var(--gold)]">{children}</h3>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h4 className="mt-3 font-serif text-base text-[#eef1ff]">{children}</h4>
+    <h4 className="mt-3 font-serif text-lg font-bold text-[var(--gold)]">{children}</h4>
   ),
   p: ({ children }: { children?: React.ReactNode }) => (
     <p className={`mb-3 last:mb-0 ${baseTextClasses}`}>{children}</p>
@@ -25,7 +25,7 @@ const components = {
     <li className="marker:text-[var(--gold)]/70">{children}</li>
   ),
   strong: ({ children }: { children?: React.ReactNode }) => (
-    <strong className="font-semibold text-[#eef1ff]">{children}</strong>
+    <strong className="font-bold text-[var(--gold)]">{children}</strong>
   ),
   em: ({ children }: { children?: React.ReactNode }) => (
     <em className="text-[#eef1ff]/95">{children}</em>
