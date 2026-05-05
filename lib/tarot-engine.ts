@@ -74,11 +74,11 @@ function buildDeepInsight(cards: string[], question: string): string {
 }
 
 async function hasTarotDeepPurchase(userId: string, readingId: string): Promise<boolean> {
-  const c = await prisma.purchase.count({
+  const c = await prisma.checkoutSession.count({
     where: {
       userId,
-      featureType: "tarot-deep",
-      targetId: readingId,
+      purchaseType: "tarot-deep",
+      analysisId: readingId,
       status: "completed",
       createdAt: { gte: oneOffCutoffDate(new Date()) },
     },
