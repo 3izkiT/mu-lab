@@ -32,6 +32,9 @@ function CardBack() {
     <div className="relative h-full w-full overflow-hidden rounded-[18px] bg-[radial-gradient(circle_at_30%_25%,rgba(247,231,206,0.18)_0%,transparent_55%),linear-gradient(140deg,#1a1235_0%,#0a0a22_55%,#020314_100%)]">
       <div className="pointer-events-none absolute inset-[6px] rounded-[14px] border border-[rgba(247,231,206,0.32)] shadow-[inset_0_0_24px_rgba(247,231,206,0.12)]" />
       <div className="pointer-events-none absolute inset-[14px] rounded-[10px] border border-[rgba(247,231,206,0.16)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-20">
+        <Image src="/logo-brand-v2.png" alt="Mu-Lab logo" fill sizes="220px" className="object-contain p-6" priority={false} />
+      </div>
       <div className="absolute inset-0 grid place-items-center">
         <svg viewBox="0 0 100 140" className="h-3/5 w-auto text-[var(--gold)] opacity-80" aria-hidden>
           <defs>
