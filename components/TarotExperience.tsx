@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { ONE_OFF_ACCESS_DAYS, PRICING_THB } from "@/lib/billing-config";
 import { getTarotCardArt } from "@/lib/tarot-cards";
 
 export type TarotResponse = {
@@ -328,7 +329,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
             ) : (
               <div>
                 <p className="mt-3 text-sm leading-relaxed text-[#dbe1ff]/72">
-                  ปลดล็อกเพื่ออ่านบทเจาะลึกเฉพาะคำถามนี้ (สิทธิ์ย้อนหลัง 7 วัน): แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
+                  ปลดล็อกเพื่ออ่านบทเจาะลึกเฉพาะคำถามนี้ (สิทธิ์ย้อนหลัง {ONE_OFF_ACCESS_DAYS} วัน): แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
                 </p>
                 <button
                   type="button"
@@ -336,7 +337,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                   disabled={unlocking}
                   className="mt-4 rounded-full border border-[rgba(247,231,206,0.5)] bg-[rgba(247,231,206,0.06)] px-5 py-2 text-sm font-semibold text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.12)] disabled:opacity-60"
                 >
-                  {unlocking ? "กำลังปลดล็อก..." : "ปลดล็อกบทอ่านลึก 39 บาท"}
+                  {unlocking ? "กำลังปลดล็อก..." : `ปลดล็อกบทอ่านลึก ${PRICING_THB["tarot-deep"]} บาท`}
                 </button>
               </div>
             )}

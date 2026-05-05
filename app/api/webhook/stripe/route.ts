@@ -113,6 +113,7 @@ export async function POST(request: Request) {
 
   const session = await prisma.checkoutSession.findUnique({ where: { id: sessionId } });
   if (!session) {
+    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "failed" } });
     return NextResponse.json({ message: "session not found" }, { status: 404 });
   }
 
@@ -125,64 +126,68 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, unlocked: false });
   }
 
-  await prisma.$transaction(async (tx: WebhookTx) => {
-    await tx.checkoutSession.update({
-      where: { id: sessionId },
-      data: { status: "completed", providerRef },
-    });
-
-    if (session.purchaseType === "deep-insight" || session.purchaseType === "tarot-deep") {
-      const exists = await tx.purchase.findFirst({
-        where: {
-          userId: session.userId,
-          featureType: session.purchaseType,
-          targetId: session.analysisId ?? undefined,
-          status: "completed",
-        },
+  try {
+    await prisma.$transaction(async (tx: WebhookTx) => {
+      await tx.checkoutSession.update({
+        where: { id: sessionId },
+        data: { status: "completed", providerRef },
       });
-      if (!exists) {
-        await tx.purchase.create({
-          data: {
-            id: nanoid(12),
+
+      if (session.purchaseType === "deep-insight" || session.purchaseType === "tarot-deep") {
+        const exists = await tx.purchase.findFirst({
+          where: {
             userId: session.userId,
             featureType: session.purchaseType,
-            targetId: session.analysisId,
-            amountTHB: session.amountTHB,
+            targetId: session.analysisId ?? undefined,
             status: "completed",
           },
         });
+        if (!exists) {
+          await tx.purchase.create({
+            data: {
+              id: nanoid(12),
+              userId: session.userId,
+              featureType: session.purchaseType,
+              targetId: session.analysisId,
+              amountTHB: session.amountTHB,
+              status: "completed",
+            },
+          });
+        }
+        return;
       }
-      return;
-    }
 
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 30);
-    await tx.subscription.upsert({
-      where: { id: `premium-${session.userId}` },
-      create: {
-        id: `premium-${session.userId}`,
-        userId: session.userId,
-        planType: "premium",
-        status: "active",
-        expiryDate,
-      },
-      update: {
-        status: "active",
-        expiryDate,
-      },
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 30);
+      await tx.subscription.upsert({
+        where: { id: `premium-${session.userId}` },
+        create: {
+          id: `premium-${session.userId}`,
+          userId: session.userId,
+          planType: "premium",
+          status: "active",
+          expiryDate,
+        },
+        update: {
+          status: "active",
+          expiryDate,
+        },
+      });
+      await tx.purchase.create({
+        data: {
+          id: nanoid(12),
+          userId: session.userId,
+          featureType: "premium-monthly",
+          amountTHB: session.amountTHB,
+          status: "completed",
+        },
+      });
     });
-    await tx.purchase.create({
-      data: {
-        id: nanoid(12),
-        userId: session.userId,
-        featureType: "premium-monthly",
-        amountTHB: session.amountTHB,
-        status: "completed",
-      },
-    });
-  });
 
-  await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "processed" } });
-
-  return NextResponse.json({ ok: true, unlocked: true });
+    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "processed" } });
+    return NextResponse.json({ ok: true, unlocked: true });
+  } catch {
+    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "failed" } });
+    return NextResponse.json({ message: "webhook processing failed" }, { status: 500 });
+  }
 }

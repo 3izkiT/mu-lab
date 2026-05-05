@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth-utils";
+import { ENTITLEMENT_MATRIX } from "@/lib/entitlement-matrix";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminPaymentsPage() {
@@ -10,7 +11,16 @@ export default async function AdminPaymentsPage() {
   const dayAgo = new Date(now - 24 * 60 * 60 * 1000);
   const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
 
-  const [pending, completed24h, failed24h, completedSessions24h, purchases7d] = await Promise.all([
+  const [
+    pending,
+    completed24h,
+    failed24h,
+    completedSessions24h,
+    purchases7d,
+    webhookReceived24h,
+    webhookFailed24h,
+    recentWebhookEvents,
+  ] = await Promise.all([
     prisma.checkoutSession.count({ where: { status: "pending" } }),
     prisma.checkoutSession.count({ where: { status: "completed", updatedAt: { gte: dayAgo } } }),
     prisma.checkoutSession.count({ where: { status: "failed", updatedAt: { gte: dayAgo } } }),
@@ -26,6 +36,14 @@ export default async function AdminPaymentsPage() {
       _count: { featureType: true },
       _sum: { amountTHB: true },
       orderBy: { _count: { featureType: "desc" } },
+    }),
+    prisma.webhookEvent.count({ where: { provider: "stripe", status: "processed", createdAt: { gte: dayAgo } } }),
+    prisma.webhookEvent.count({ where: { provider: "stripe", status: "failed", createdAt: { gte: dayAgo } } }),
+    prisma.webhookEvent.findMany({
+      where: { provider: "stripe" },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: { id: true, eventType: true, status: true, createdAt: true },
     }),
   ]);
 
@@ -52,6 +70,8 @@ export default async function AdminPaymentsPage() {
           <KpiCard label="Completed (24h)" value={String(completed24h)} />
           <KpiCard label="Failed (24h)" value={String(failed24h)} />
           <KpiCard label="Avg Unlock (sec)" value={String(avgUnlockSeconds)} />
+          <KpiCard label="Webhook OK (24h)" value={String(webhookReceived24h)} />
+          <KpiCard label="Webhook Failed (24h)" value={String(webhookFailed24h)} />
         </div>
 
         <div className="mt-6 rounded-2xl border border-white/10 bg-[rgba(5,10,24,0.45)] p-4">
@@ -71,6 +91,40 @@ export default async function AdminPaymentsPage() {
             {purchases7d.length === 0 ? (
               <p className="text-sm text-[#dbe1ff]/65">ยังไม่มีธุรกรรมในรอบ 7 วัน</p>
             ) : null}
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-[rgba(5,10,24,0.45)] p-4">
+          <p className="text-sm font-semibold text-[#eef1ff]">Recent Stripe Webhooks</p>
+          <div className="mt-3 grid gap-2">
+            {recentWebhookEvents.map((event) => (
+              <div
+                key={event.id}
+                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-xs"
+              >
+                <p className="truncate text-[#dbe1ff]/86">{event.eventType}</p>
+                <p
+                  className={
+                    event.status === "processed" ? "text-emerald-300" : event.status === "failed" ? "text-rose-300" : "text-amber-300"
+                  }
+                >
+                  {event.status}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-[rgba(5,10,24,0.45)] p-4">
+          <p className="text-sm font-semibold text-[#eef1ff]">Entitlement Matrix (Current)</p>
+          <div className="mt-3 grid gap-2">
+            {ENTITLEMENT_MATRIX.map((rule) => (
+              <div key={rule.key} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                <p className="text-sm text-[var(--gold)]">{rule.label}</p>
+                <p className="mt-1 text-[11px] text-[#dbe1ff]/70">{rule.tier}</p>
+                <p className="mt-1 text-xs text-[#dbe1ff]/82">{rule.notes}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
