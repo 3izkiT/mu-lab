@@ -30,10 +30,25 @@ const SPREAD_OPTIONS = [3, 5, 10] as const;
 function CardBack() {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[18px] bg-[#060a1a]">
-      <Image src="/logo-brand-v2.png" alt="Mu-Lab logo card back" fill sizes="220px" className="object-cover" priority={false} />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(2,4,12,0.18)_0%,rgba(2,4,12,0.45)_100%)]" />
-      <div className="pointer-events-none absolute inset-[6px] rounded-[14px] border border-[rgba(247,231,206,0.36)] shadow-[inset_0_0_20px_rgba(247,231,206,0.14)]" />
-      <div className="pointer-events-none absolute inset-[14px] rounded-[10px] border border-[rgba(247,231,206,0.2)]" />
+      {/* Background gloss */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(247,231,206,0.14)_0%,transparent_55%),linear-gradient(140deg,#0f0a2a_0%,#0a0a22_45%,#020314_100%)]" />
+
+      {/* Brand poster scaled down (~50%) */}
+      <div className="pointer-events-none absolute inset-0 p-10">
+        <Image
+          src="/logo-brand-v2.png"
+          alt="Mu-Lab logo card back"
+          fill
+          sizes="220px"
+          className="object-contain"
+          priority={false}
+        />
+      </div>
+
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(2,4,12,0.10)_0%,rgba(2,4,12,0.55)_100%)]" />
+
+      <div className="pointer-events-none absolute inset-[6px] rounded-[14px] border border-[rgba(247,231,206,0.28)] shadow-[inset_0_0_18px_rgba(247,231,206,0.12)]" />
+      <div className="pointer-events-none absolute inset-[14px] rounded-[10px] border border-[rgba(247,231,206,0.18)]" />
     </div>
   );
 }
@@ -99,6 +114,13 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
 
   useEffect(() => {
     if (!result) return;
+    // Lock UI selector to whatever the API actually returned for this reading.
+    // If today's free quota is already used, the API will return the latest saved reading,
+    // so cards count will remain the same for the rest of the day.
+    const actualCount = result.cards.length;
+    if (actualCount === 3 || actualCount === 5 || actualCount === 10) {
+      setSpreadCount(actualCount);
+    }
     const cards = result.cards;
     setSlots(cards.map((name, i) => ({ key: `${result.readingId}-${i}`, name, flipped: false })));
     cards.forEach((_, i) => {
@@ -110,6 +132,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
 
   const totalRemaining = result?.freeRemainingToday ?? 1;
   const totalLimit = result?.freeLimitPerDay ?? 1;
+  const canChangeSpread = totalRemaining > 0;
   const cardArts = useMemo(
     () => slots.map((slot) => (slot.name ? getTarotCardArt(slot.name) : null)),
     [slots],
@@ -205,7 +228,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
           <button
             key={n}
             type="button"
-            disabled={loading}
+            disabled={loading || !canChangeSpread}
             onClick={() => setSpreadCount(n)}
             className={`rounded-full px-3 py-1 text-xs transition ${
               spreadCount === n
@@ -217,6 +240,12 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
           </button>
         ))}
       </div>
+
+      {result && !canChangeSpread ? (
+        <p className="mt-2 text-xs text-[#dbe1ff]/65">
+          วันนี้คุณเปิดไพ่แล้ว (ชุดล่าสุด {result.cards.length} ใบ) — ตัวเลือก 3/5/10 จะมีผลกับการเปิดครั้งถัดไป
+        </p>
+      ) : null}
 
       <div className="relative mt-7 flex justify-center [perspective:1400px]">
         <div
