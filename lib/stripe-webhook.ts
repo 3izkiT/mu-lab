@@ -1,7 +1,5 @@
-import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
-
-type WebhookTx = Pick<typeof prisma, "checkoutSession" | "purchase" | "subscription" | "webhookEvent">;
+import { fulfillCheckoutSession } from "@/lib/checkout-fulfillment";
 
 export type StripeEventLike = {
   id?: string;
@@ -85,80 +83,19 @@ export async function processStripeWebhookEvent(args: {
     return { ok: false, status: 404, message: "session not found", eventId };
   }
 
-  if (status !== "completed") {
-    await prisma.checkoutSession.update({
-      where: { id: sessionId },
-      data: { status: "failed", providerRef },
-    });
-    await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "processed" } });
-    return { ok: true, unlocked: false, eventId };
-  }
-
   try {
-    await prisma.$transaction(async (tx: WebhookTx) => {
-      await tx.checkoutSession.update({
-        where: { id: sessionId },
-        data: { status: "completed", providerRef },
-      });
-
-      if (
-        session.purchaseType === "deep-insight" ||
-        session.purchaseType === "tarot-deep" ||
-        session.purchaseType === "vip-daily" ||
-        session.purchaseType === "vip-weekly"
-      ) {
-        const exists = await tx.purchase.findFirst({
-          where: {
-            userId: session.userId,
-            featureType: session.purchaseType,
-            targetId: session.analysisId ?? undefined,
-            status: "completed",
-          },
-        });
-        if (!exists) {
-          await tx.purchase.create({
-            data: {
-              id: nanoid(12),
-              userId: session.userId,
-              featureType: session.purchaseType,
-              targetId: session.analysisId,
-              amountTHB: session.amountTHB,
-              status: "completed",
-            },
-          });
-        }
-        return;
-      }
-
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + 30);
-      await tx.subscription.upsert({
-        where: { id: `premium-${session.userId}` },
-        create: {
-          id: `premium-${session.userId}`,
-          userId: session.userId,
-          planType: "premium",
-          status: "active",
-          expiryDate,
-        },
-        update: {
-          status: "active",
-          expiryDate,
-        },
-      });
-      await tx.purchase.create({
-        data: {
-          id: nanoid(12),
-          userId: session.userId,
-          featureType: "premium-monthly",
-          amountTHB: session.amountTHB,
-          status: "completed",
-        },
-      });
+    const fulfilled = await fulfillCheckoutSession({
+      sessionId,
+      providerRef,
+      status,
     });
+    if (!fulfilled.ok) {
+      await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "failed" } });
+      return { ok: false, status: fulfilled.status, message: fulfilled.message, eventId };
+    }
 
     await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "processed" } });
-    return { ok: true, unlocked: true, eventId };
+    return { ok: true, unlocked: fulfilled.unlocked, eventId };
   } catch {
     await prisma.webhookEvent.update({ where: { id: eventId }, data: { status: "failed" } });
     return { ok: false, status: 500, message: "webhook processing failed", eventId };

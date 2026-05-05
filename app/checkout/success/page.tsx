@@ -20,7 +20,7 @@ export default async function CheckoutSuccessPage({ searchParams }: SuccessPageP
   if (sessionId) {
     const session = await prisma.checkoutSession.findUnique({
       where: { id: sessionId },
-      select: { purchaseType: true, analysisId: true },
+      select: { purchaseType: true, analysisId: true, status: true, amountTHB: true },
     });
     if (session) {
       resolvedPurchaseType = resolvedPurchaseType || session.purchaseType;
@@ -32,6 +32,33 @@ export default async function CheckoutSuccessPage({ searchParams }: SuccessPageP
             : session.purchaseType === "premium-monthly" || session.purchaseType === "vip-daily" || session.purchaseType === "vip-weekly"
               ? "dashboard"
               : "analysis";
+      }
+      if (session.status !== "completed") {
+        return (
+          <main className="mx-auto max-w-3xl px-4 py-20">
+            <div className="mu-lab-glass rounded-3xl border border-[rgba(247,231,206,0.24)] p-8 text-center">
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/80">Awaiting Payment Confirmation</p>
+              <h1 className="mt-3 font-serif text-3xl text-[#eef1ff]">กำลังรอยืนยันยอดชำระ</h1>
+              <p className="mt-3 text-sm text-[#dbe1ff]/82">
+                หากชำระแล้วแต่ระบบยังไม่อัปเดต ให้ส่งข้อมูลสลิปเพื่อปลดล็อคอัตโนมัติทันที
+              </p>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <Link
+                  href={`/checkout/slip?sessionId=${encodeURIComponent(sessionId)}&amount=${session.amountTHB}`}
+                  className="inline-block rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16]"
+                >
+                  ส่งสลิปเพื่อยืนยันยอด
+                </Link>
+                <Link
+                  href="/vault"
+                  className="inline-block rounded-full border border-white/20 px-6 py-2.5 text-sm font-semibold text-[#eef1ff]"
+                >
+                  กลับไป Vault
+                </Link>
+              </div>
+            </div>
+          </main>
+        );
       }
     }
   }
