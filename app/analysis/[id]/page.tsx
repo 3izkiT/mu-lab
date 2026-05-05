@@ -65,7 +65,7 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
               ลักขณาและดวงชะตาของ {analysis.fullName ?? "คุณ"}
             </h1>
             <p className="mt-1 text-xs text-[#dbe1ff]/60">
-              ลัคนาคำนวณแบบสุริยยาตร์ไทย (อันตรนาที + อาทิตย์อุทัยต่อจังหวัด) ผ่านเอนจินมาตรฐานเปิดโค้ด · เก็บไว้ใน Personal Vault
+              ลัคนาคำนวณแบบสุริยยาตร์ไทย · เก็บไว้ใน Personal Vault
             </p>
           </div>
 
@@ -79,7 +79,7 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
           )}
 
           {/* Birth profile compact */}
-          <section className="grid gap-4 rounded-2xl border border-[rgba(247,231,206,0.12)] bg-[rgba(247,231,206,0.04)] p-5 text-sm sm:grid-cols-4 sm:p-6">
+          <section className="grid gap-4 rounded-2xl border border-[rgba(247,231,206,0.12)] bg-[rgba(247,231,206,0.04)] p-5 text-base sm:grid-cols-4 sm:p-6">
             <ProfileItem label="ชื่อ" value={analysis.fullName ?? "ไม่ได้ระบุ"} />
             <ProfileItem label="วันเกิด" value={analysis.birthDate ?? "ไม่ได้ระบุ"} />
             <ProfileItem label="เวลาเกิด" value={analysis.birthTime ?? "ไม่ได้ระบุ"} />
@@ -192,8 +192,8 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
 function ProfileItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/65">{label}</p>
-      <p className="mt-1.5 text-sm text-[#eef1ff]/95">{value}</p>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--gold)]/65">{label}</p>
+      <p className="mt-1.5 text-base text-[#eef1ff]/95 sm:text-lg">{value}</p>
     </div>
   );
 }
@@ -209,8 +209,8 @@ function ValueCard({ title, accent, items }: { title: string; accent: string; it
         }}
       />
       <div className="relative">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/70">{title}</p>
-        <ul className="mt-3 space-y-2 text-sm text-[#eef1ff]/92">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--gold)]/70">{title}</p>
+        <ul className="mt-3 space-y-2 text-base text-[#eef1ff]/92 sm:text-lg">
           {items.map((item) => (
             <li key={item} className="flex gap-2">
               <span className="mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: accent }} />

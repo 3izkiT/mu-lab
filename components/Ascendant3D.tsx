@@ -67,15 +67,13 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
                     <stop offset="100%" stopColor={accent2} stopOpacity={0.92} />
                   </linearGradient>
                 </defs>
-                <ellipse
+                <circle
                   cx="100"
                   cy="100"
-                  rx="93"
-                  ry="88"
+                  r="90"
                   fill="none"
                   stroke={`url(#${ringGradId})`}
                   strokeWidth="2"
-                  transform="rotate(-12 100 100)"
                   strokeDasharray="3 11"
                   opacity={0.9}
                 />
@@ -87,8 +85,6 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
               aria-hidden
               className="absolute inset-[10%] rounded-full border border-[rgba(247,231,206,0.18)] opacity-85"
               style={{
-                transform: "rotateX(32deg)",
-                transformStyle: "preserve-3d",
                 boxShadow: `inset 0 18px 50px rgba(0,0,0,0.55), inset 0 -28px 40px ${accentColor}18`,
               }}
             />
@@ -105,12 +101,12 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
               <div
                 className="relative grid h-full w-full place-items-center rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.18)_0%,transparent_42%)]"
                 style={{
-                  transform: "translateZ(12px) rotateX(18deg)",
+                  transform: "translateZ(12px)",
                   transformStyle: "preserve-3d",
                   textShadow: `0 -2px 1px rgba(255,255,255,0.35), 0 8px 16px rgba(0,0,0,0.55)`,
                 }}
               >
-                <span className="font-serif text-[clamp(4.75rem,19vw,6.85rem)] leading-none text-[#0c0e26]">{symbol}</span>
+                <span className="font-serif text-[clamp(4.35rem,17vw,6rem)] leading-[1.05] text-[#0c0e26]">{symbol}</span>
               </div>
             </div>
           </div>
@@ -161,7 +157,7 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
                   <Stat label="ดาวเจ้าเรือน" value={meta.ruler} />
                   <Stat label="อัญมณีมงคล" value={meta.gemstone} />
                   <div className="col-span-2 mt-4">
-                    <p className="text-sm leading-relaxed text-[#e8eeff]/85">{meta.archetype}</p>
+                    <p className="text-base leading-relaxed text-[#e8eeff]/85 sm:text-lg">{meta.archetype}</p>
                   </div>
                 </>
               ) : null}
@@ -175,9 +171,9 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[rgba(247,231,206,0.14)] bg-[rgba(7,16,36,0.55)] px-3 py-2.5 backdrop-blur-sm">
-      <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/60">{label}</p>
-      <p className="mt-1 text-sm text-[#eef1ff]/92">{value}</p>
+    <div className="rounded-xl border border-[rgba(247,231,206,0.14)] bg-[rgba(7,16,36,0.55)] px-3 py-3 backdrop-blur-sm">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--gold)]/60">{label}</p>
+      <p className="mt-1.5 text-base text-[#eef1ff]/92 sm:text-lg">{value}</p>
     </div>
   );
 }
