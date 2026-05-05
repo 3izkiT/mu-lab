@@ -27,7 +27,7 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
   const accent2 = palette.secondary;
   const symbol = meta?.symbol ?? "✦";
   const nameEn = meta?.nameEn ?? "Ascendant";
-  const zodiacSpriteStyle = getZodiacSpriteStyle(signName);
+  const zodiacIconPath = getZodiacIconPath(signName);
 
   const showDetailGrid = mode === "full" && meta;
 
@@ -108,18 +108,12 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
                   textShadow: `0 -2px 1px rgba(255,255,255,0.35), 0 8px 16px rgba(0,0,0,0.55)`,
                 }}
               >
-                {zodiacSpriteStyle ? (
-                  <span
-                    role="img"
-                    aria-label={`${signName} icon`}
-                    className="h-[72%] w-[72%] rounded-full bg-no-repeat"
-                    style={{
-                      backgroundImage: "url('/zodiac-animal-sprites.png')",
-                      backgroundSize: zodiacSpriteStyle.size,
-                      backgroundPosition: zodiacSpriteStyle.position,
-                      filter:
-                        "brightness(1.13) contrast(1.2) saturate(1.06) drop-shadow(0 2px 4px rgba(11,18,44,0.36)) drop-shadow(0 0 6px rgba(255,242,214,0.28))",
-                    }}
+                {zodiacIconPath ? (
+                  <img
+                    src={zodiacIconPath}
+                    alt={`${signName} icon`}
+                    className="h-[72%] w-[72%] object-contain drop-shadow-[0_10px_16px_rgba(8,12,26,0.58)]"
+                    draggable={false}
                   />
                 ) : (
                   <span className="font-serif text-[clamp(4.15rem,16vw,5.7rem)] leading-[1.12] text-[#0c0e26]">{symbol}</span>
@@ -186,29 +180,22 @@ export default function Ascendant3D({ signName, degInSign, mode = "signature", f
   );
 }
 
-function getZodiacSpriteStyle(signName: string): { position: string; size: string } | null {
-  const signIndex: Record<string, number> = {
-    เมษ: 0,
-    พฤษภ: 1,
-    เมถุน: 2,
-    กรกฎ: 3,
-    สิงห์: 4,
-    กันย์: 5,
-    ตุลย์: 6,
-    พิจิก: 7,
-    ธนู: 8,
-    มังกร: 9,
-    กุมภ์: 10,
-    มีน: 11,
+function getZodiacIconPath(signName: string): string | null {
+  const bySign: Record<string, string> = {
+    เมษ: "/zodiac-icons/aries.png",
+    พฤษภ: "/zodiac-icons/taurus.png",
+    เมถุน: "/zodiac-icons/gemini.png",
+    กรกฎ: "/zodiac-icons/cancer.png",
+    สิงห์: "/zodiac-icons/leo.png",
+    กันย์: "/zodiac-icons/virgo.png",
+    ตุลย์: "/zodiac-icons/libra.png",
+    พิจิก: "/zodiac-icons/scorpio.png",
+    ธนู: "/zodiac-icons/sagittarius.png",
+    มังกร: "/zodiac-icons/capricorn.png",
+    กุมภ์: "/zodiac-icons/aquarius.png",
+    มีน: "/zodiac-icons/pisces.png",
   };
-  const index = signIndex[signName];
-  if (typeof index !== "number") return null;
-  const col = index % 4;
-  const row = Math.floor(index / 4);
-  // The source sprite has labels under each icon, so we zoom slightly and nudge Y to keep icon centered.
-  const x = [0, 33.33, 66.66, 100][col] ?? 0;
-  const y = [8, 50, 92][row] ?? 50;
-  return { position: `${x}% ${y}%`, size: "400% 360%" };
+  return bySign[signName] ?? null;
 }
 
 function getElementPalette(element?: string) {
