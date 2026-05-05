@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
-import { getPriceTHB, oneOffCutoffDate } from "@/lib/billing-config";
+import { oneOffCutoffDate } from "@/lib/billing-config";
 import { getBangkokDateKey } from "@/lib/daily-forecast-data";
 
 const DECK = [
@@ -37,7 +37,7 @@ export type TarotDrawResult = {
   freeRemainingToday: number;
   deepUnlocked: boolean;
   deepInsight?: string;
-  checkout?: { purchaseType: "tarot-deep"; readingId: string; amountTHB: number };
+  checkout?: { readingId: string };
 };
 
 const FREE_LIMIT_PER_DAY = 1;
@@ -112,9 +112,7 @@ export async function createOrGetTarotReading(userId: string, question: string, 
         freeRemainingToday: 0,
         deepUnlocked,
         deepInsight: deepUnlocked ? latest.deepInsight : undefined,
-        checkout: deepUnlocked
-          ? undefined
-          : { purchaseType: "tarot-deep", readingId: latest.id, amountTHB: getPriceTHB("tarot-deep") },
+        checkout: deepUnlocked ? undefined : { readingId: latest.id },
       };
     }
   }
@@ -152,7 +150,7 @@ export async function createOrGetTarotReading(userId: string, question: string, 
     freeLimitPerDay: FREE_LIMIT_PER_DAY,
     freeRemainingToday: 0,
     deepUnlocked: false,
-    checkout: { purchaseType: "tarot-deep", readingId, amountTHB: getPriceTHB("tarot-deep") },
+    checkout: { readingId },
   };
 }
 
@@ -170,8 +168,6 @@ export async function getTarotReadingForUser(userId: string, readingId: string):
     freeRemainingToday: reading.dateKey === getBangkokDateKey() ? 0 : FREE_LIMIT_PER_DAY,
     deepUnlocked,
     deepInsight: deepUnlocked ? reading.deepInsight : undefined,
-    checkout: deepUnlocked
-      ? undefined
-      : { purchaseType: "tarot-deep", readingId, amountTHB: getPriceTHB("tarot-deep") },
+    checkout: deepUnlocked ? undefined : { readingId },
   };
 }

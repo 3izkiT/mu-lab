@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { isPurchaseType, getPurchaseTitleTh } from "@/lib/purchase-labels";
 
 type SuccessPageProps = {
   searchParams: Promise<{
@@ -34,24 +35,28 @@ export default async function CheckoutSuccessPage({ searchParams }: SuccessPageP
               : "analysis";
       }
       if (session.status !== "completed") {
+        const slipLabel = isPurchaseType(session.purchaseType)
+          ? `${getPurchaseTitleTh(session.purchaseType)} · ฿${session.amountTHB}`
+          : `ยืนยันการชำระ · ฿${session.amountTHB}`;
         return (
           <main className="mx-auto max-w-3xl px-4 py-20">
             <div className="mu-lab-glass rounded-3xl border border-[rgba(247,231,206,0.24)] p-8 text-center">
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/80">Awaiting Payment Confirmation</p>
-              <h1 className="mt-3 font-serif text-3xl text-[#eef1ff]">กำลังรอยืนยันยอดชำระ</h1>
-              <p className="mt-3 text-sm text-[#dbe1ff]/82">
-                หากชำระแล้วแต่ระบบยังไม่อัปเดต ให้ส่งข้อมูลสลิปเพื่อปลดล็อคอัตโนมัติทันที
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--gold)]/80 sm:text-sm">Awaiting Payment Confirmation</p>
+              <h1 className="mt-3 font-serif text-2xl text-[#eef1ff] sm:text-3xl">กำลังรอยืนยันยอดชำระ</h1>
+              <p className="mt-4 text-base leading-relaxed text-[#dbe1ff]/86 sm:text-lg">
+                หากโอนแล้ว ให้แจ้งสลิปในขั้นตอนถัดไป ทีมจะตรวจและปลดล็อกให้ (ไม่ปลดอัตโนมัติจากฟอร์มเพื่อความปลอดภัย)
               </p>
+              <p className="mt-3 font-serif text-lg font-semibold text-[var(--gold)] sm:text-xl">{slipLabel}</p>
               <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                 <Link
-                  href={`/checkout/slip?sessionId=${encodeURIComponent(sessionId)}&amount=${session.amountTHB}`}
-                  className="inline-block rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16]"
+                  href={`/checkout/slip?sessionId=${encodeURIComponent(sessionId)}&amount=${session.amountTHB}&purchaseType=${encodeURIComponent(session.purchaseType)}`}
+                  className="inline-block rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-base font-semibold text-[#241d16] sm:text-lg"
                 >
-                  ส่งสลิปเพื่อยืนยันยอด
+                  แจ้งโอน / แนบสลิป
                 </Link>
                 <Link
                   href="/vault"
-                  className="inline-block rounded-full border border-white/20 px-6 py-2.5 text-sm font-semibold text-[#eef1ff]"
+                  className="inline-block rounded-full border border-white/20 px-6 py-2.5 text-base font-semibold text-[#eef1ff] sm:text-lg"
                 >
                   กลับไป Vault
                 </Link>

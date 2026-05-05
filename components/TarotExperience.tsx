@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ONE_OFF_ACCESS_DAYS, PRICING_THB } from "@/lib/billing-config";
 import { getTarotCardArt } from "@/lib/tarot-cards";
 
-type TarotCheckoutPurchaseType = "vip-daily" | "tarot-deep" | "vip-weekly" | "premium-monthly";
+type GlobalPassPurchaseType = "vip-daily" | "vip-weekly" | "premium-monthly";
 
 export type TarotResponse = {
   readingId: string;
@@ -17,7 +17,7 @@ export type TarotResponse = {
   deepUnlocked: boolean;
   guestMode?: boolean;
   deepInsight?: string;
-  checkout?: { purchaseType: TarotCheckoutPurchaseType; readingId: string; amountTHB: number };
+  checkout?: { readingId: string };
 };
 
 type TarotExperienceProps = {
@@ -87,8 +87,19 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
   const [shuffling, setShuffling] = useState(false);
 
   useEffect(() => {
+    if (result) return;
+    setSlots(
+      Array.from({ length: spreadCount }, (_, i) => ({
+        key: `empty-${spreadCount}-${i}`,
+        name: null,
+        flipped: false,
+      })),
+    );
+  }, [spreadCount, result]);
+
+  useEffect(() => {
     if (!result) return;
-    const cards = result.cards.slice(0, 3);
+    const cards = result.cards;
     setSlots(cards.map((name, i) => ({ key: `${result.readingId}-${i}`, name, flipped: false })));
     cards.forEach((_, i) => {
       setTimeout(() => {
@@ -136,12 +147,12 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     }
   }
 
-  async function startCheckout(purchaseType: TarotCheckoutPurchaseType) {
+  async function startCheckout(purchaseType: GlobalPassPurchaseType) {
     if (!result?.checkout) return;
     setUnlocking(true);
     setError(null);
     try {
-      const targetType = purchaseType === "tarot-deep" ? "tarot" : "dashboard";
+      const targetType = "dashboard";
       const checkout = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -209,8 +220,10 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
 
       <div className="relative mt-7 flex justify-center [perspective:1400px]">
         <div
-          className={`grid w-full max-w-4xl gap-3 sm:gap-5 ${shuffling ? "tarot-shuffle" : ""}`}
-          style={{ gridTemplateColumns: `repeat(${Math.min(slots.length, 5)}, minmax(0, 1fr))` }}
+          className={`grid w-full max-w-5xl gap-3 sm:gap-5 ${shuffling ? "tarot-shuffle" : ""}`}
+          style={{
+            gridTemplateColumns: `repeat(${slots.length <= 3 ? 3 : slots.length <= 5 ? slots.length : 5}, minmax(0, 1fr))`,
+          }}
         >
           {slots.map((slot, i) => {
             const art = cardArts[i];
@@ -287,8 +300,16 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         <div className="mt-8 grid gap-5">
           <div className="rounded-2xl border border-white/12 bg-[rgba(5,10,24,0.55)] p-5">
             <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--gold)]/75">Quick Reading</p>
-            <p className="mt-3 text-sm leading-relaxed text-[#dbe1ff]/88">{result.preview}</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <p className="mt-3 text-base leading-relaxed text-[#dbe1ff]/88 sm:text-lg">{result.preview}</p>
+            <div
+              className={`mt-4 grid gap-3 ${
+                result.cards.length <= 3
+                  ? "sm:grid-cols-3"
+                  : result.cards.length <= 5
+                    ? "sm:grid-cols-2 md:grid-cols-5"
+                    : "grid-cols-2 sm:grid-cols-3 md:grid-cols-5"
+              }`}
+            >
               {cardArts.map((art, i) =>
                 art ? (
                   <div key={`m-${art.slug}`} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
@@ -309,31 +330,23 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
               </pre>
             ) : (
               <div>
-                <p className="mt-3 text-sm leading-relaxed text-[#dbe1ff]/72">
-                  ปลดล็อกเพื่ออ่านบทเจาะลึกเฉพาะคำถามนี้ (สิทธิ์ย้อนหลัง {ONE_OFF_ACCESS_DAYS} วัน): แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
+                <p className="mt-3 text-base leading-relaxed text-[#dbe1ff]/82 sm:text-lg">
+                  ปลดล็อกทั้งระบบเพื่ออ่านบทเจาะลึกของคำถามนี้ (สิทธิ์ย้อนหลัง {ONE_OFF_ACCESS_DAYS} วัน): แผน 30 วัน, สัญญาณดี/ข้อควรเลี่ยง, จังหวะที่ใช่
                 </p>
                 <div className="mt-4 grid gap-2 sm:grid-cols-3">
                   <button
                     type="button"
                     onClick={() => startCheckout("vip-daily")}
                     disabled={unlocking}
-                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
+                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
                   >
                     {unlocking ? "กำลังพาไปจ่าย..." : `ทั้งระบบ 1 วัน ฿${PRICING_THB["vip-daily"]}`}
                   </button>
                   <button
                     type="button"
-                    onClick={() => startCheckout("tarot-deep")}
-                    disabled={unlocking}
-                    className="rounded-full border border-[rgba(247,231,206,0.5)] bg-[rgba(247,231,206,0.06)] px-4 py-2 text-xs font-semibold text-[var(--gold)] transition hover:bg-[rgba(247,231,206,0.12)] disabled:opacity-60"
-                  >
-                    {unlocking ? "กำลังพาไปจ่าย..." : `เฉพาะบทนี้ ฿${PRICING_THB["tarot-deep"]}`}
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => startCheckout("vip-weekly")}
                     disabled={unlocking}
-                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
+                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
                   >
                     {unlocking ? "กำลังพาไปจ่าย..." : `ทั้งระบบ 7 วัน ฿${PRICING_THB["vip-weekly"]}`}
                   </button>
@@ -341,7 +354,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                     type="button"
                     onClick={() => startCheckout("premium-monthly")}
                     disabled={unlocking}
-                    className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-4 py-2 text-xs font-semibold text-[#241d16] transition hover:brightness-105 disabled:opacity-60"
+                    className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-4 py-2 text-sm font-semibold text-[#241d16] transition hover:brightness-105 disabled:opacity-60"
                   >
                     {unlocking ? "กำลังพาไปจ่าย..." : `พรีเมียมรายเดือน ฿${PRICING_THB["premium-monthly"]}`}
                   </button>

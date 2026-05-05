@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   const successUrl = `/checkout/success?sessionId=${encodeURIComponent(sessionId)}&purchaseType=${encodeURIComponent(body.purchaseType)}&targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`;
   const cancelUrl = `/checkout/cancel?sessionId=${encodeURIComponent(sessionId)}`;
   const providerBaseUrl = process.env.PAYMENT_PROVIDER_CHECKOUT_URL?.trim();
-  const slipFallbackUrl = `/checkout/slip?sessionId=${encodeURIComponent(sessionId)}&amount=${amountTHB}`;
+  const slipFallbackUrl = `/checkout/slip?sessionId=${encodeURIComponent(sessionId)}&amount=${amountTHB}&purchaseType=${encodeURIComponent(body.purchaseType)}`;
   const redirectUrl = providerBaseUrl
     ? `${providerBaseUrl}?sessionId=${encodeURIComponent(sessionId)}&successUrl=${encodeURIComponent(successUrl)}&cancelUrl=${encodeURIComponent(cancelUrl)}`
     : process.env.NODE_ENV === "production"
