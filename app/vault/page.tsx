@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentUser, checkFeatureAccess } from "@/lib/auth-utils";
+import { getCurrentUser, checkFeatureAccess, getEntitlementSnapshot } from "@/lib/auth-utils";
 import SoulDashboard from "@/components/SoulDashboard";
 import { SiteNavHeader } from "@/components/SiteNavHeader";
 import { stripMarkdown } from "@/components/MarkdownText";
@@ -36,6 +36,7 @@ export default async function VaultPage() {
     take: 12,
   });
   const isPremium = await checkFeatureAccess(user.id, "premium");
+  const entitlement = await getEntitlementSnapshot(user.id);
   const latest = history[0];
   const dashboardData = isPremium
     ? buildSoulDashboardData({
@@ -72,6 +73,24 @@ export default async function VaultPage() {
         </aside>
 
         <section className="space-y-6">
+        <div className="mu-lab-glass rounded-2xl border border-[rgba(247,231,206,0.22)] p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/80">Entitlement Status</p>
+          <p className="mt-2 text-sm text-[#dbe1ff]/86">
+            สิทธิ์ตอนนี้: {entitlement.hasPremium ? "ปลดล็อกแล้ว" : "ยังไม่ปลดล็อก"} · แหล่งสิทธิ์:{" "}
+            {entitlement.source === "subscription"
+              ? "premium-monthly"
+              : entitlement.source === "vip-weekly"
+                ? "vip-weekly"
+                : entitlement.source === "vip-daily"
+                  ? "vip-daily"
+                  : "none"}
+          </p>
+          {entitlement.expiresAt ? (
+            <p className="mt-1 text-xs text-[#dbe1ff]/70">หมดอายุ: {entitlement.expiresAt.toLocaleString("th-TH")}</p>
+          ) : (
+            <p className="mt-1 text-xs text-[#dbe1ff]/70">ยังไม่พบสิทธิ์ที่ใช้งานอยู่ในบัญชีนี้</p>
+          )}
+        </div>
         <SoulDashboard data={dashboardData} hasPremium={isPremium} />
         <div className="mu-lab-glass rounded-2xl p-6">
           <h1 className="font-serif text-3xl text-[#eef1ff]">Daily Personal Dashboard</h1>
