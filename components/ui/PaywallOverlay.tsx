@@ -25,20 +25,31 @@ export default function PaywallOverlay({ analysisId }: PaywallOverlayProps) {
           เนื้อหาส่วนนี้ถูกล็อกไว้สำหรับสมาชิกหรือการปลดล็อกรายครั้ง
         </p>
         <div className="mt-5 flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={() => startCheckout("deep-insight")}
-            className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2.5 text-sm font-semibold text-[#241d16]"
-          >
-            ปลดล็อกเฉพาะรายงานนี้ 99 บาท
-          </button>
-          <button
-            type="button"
-            onClick={() => startCheckout("premium-monthly")}
-            className="rounded-full border border-[rgba(247,231,206,0.4)] bg-[rgba(247,231,206,0.08)] px-5 py-2.5 text-sm font-semibold text-[var(--gold)]"
-          >
-            อัปเกรด Premium 199 บาท/เดือน
-          </button>
+          <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.06)] p-3 text-left">
+            <button
+              type="button"
+              onClick={() => startCheckout("deep-insight")}
+              className="w-full rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-5 py-2.5 text-sm font-semibold text-[#241d16]"
+            >
+              ปลดล็อกเฉพาะรายงานนี้ 99 บาท
+            </button>
+            <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">
+              ใช้ได้กับรายงานนี้ครั้งเดียว ปลดล็อก Deep Insight อ่านได้เต็มทันที
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[rgba(247,231,206,0.2)] bg-[rgba(247,231,206,0.04)] p-3 text-left">
+            <button
+              type="button"
+              onClick={() => startCheckout("premium-monthly")}
+              className="w-full rounded-full border border-[rgba(247,231,206,0.4)] bg-[rgba(247,231,206,0.08)] px-5 py-2.5 text-sm font-semibold text-[var(--gold)]"
+            >
+              อัปเกรด Premium 199 บาท/เดือน
+            </button>
+            <p className="mt-2 text-xs leading-relaxed text-[#dbe1ff]/80">
+              ใช้งานได้ไม่จำกัดตลอด 30 วัน สำหรับทุกรายงานใหม่และรายงานเดิมในบัญชีเดียวกัน
+            </p>
+          </div>
         </div>
       </div>
     </div>
