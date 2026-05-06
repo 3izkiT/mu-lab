@@ -110,6 +110,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
   });
   const [shuffling, setShuffling] = useState(false);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const [isDealing, setIsDealing] = useState(false);
 
   useEffect(() => {
     if (result) return;
@@ -171,6 +172,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     setError(null);
     setLoading(true);
     setShuffling(true);
+    setIsDealing(true);
     setSlots((prev) => prev.map((s) => ({ ...s, flipped: false })));
     try {
       await new Promise((r) => setTimeout(r, 700));
@@ -187,6 +189,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     } finally {
       setLoading(false);
       setShuffling(false);
+      setTimeout(() => setIsDealing(false), 350);
     }
   }
 
@@ -271,29 +274,45 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
             เลือกแล้ว {selectedCards.length}/{spreadCount} ใบ
           </p>
         </div>
-        <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
-          {TAROT_DRAW_DECK.map((card) => {
-            const selected = selectedCards.includes(card.name);
-            return (
-              <button
-                key={card.name}
-                type="button"
-                onClick={() => toggleSelectCard(card.name)}
-                disabled={loading || (!selected && selectedCards.length >= spreadCount)}
-                className={`${BTN_BASE} relative overflow-hidden rounded-xl border ${
-                  selected
-                    ? "border-[var(--gold)] bg-[rgba(247,231,206,0.12)] -translate-y-2 shadow-[0_10px_24px_rgba(247,231,206,0.22)]"
-                    : "border-white/10 bg-white/[0.02]"
-                }`}
-                title={card.name}
-              >
-                <div className="aspect-[2/3] p-1.5">
-                  <CardBack />
-                </div>
-                <div className="px-1 pb-1 text-[10px] text-[#dbe1ff]/75">{selected ? "เลือกแล้ว" : "แตะเพื่อเลือก"}</div>
-              </button>
-            );
-          })}
+        <div className="mt-3 overflow-x-auto pb-4">
+          <div className="relative mx-auto flex h-[190px] min-w-[760px] items-end px-3 sm:h-[220px] sm:min-w-[980px]">
+            {TAROT_DRAW_DECK.map((card, idx) => {
+              const selected = selectedCards.includes(card.name);
+              const disabled = loading || (!selected && selectedCards.length >= spreadCount);
+              const fanRotate = -11 + (22 * idx) / (TAROT_DRAW_DECK.length - 1);
+              const fanLift = Math.abs(fanRotate) * 0.8;
+              return (
+                <button
+                  key={card.name}
+                  type="button"
+                  onClick={() => toggleSelectCard(card.name)}
+                  disabled={disabled}
+                  className={`absolute left-0 bottom-0 h-[130px] w-[76px] sm:h-[148px] sm:w-[86px] ${BTN_BASE} ${
+                    selected ? "z-30" : "z-10"
+                  }`}
+                  style={{
+                    transform: `translateX(${idx * 10}px) translateY(${selected ? -34 : -fanLift}px) rotate(${fanRotate}deg)`,
+                    transition: "transform 260ms ease, filter 260ms ease, box-shadow 260ms ease",
+                  }}
+                  title={card.name}
+                >
+                  <div
+                    className={`h-full w-full overflow-hidden rounded-xl border ${
+                      selected
+                        ? "border-[var(--gold)] shadow-[0_14px_30px_rgba(247,231,206,0.26)]"
+                        : "border-white/10 shadow-[0_8px_20px_rgba(3,5,16,0.42)]"
+                    } ${loading ? "opacity-60" : ""}`}
+                  >
+                    <CardBack />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="mt-2 flex items-center gap-3">
+          <div className={`h-8 w-8 rounded-full border border-[var(--gold)]/35 bg-[rgba(247,231,206,0.08)] ${loading ? "mu-lab-tarot-shuffle" : ""}`} />
+          <p className="text-xs text-[#dbe1ff]/70">เลือกไพ่จากกองกรีดแบบหมอดู (ไพ่ที่เลือกจะลอยขึ้น)</p>
         </div>
       </div>
 
@@ -358,7 +377,11 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                   className={`group relative aspect-[2/3.4] w-full max-w-[200px] cursor-default rounded-[20px] outline-none transition will-change-transform [transform-style:preserve-3d] ${
                     isFlipped ? "[transform:rotateY(180deg)]" : ""
                   }`}
-                  style={{ transitionProperty: "transform", transitionDuration: "650ms" }}
+                  style={{
+                    transitionProperty: "transform",
+                    transitionDuration: "650ms",
+                    animation: isDealing ? `mu-lab-tarot-deal 520ms ease ${i * 90}ms both` : undefined,
+                  }}
                 >
                   <div
                     className="absolute inset-0 [backface-visibility:hidden] drop-shadow-[0_18px_40px_rgba(3,5,16,0.6)]"
@@ -396,19 +419,9 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         />
       </label>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={onDraw}
-          disabled={loading}
-          className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-6 py-2.5 text-sm font-semibold text-[#241d16] shadow-[0_0_28px_rgba(247,231,206,0.22)] transition hover:brightness-105 disabled:opacity-60"
-        >
-          {loading ? "กำลังสับไพ่..." : result ? "สับและเปิดไพ่อีกครั้ง" : "สับและเปิดไพ่"}
-        </button>
-        <p className="text-xs text-[#dbe1ff]/55">
-          {totalRemaining > 0 ? "สิทธิ์ฟรียังเหลืออยู่ในวันนี้" : "วันนี้ใช้สิทธิ์ฟรีแล้ว — ปลดล็อกบทอ่านลึกได้ด้านล่าง"}
-        </p>
-      </div>
+      <p className="mt-4 text-xs text-[#dbe1ff]/55">
+        {totalRemaining > 0 ? "สิทธิ์ฟรียังเหลืออยู่ในวันนี้" : "วันนี้ใช้สิทธิ์ฟรีแล้ว — ปลดล็อกบทอ่านลึกได้ด้านล่าง"}
+      </p>
 
       {error ? <p className="mt-4 text-sm text-rose-300">{error}</p> : null}
 
