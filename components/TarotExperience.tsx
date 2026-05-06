@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ONE_OFF_ACCESS_DAYS, PRICING_THB } from "@/lib/billing-config";
 import { getTarotCardArt, TAROT_DRAW_DECK } from "@/lib/tarot-cards";
 
@@ -30,6 +30,90 @@ const BASE_SLOT_LABELS = ["อดีต", "ปัจจุบัน", "อนา
 const SPREAD_OPTIONS = [3, 5, 10] as const;
 const BTN_BASE =
   "transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] active:brightness-95";
+
+function chunkIntoRows<T>(items: T[], rowCount: number): T[][] {
+  if (rowCount <= 1) return [items];
+  const chunkSize = Math.ceil(items.length / rowCount);
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += chunkSize) {
+    rows.push(items.slice(i, i + chunkSize));
+  }
+  return rows;
+}
+
+/** Pick row count & overlap from measured container width — balances scroll vs stack height for touch/desktop. */
+function computeResponsiveDeckLayout(
+  containerWidth: number,
+  deckCount: number,
+  prefersTouchSpacing: boolean,
+): { rows: number; cardW: number; cardH: number; overlap: number; fanMax: number } {
+  const w = Math.max(180, containerWidth);
+  const hPad = 24;
+  const usable = Math.max(200, w - hPad * 2);
+
+  const cardW = (() => {
+    const fluid = Math.round(Math.min(86, Math.max(46, w * 0.072 + 44)));
+    if (w < 340) return 46;
+    if (w > 560 && w < 720) return Math.max(fluid, 56);
+    return fluid;
+  })();
+
+  const cardH = Math.round(cardW * 1.45);
+  const minFanOverlap = w < 520 ? 9 : w < 840 ? 11 : 13;
+  const maxStep = Math.max(cardW - minFanOverlap, Math.round(cardW * 0.5));
+
+  const minStep = prefersTouchSpacing
+    ? Math.max(28, Math.min(44, Math.round(w * 0.058 + 20)))
+    : Math.max(13, Math.min(22, Math.round(cardW * 0.178)));
+
+  const maxRows = w < 400 ? 4 : 3;
+
+  let bestRows = prefersTouchSpacing ? Math.min(maxRows, 3) : 2;
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  const gapPenalty = prefersTouchSpacing
+    ? Math.max(10, Math.min(28, Math.round(usable * 0.028)))
+    : Math.max(22, Math.min(96, Math.round(usable * 0.042)));
+
+  for (let rows = 1; rows <= maxRows; rows++) {
+    const perRow = Math.ceil(deckCount / rows);
+    if (perRow < 2) continue;
+    const stepIdeal = usable / (perRow - 1);
+    const step = Math.min(maxStep, Math.max(minStep, stepIdeal));
+    const rowWidth = cardW + (perRow - 1) * step;
+    const scroll = Math.max(0, rowWidth - usable);
+
+    let score = scroll + (rows - 1) * gapPenalty;
+
+    const rowBalance = prefersTouchSpacing ? 0 : Math.round((deckCount % rows) * 3);
+
+    score += scroll > usable * 1.95 ? scroll * 0.35 : 0;
+    if (w >= 1020 && rows >= 3) score += prefersTouchSpacing ? 0 : 28;
+    if (prefersTouchSpacing && w < 560 && rows === 2 && scroll > usable * 0.95) score += 18;
+
+    score += rowBalance;
+
+    if (score < bestScore) {
+      bestScore = score;
+      bestRows = rows;
+    }
+  }
+
+  const perRowChosen = Math.ceil(deckCount / bestRows);
+  const stepChosen = Math.min(
+    maxStep,
+    Math.max(minStep, usable / Math.max(perRowChosen - 1, 1)),
+  );
+  let overlap = Math.round(cardW - stepChosen);
+  overlap = Math.min(Math.max(overlap, minFanOverlap), Math.round(cardW * 0.88));
+
+  let fanMax: number;
+  if (bestRows >= 3) fanMax = Math.min(10, Math.round(5 + perRowChosen / 24));
+  else if (bestRows === 2) fanMax = Math.min(12, Math.round(6 + perRowChosen / 22));
+  else fanMax = Math.min(13, Math.round(7 + perRowChosen / 48));
+
+  return { rows: bestRows, cardW, cardH, overlap, fanMax };
+}
 
 function CardBack() {
   return (
@@ -111,6 +195,63 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
   const [shuffling, setShuffling] = useState(false);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [isDealing, setIsDealing] = useState(false);
+  const deckMeasureRef = useRef<HTMLDivElement | null>(null);
+  const [deckLayout, setDeckLayout] = useState<{
+    rows: number;
+    cardW: number;
+    cardH: number;
+    overlap: number;
+    fanMax: number;
+  }>({
+    rows: 3,
+    cardW: 64,
+    cardH: 108,
+    overlap: 42,
+    fanMax: 8,
+  });
+
+  useLayoutEffect(() => {
+    const el = deckMeasureRef.current;
+    if (!el) return;
+    const mqCoarse =
+      typeof window !== "undefined" ? window.matchMedia("(pointer: coarse)") : null;
+    const mqHoverNone =
+      typeof window !== "undefined" ? window.matchMedia("(hover: none)") : null;
+
+    const applyLayout = () => {
+      const width = el.getBoundingClientRect().width || el.clientWidth || 340;
+      const prefersTouchSpacing = Boolean(mqCoarse?.matches || mqHoverNone?.matches);
+      const next = computeResponsiveDeckLayout(
+        width,
+        TAROT_DRAW_DECK.length,
+        prefersTouchSpacing,
+      );
+      setDeckLayout((prev) =>
+        prev.rows === next.rows &&
+        prev.overlap === next.overlap &&
+        prev.cardW === next.cardW &&
+        prev.cardH === next.cardH &&
+        prev.fanMax === next.fanMax
+          ? prev
+          : next,
+      );
+    };
+
+    const ro = new ResizeObserver(() => {
+      applyLayout();
+    });
+
+    mqCoarse?.addEventListener("change", applyLayout);
+    mqHoverNone?.addEventListener("change", applyLayout);
+
+    ro.observe(el);
+    applyLayout();
+    return () => {
+      ro.disconnect();
+      mqCoarse?.removeEventListener("change", applyLayout);
+      mqHoverNone?.removeEventListener("change", applyLayout);
+    };
+  }, []);
 
   useEffect(() => {
     if (result) return;
@@ -157,6 +298,10 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     [slots, result?.spreadPositions],
   );
   const selectionComplete = selectedCards.length === spreadCount;
+  const deckRows = useMemo(
+    () => chunkIntoRows(TAROT_DRAW_DECK, deckLayout.rows),
+    [deckLayout.rows],
+  );
 
   function toggleSelectCard(cardName: string) {
     if (loading) return;
@@ -267,48 +412,76 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         ))}
       </div>
 
-      <div className="mt-5 rounded-2xl border border-white/12 bg-[rgba(5,10,24,0.55)] p-4">
+      <div ref={deckMeasureRef} className="mt-5 rounded-2xl border border-white/12 bg-[rgba(5,10,24,0.55)] p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">Full Deck · 72 Cards</p>
           <p className="text-xs text-[#dbe1ff]/72">
             เลือกแล้ว {selectedCards.length}/{spreadCount} ใบ
           </p>
         </div>
-        <div className="mt-3 overflow-x-auto pb-4">
-          <div className="relative mx-auto flex h-[190px] min-w-[760px] items-end px-3 sm:h-[220px] sm:min-w-[980px]">
-            {TAROT_DRAW_DECK.map((card, idx) => {
-              const selected = selectedCards.includes(card.name);
-              const disabled = loading || (!selected && selectedCards.length >= spreadCount);
-              const fanRotate = -11 + (22 * idx) / (TAROT_DRAW_DECK.length - 1);
-              const fanLift = Math.abs(fanRotate) * 0.8;
-              return (
-                <button
-                  key={card.name}
-                  type="button"
-                  onClick={() => toggleSelectCard(card.name)}
-                  disabled={disabled}
-                  className={`absolute left-0 bottom-0 h-[130px] w-[76px] sm:h-[148px] sm:w-[86px] ${BTN_BASE} ${
-                    selected ? "z-30" : "z-10"
-                  }`}
-                  style={{
-                    transform: `translateX(${idx * 10}px) translateY(${selected ? -34 : -fanLift}px) rotate(${fanRotate}deg)`,
-                    transition: "transform 260ms ease, filter 260ms ease, box-shadow 260ms ease",
-                  }}
-                  title={card.name}
-                >
+        <p className="mt-2 text-[11px] text-[#dbe1ff]/60 sm:text-xs">
+          แบ่ง {deckLayout.rows} ชั้นทับกัน พอดีกับความกว้างหน้าจอ · แถวละประมาณ{" "}
+          {Math.ceil(TAROT_DRAW_DECK.length / deckLayout.rows)} ใบ (เลื่อนซ้าย–ขวาในแถวได้)
+        </p>
+        <div className="mt-4">
+          {deckRows.map((rowCards, rowIdx) => {
+            const step = Math.max(12, deckLayout.cardW - deckLayout.overlap);
+            const rowWidth = deckLayout.cardW + Math.max(0, rowCards.length - 1) * step;
+            const stripH = deckLayout.cardH + deckLayout.fanMax * 2 + 52;
+
+            return (
+              <div
+                key={`row-${rowIdx}`}
+                className={`${rowIdx === 0 ? "" : "-mt-4 sm:-mt-6 md:-mt-7"} first:mt-0`}
+              >
+                <div className="touch-pan-x overflow-x-auto overflow-y-visible px-1 pb-2 pt-2 [scrollbar-gutter:stable] [scrollbar-width:thin]">
                   <div
-                    className={`h-full w-full overflow-hidden rounded-xl border ${
-                      selected
-                        ? "border-[var(--gold)] shadow-[0_14px_30px_rgba(247,231,206,0.26)]"
-                        : "border-white/10 shadow-[0_8px_20px_rgba(3,5,16,0.42)]"
-                    } ${loading ? "opacity-60" : ""}`}
+                    className="relative mx-auto max-w-none shrink-0 sm:px-1"
+                    style={{ width: `${rowWidth}px`, minHeight: `${stripH}px` }}
                   >
-                    <CardBack />
+                    {rowCards.map((card, localIdx) => {
+                      const selected = selectedCards.includes(card.name);
+                      const disabled = loading || (!selected && selectedCards.length >= spreadCount);
+                      const n = rowCards.length;
+                      const t = n <= 1 ? 0.5 : localIdx / (n - 1);
+                      const fanRotate = -(deckLayout.fanMax * 0.5) + deckLayout.fanMax * t;
+                      const fanLift = Math.abs(fanRotate) * 0.82;
+                      const left = localIdx * step;
+
+                      return (
+                        <button
+                          key={card.name}
+                          type="button"
+                          onClick={() => toggleSelectCard(card.name)}
+                          disabled={disabled}
+                          className={`${BTN_BASE} absolute bottom-0 origin-bottom`}
+                          style={{
+                            left,
+                            width: deckLayout.cardW,
+                            height: deckLayout.cardH,
+                            transform: `translateY(${selected ? -48 : -fanLift}px) rotate(${fanRotate}deg) scale(${selected ? 1.06 : 1})`,
+                            transition: "transform 220ms cubic-bezier(0.34,1.2,0.64,1), box-shadow 220ms ease",
+                            zIndex: selected ? 999 : 10 + localIdx,
+                          }}
+                          title={card.name}
+                        >
+                          <div
+                            className={`h-full w-full overflow-hidden rounded-xl border ${
+                              selected
+                                ? "border-[var(--gold)] shadow-[0_16px_38px_rgba(247,231,206,0.3)] ring-2 ring-[rgba(247,231,206,0.22)]"
+                                : "border-white/10 shadow-[0_8px_20px_rgba(3,5,16,0.42)]"
+                            } ${loading ? "opacity-60" : ""}`}
+                          >
+                            <CardBack />
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
-                </button>
-              );
-            })}
-          </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
         <div className="mt-2 flex items-center gap-3">
           <div className={`h-8 w-8 rounded-full border border-[var(--gold)]/35 bg-[rgba(247,231,206,0.08)] ${loading ? "mu-lab-tarot-shuffle" : ""}`} />
