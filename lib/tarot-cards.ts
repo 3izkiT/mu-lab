@@ -204,6 +204,8 @@ const MINOR_ARCANA: TarotCardArt[] = SUITS.flatMap((suit) =>
 
 export const TAROT_CARDS: TarotCardArt[] = [...MAJOR_ARCANA, ...MINOR_ARCANA];
 export const TAROT_CARD_NAMES = TAROT_CARDS.map((c) => c.name);
+export const TAROT_DRAW_DECK = TAROT_CARDS.slice(0, 72);
+export const TAROT_DRAW_CARD_NAMES = TAROT_DRAW_DECK.map((c) => c.name);
 
 const BY_NAME = new Map<string, TarotCardArt>(TAROT_CARDS.map((c) => [c.name, c]));
 

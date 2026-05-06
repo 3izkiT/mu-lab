@@ -2,9 +2,9 @@ import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { oneOffCutoffDate } from "@/lib/billing-config";
 import { getBangkokDateKey } from "@/lib/daily-forecast-data";
-import { TAROT_CARD_NAMES } from "@/lib/tarot-cards";
+import { TAROT_DRAW_CARD_NAMES } from "@/lib/tarot-cards";
 
-const DECK = TAROT_CARD_NAMES;
+const DECK = TAROT_DRAW_CARD_NAMES;
 
 const SPREAD_POSITIONS: Record<3 | 5 | 10, string[]> = {
   3: ["อดีต", "ปัจจุบัน", "อนาคต"],
@@ -62,6 +62,19 @@ function pickCards(seedKey: string, count = 3): string[] {
   return picked;
 }
 
+function normalizeSelectedCards(selectedCards: string[] | undefined, count: 3 | 5 | 10): string[] | null {
+  if (!selectedCards || selectedCards.length !== count) return null;
+  const seen = new Set<string>();
+  const cleaned: string[] = [];
+  for (const raw of selectedCards) {
+    const name = String(raw || "").trim();
+    if (!name || seen.has(name) || !DECK.includes(name)) return null;
+    seen.add(name);
+    cleaned.push(name);
+  }
+  return cleaned.length === count ? cleaned : null;
+}
+
 function buildPreview(cards: string[], question: string, positions: string[]): string {
   const mapped = cards
     .map((card, idx) => `${positions[idx] ?? `ตำแหน่ง ${idx + 1}`}: ${card}`)
@@ -96,7 +109,12 @@ async function hasTarotDeepPurchase(userId: string, readingId: string): Promise<
   return c > 0;
 }
 
-export async function createOrGetTarotReading(userId: string, question: string, spreadCount = 3): Promise<TarotDrawResult> {
+export async function createOrGetTarotReading(
+  userId: string,
+  question: string,
+  spreadCount = 3,
+  selectedCards?: string[],
+): Promise<TarotDrawResult> {
   const dateKey = getBangkokDateKey();
   const normalizedQuestion = question.trim().slice(0, 240) || "ภาพรวมวันนี้";
 
@@ -107,7 +125,8 @@ export async function createOrGetTarotReading(userId: string, question: string, 
 
   const count = normalizeSpreadCount(spreadCount);
   const positions = SPREAD_POSITIONS[count];
-  const cards = pickCards(`${userId}:${dateKey}:${normalizedQuestion}:${count}`, count);
+  const manualSelection = normalizeSelectedCards(selectedCards, count);
+  const cards = manualSelection ?? pickCards(`${userId}:${dateKey}:${normalizedQuestion}:${count}`, count);
   const preview = buildPreview(cards, normalizedQuestion, positions);
   const deepInsight = buildDeepInsight(cards, normalizedQuestion, positions);
   const readingId = nanoid(12);

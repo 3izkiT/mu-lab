@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { ONE_OFF_ACCESS_DAYS, PRICING_THB } from "@/lib/billing-config";
-import { getTarotCardArt } from "@/lib/tarot-cards";
+import { getTarotCardArt, TAROT_DRAW_DECK } from "@/lib/tarot-cards";
 
 type GlobalPassPurchaseType = "vip-daily" | "vip-weekly" | "premium-monthly";
 
@@ -28,6 +28,8 @@ type TarotExperienceProps = {
 
 const BASE_SLOT_LABELS = ["อดีต", "ปัจจุบัน", "อนาคต"] as const;
 const SPREAD_OPTIONS = [3, 5, 10] as const;
+const BTN_BASE =
+  "transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] active:brightness-95";
 
 function CardBack() {
   return (
@@ -107,6 +109,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     return EMPTY_SLOTS.slice(0, 3);
   });
   const [shuffling, setShuffling] = useState(false);
+  const [selectedCards, setSelectedCards] = useState<string[]>([]);
 
   useEffect(() => {
     if (result) return;
@@ -152,9 +155,19 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
       }),
     [slots, result?.spreadPositions],
   );
+  const selectionComplete = selectedCards.length === spreadCount;
+
+  function toggleSelectCard(cardName: string) {
+    if (loading) return;
+    setSelectedCards((prev) => {
+      if (prev.includes(cardName)) return prev.filter((v) => v !== cardName);
+      if (prev.length >= spreadCount) return prev;
+      return [...prev, cardName];
+    });
+  }
 
   async function onDraw() {
-    if (loading) return;
+    if (loading || !selectionComplete) return;
     setError(null);
     setLoading(true);
     setShuffling(true);
@@ -164,7 +177,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
       const response = await fetch("/api/tarot/read", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, spreadCount }),
+        body: JSON.stringify({ question, spreadCount, selectedCards }),
       });
       const payload = (await response.json()) as TarotResponse & { message?: string };
       if (!response.ok) throw new Error(payload.message || "tarot unavailable");
@@ -220,8 +233,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
         </div>
       </div>
       <p className="mt-3 text-sm text-[#dbe1ff]/82">
-        ตั้งคำถามในใจ แล้วกด <span className="text-[var(--gold)]">"สับและเปิดไพ่"</span>{" "}
-        หรือคลิกที่ไพ่ด้านหลังเพื่อเปิด เลือกได้ 3 / 5 / 10 ใบตามความลึกที่ต้องการ
+        เริ่มจากเลือกไพ่จากสำรับเต็ม 72 ใบก่อน จากนั้นกดทำนายตามสเปรดที่เลือก (3 / 5 / 10 ใบ)
       </p>
       {result?.guestMode ? (
         <p className="mt-2 text-xs text-[#dbe1ff]/65">
@@ -236,8 +248,12 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
             key={n}
             type="button"
             disabled={loading}
-            onClick={() => setSpreadCount(n)}
-            className={`rounded-full px-3 py-1 text-xs transition ${
+            onClick={() => {
+              setSpreadCount(n);
+              setSelectedCards([]);
+              setResult(null);
+            }}
+            className={`${BTN_BASE} rounded-full px-3 py-1 text-xs ${
               spreadCount === n
                 ? "border border-[rgba(247,231,206,0.5)] bg-[rgba(247,231,206,0.08)] text-[var(--gold)]"
                 : "border border-white/15 bg-white/[0.03] text-[#dbe1ff]/82"
@@ -247,6 +263,52 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
           </button>
         ))}
       </div>
+
+      <div className="mt-5 rounded-2xl border border-white/12 bg-[rgba(5,10,24,0.55)] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--gold)]/75">Full Deck · 72 Cards</p>
+          <p className="text-xs text-[#dbe1ff]/72">
+            เลือกแล้ว {selectedCards.length}/{spreadCount} ใบ
+          </p>
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+          {TAROT_DRAW_DECK.map((card) => {
+            const selected = selectedCards.includes(card.name);
+            return (
+              <button
+                key={card.name}
+                type="button"
+                onClick={() => toggleSelectCard(card.name)}
+                disabled={loading || (!selected && selectedCards.length >= spreadCount)}
+                className={`${BTN_BASE} relative overflow-hidden rounded-xl border ${
+                  selected
+                    ? "border-[var(--gold)] bg-[rgba(247,231,206,0.12)] -translate-y-2 shadow-[0_10px_24px_rgba(247,231,206,0.22)]"
+                    : "border-white/10 bg-white/[0.02]"
+                }`}
+                title={card.name}
+              >
+                <div className="aspect-[2/3] p-1.5">
+                  <CardBack />
+                </div>
+                <div className="px-1 pb-1 text-[10px] text-[#dbe1ff]/75">{selected ? "เลือกแล้ว" : "แตะเพื่อเลือก"}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {!result ? (
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={onDraw}
+            disabled={!selectionComplete || loading}
+            className={`${BTN_BASE} inline-flex min-w-[240px] items-center justify-center rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-8 py-3 text-base font-semibold text-[#241d16] shadow-[0_0_34px_rgba(247,231,206,0.32)] disabled:opacity-50`}
+          >
+            {loading ? "กำลังทำนาย..." : `ทำนายจากไพ่ที่เลือก (${spreadCount} ใบ)`}
+          </button>
+        </div>
+      ) : null}
 
       <div className="relative mt-7 flex justify-center [perspective:1400px]">
         <div
@@ -291,12 +353,11 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                 </div>
                 <button
                   type="button"
-                  onClick={onDraw}
-                  disabled={!interactive}
+                  disabled
                   aria-label={`เปิดไพ่ ${slotLabels[i]}`}
-                  className={`group relative aspect-[2/3.4] w-full max-w-[200px] cursor-pointer rounded-[20px] outline-none transition will-change-transform [transform-style:preserve-3d] ${
+                  className={`group relative aspect-[2/3.4] w-full max-w-[200px] cursor-default rounded-[20px] outline-none transition will-change-transform [transform-style:preserve-3d] ${
                     isFlipped ? "[transform:rotateY(180deg)]" : ""
-                  } ${interactive ? "hover:-translate-y-1.5 focus-visible:-translate-y-1.5" : "cursor-default"}`}
+                  }`}
                   style={{ transitionProperty: "transform", transitionDuration: "650ms" }}
                 >
                   <div
@@ -393,7 +454,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                     type="button"
                     onClick={() => startCheckout("vip-daily")}
                     disabled={unlocking}
-                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
+                    className={`${BTN_BASE} rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-[#dbe1ff] hover:bg-white/[0.08] disabled:opacity-60`}
                   >
                     {unlocking ? "กำลังพาไปจ่าย..." : `ทั้งระบบ 1 วัน ฿${PRICING_THB["vip-daily"]}`}
                   </button>
@@ -401,7 +462,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                     type="button"
                     onClick={() => startCheckout("vip-weekly")}
                     disabled={unlocking}
-                    className="rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-[#dbe1ff] transition hover:bg-white/[0.08] disabled:opacity-60"
+                    className={`${BTN_BASE} rounded-full border border-white/25 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-[#dbe1ff] hover:bg-white/[0.08] disabled:opacity-60`}
                   >
                     {unlocking ? "กำลังพาไปจ่าย..." : `ทั้งระบบ 7 วัน ฿${PRICING_THB["vip-weekly"]}`}
                   </button>
@@ -409,7 +470,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
                     type="button"
                     onClick={() => startCheckout("premium-monthly")}
                     disabled={unlocking}
-                    className="rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-4 py-2 text-sm font-semibold text-[#241d16] transition hover:brightness-105 disabled:opacity-60"
+                    className={`${BTN_BASE} rounded-full bg-[linear-gradient(125deg,#f7e7ce_0%,#ead2a6_48%,#d9bb85_100%)] px-4 py-2 text-sm font-semibold text-[#241d16] hover:brightness-105 disabled:opacity-60`}
                   >
                     {unlocking ? "กำลังพาไปจ่าย..." : `พรีเมียมรายเดือน ฿${PRICING_THB["premium-monthly"]}`}
                   </button>
@@ -417,6 +478,22 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
               </div>
             )}
           </div>
+        </div>
+      ) : null}
+
+      {result ? (
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              setResult(null);
+              setSelectedCards([]);
+              setSlots(Array.from({ length: spreadCount }, (_, i) => ({ key: `reset-${i}`, name: null, flipped: false })));
+            }}
+            className={`${BTN_BASE} rounded-full border border-white/20 px-6 py-2 text-sm font-semibold text-[#e8eeff] hover:bg-white/[0.06]`}
+          >
+            เริ่มจัดไพ่ใหม่
+          </button>
         </div>
       ) : null}
     </div>
