@@ -59,12 +59,16 @@ function computeResponsiveDeckLayout(
   })();
 
   const cardH = Math.round(cardW * 1.45);
-  const minFanOverlap = w < 520 ? 9 : w < 840 ? 11 : 13;
-  const maxStep = Math.max(cardW - minFanOverlap, Math.round(cardW * 0.5));
+  const minFanOverlap = w < 520 ? 8 : w < 840 ? 10 : 12;
+  const maxStep = Math.max(cardW - minFanOverlap, Math.round(cardW * 0.48));
 
-  const minStep = prefersTouchSpacing
-    ? Math.max(28, Math.min(44, Math.round(w * 0.058 + 20)))
-    : Math.max(13, Math.min(22, Math.round(cardW * 0.178)));
+  const minStepBase = prefersTouchSpacing
+    ? Math.max(30, Math.min(46, Math.round(w * 0.062 + 22)))
+    : Math.max(22, Math.min(36, Math.round(cardW * 0.32)));
+  const minStep = Math.max(
+    minStepBase,
+    Math.round(cardW * (prefersTouchSpacing ? 0.36 : 0.28)),
+  );
 
   const maxRows = w < 400 ? 4 : 3;
 
@@ -73,7 +77,7 @@ function computeResponsiveDeckLayout(
 
   const gapPenalty = prefersTouchSpacing
     ? Math.max(10, Math.min(28, Math.round(usable * 0.028)))
-    : Math.max(22, Math.min(96, Math.round(usable * 0.042)));
+    : Math.max(18, Math.min(88, Math.round(usable * 0.038)));
 
   for (let rows = 1; rows <= maxRows; rows++) {
     const perRow = Math.ceil(deckCount / rows);
@@ -91,6 +95,11 @@ function computeResponsiveDeckLayout(
     if (w >= 1020 && rows >= 3) score += prefersTouchSpacing ? 0 : 28;
     if (prefersTouchSpacing && w < 560 && rows === 2 && scroll > usable * 0.95) score += 18;
 
+    const comfort = prefersTouchSpacing ? 0.26 : 0.3;
+    if (perRow >= 18 && step < cardW * comfort) {
+      score += (cardW * comfort - step) * (prefersTouchSpacing ? 2.4 : 3.2);
+    }
+
     score += rowBalance;
 
     if (score < bestScore) {
@@ -105,7 +114,8 @@ function computeResponsiveDeckLayout(
     Math.max(minStep, usable / Math.max(perRowChosen - 1, 1)),
   );
   let overlap = Math.round(cardW - stepChosen);
-  overlap = Math.min(Math.max(overlap, minFanOverlap), Math.round(cardW * 0.88));
+  const maxOverlapForReadability = Math.round(cardW * (prefersTouchSpacing ? 0.76 : 0.68));
+  overlap = Math.min(Math.max(overlap, minFanOverlap), maxOverlapForReadability);
 
   let fanMax: number;
   if (bestRows >= 3) fanMax = Math.min(10, Math.round(5 + perRowChosen / 24));
@@ -215,12 +225,16 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     if (!el) return;
     const mqCoarse =
       typeof window !== "undefined" ? window.matchMedia("(pointer: coarse)") : null;
+    const mqAnyCoarse =
+      typeof window !== "undefined" ? window.matchMedia("(any-pointer: coarse)") : null;
     const mqHoverNone =
       typeof window !== "undefined" ? window.matchMedia("(hover: none)") : null;
 
     const applyLayout = () => {
       const width = el.getBoundingClientRect().width || el.clientWidth || 340;
-      const prefersTouchSpacing = Boolean(mqCoarse?.matches || mqHoverNone?.matches);
+      const prefersTouchSpacing = Boolean(
+        mqCoarse?.matches || mqAnyCoarse?.matches || mqHoverNone?.matches,
+      );
       const next = computeResponsiveDeckLayout(
         width,
         TAROT_DRAW_DECK.length,
@@ -242,6 +256,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     });
 
     mqCoarse?.addEventListener("change", applyLayout);
+    mqAnyCoarse?.addEventListener("change", applyLayout);
     mqHoverNone?.addEventListener("change", applyLayout);
 
     ro.observe(el);
@@ -249,6 +264,7 @@ export default function TarotExperience({ initialResult = null }: TarotExperienc
     return () => {
       ro.disconnect();
       mqCoarse?.removeEventListener("change", applyLayout);
+      mqAnyCoarse?.removeEventListener("change", applyLayout);
       mqHoverNone?.removeEventListener("change", applyLayout);
     };
   }, []);
